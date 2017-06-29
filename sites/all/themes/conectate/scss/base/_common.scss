@@ -1,0 +1,47 @@
+body, p{
+  color: #666;
+  font-size: 0.938em;
+}
+
+//Divisor
+
+.divider{
+   display: block;
+   height: 2px;
+   width: 30px;
+   background-color: $primary-color;
+ }
+hr {
+  border: solid #eaeaea;
+  border-width: 1px 0 0;
+  clear: both;
+  margin: 1.3rem 0;
+  height: 0;
+}
+
+ul.pagination li.current a, ul.pagination li.current button {
+  border-radius: 27px;}
+
+//Breadcrumb
+
+.breadcrumbs{
+  background-color: transparent;
+  border-width: 0px;
+  color: white;
+  display: inline-block;
+  margin-top: 12px;
+}
+
+.breadcrumbs > .current a{
+  color: white;
+}
+.breadcrumbs > *::before {
+  content: "/";
+  color: white;
+  margin: 0 .75rem;
+  position: relative;
+  top: 1px;
+}
+.bk-bread{
+  float: right;
+}

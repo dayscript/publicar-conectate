@@ -1,0 +1,228 @@
+//Noticias
+
+.img-rounded{
+  img{
+    border-radius: 80px;
+  }
+}
+.title{
+  font-family: $font-bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  a{
+    color: #222222;
+  }
+  &.big{
+    font-size: 32px;
+    line-height: 32px;
+    margin-top: 16px;
+    &:before{
+      border-top: 2px solid $primary-color;
+      content: ' ';
+      width: 60px;
+      left: 16px;
+      position: absolute;
+      top: 0px;
+    }
+    @media (min-width: 600px){
+      font-size: 42px;
+      line-height: 40px;
+    }
+  }
+}
+//Seccion-noticias
+.resumen{
+  min-height: 145px;
+}
+//Detalle noticia
+.node-article, .node-page{
+  .image{
+    margin-bottom: 20px;
+  }
+  .field-name-title{
+    font-size: 42px;
+    line-height: 40px;
+    margin-top: 16px;
+    font-family: $font-bold;
+    color: #222222;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    &:before{
+      border-top: 2px solid $primary-color;
+      content: ' ';
+      width: 60px;
+      left: 16px;
+      position: absolute;
+      top: 0px;
+    }
+  }
+}
+.links {
+  list-style: none;
+  margin: 10px 0;
+}
+//About
+
+.block-nodeblock-9, .about{
+  background: url(../images/bk-machupichu.jpg) center 0px round;
+  padding: 32px 18px 18px 18px;
+  min-height: 572px;
+  h2{
+    color: white;
+  }
+  .block-title{
+    &:before{
+      border-top: 2px solid white;
+      content: ' ';
+      width: 60px;
+      left: 10px;
+      position: absolute;
+      top: 28px;
+    }
+  }
+  body, p{
+    color: white;
+  }
+}
+.about2{
+  background: url(../images/bk-machupichu.jpg) center 0px no-repeat;
+  padding: 32px 18px 18px 18px;
+  min-height: 400px;
+  h2{
+    color: white;
+  }
+  .block-title{
+    &:before{
+      border-top: 2px solid white;
+      content: ' ';
+      width: 60px;
+      left: 10px;
+      position: absolute;
+      top: 28px;
+    }
+  }
+  body, p{
+    color: white;
+  }
+}
+
+.bk-noticias{
+  margin-top: 32px;
+  .block-title{
+    &:before{
+      border-top: 2px solid $primary-color;
+      content: ' ';
+      width: 60px;
+      left: 0;
+      position: absolute;
+      top:-8px;
+    }
+  }
+}
+//Bloque puntos home
+.bk-puntos {
+  z-index: 100;
+  position: absolute;
+  background: url(../images/bg-puntaje.png) left 0px no-repeat;
+  width:265px;
+  height: 267px;
+  right: 40px;
+  bottom: 162px;
+  .puntos{
+    font-family: $font-title;
+    color: white;
+    font-size: 120px;
+    text-align: center;
+    margin-top: 30%;
+    line-height: 80px;
+  }
+  .title{
+    text-align: center;
+    color: white;
+    font-family: $font-medium;
+    text-transform: uppercase;
+    font-size: 18px;
+  }
+}
+//Bloque puntos interno
+.bk-puntos-2{
+  background: #2885b0;
+  padding: 19px 14px 0px 24px;
+  color: white;
+  margin: 16px 0px;
+  .puntos{
+    font-family: $font-title;
+    color: white;
+    font-size: 62px;
+    text-align: center;
+    line-height: 60px;
+  }
+  .title,{
+    text-align: left;
+    color: white;
+    font-family: $font-family-sans-serif;
+    text-transform: uppercase;
+    font-size: 11px;
+    margin-bottom: -5px;
+    margin-top: 5px;
+  }
+  .destino{
+    font-family: $font-title;
+    color: white;
+    font-size: 30px;
+    text-align: left;
+    letter-spacing: 1px;
+  }
+}
+
+//Tablas rendimiento
+
+  table thead {
+    background: $primary-color;
+    color: white;
+    text-transform: uppercase;
+  }
+
+table thead tr th, table thead tr td {
+  padding: .6rem;
+  font-size: .875rem;
+  font-weight: normal;
+  color: white;
+}
+.group {
+  color: #222222;
+  font-weight: bold;
+}
+.total {
+  background: #7d7d7d;
+  color: white;
+  text-transform: uppercase;
+  &.percent{
+    text-align: right;
+    padding-right: 80px;
+  }
+}
+table tr th, table tr td {
+  padding: 1rem .625rem;
+}
+
+//Quicktabs Rendimiento movil
+
+#quickset-rendimiento_mobile {
+  margin-bottom: 20px;
+}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+  border: 0px solid #d3d3d3;
+  background: $primary-color;
+  font-weight: normal;
+  color: white;
+}
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
+  color: white;
+  text-decoration: none;
+  font-family: $font-medium;
+  text-transform: uppercase;
+  font-weight: normal;
+  font-size: 0.9em;
+}
