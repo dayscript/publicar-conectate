@@ -11,16 +11,29 @@ h1, h2, h3,
 h4, h5, h6 {
   font-family: $font-title;
   letter-spacing: 1px;
-  color:#272727;
+  color: #272727;
 }
-.title-white p{
-  margin-bottom: 20px;
+
+.title-white p {
+  margin-bottom: 0px;
   color: white;
   font-family: $font-title;
   letter-spacing: 1px;
   font-size: 42px;
+  margin-top: -59px;
+  @media (min-width: 600px) {
+    margin-top: 0px;
+    margin-bottom: 20px;
+  }
 
 }
+
+button.secondary, .button.secondary {
+  background-color: $primary-color;
+  border-color: $primary-color;
+  color: #fff;
+}
+
 
 // Anchors
 //-----------------------------------------------------------------------------

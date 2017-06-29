@@ -150,7 +150,7 @@
   background: #2885b0;
   padding: 19px 14px 0px 24px;
   color: white;
-  margin: 16px 0px;
+  margin: -45px 0px 21px 0px;
   .puntos{
     font-family: $font-title;
     color: white;
@@ -173,6 +173,9 @@
     font-size: 30px;
     text-align: left;
     letter-spacing: 1px;
+  }
+  @media (min-width: 600px){
+    margin: 16px 0px;
   }
 }
 
@@ -225,4 +228,103 @@ table tr th, table tr td {
   text-transform: uppercase;
   font-weight: normal;
   font-size: 0.9em;
+}
+
+//login
+#user-login-form{
+  .item-list ul {
+    margin: 0 0 0.75em 0;
+    padding: 0;
+    list-style: none;
+    li{
+      margin: 0;
+      padding: 0;
+      a{
+        font-size: 0.9em;
+      }
+    }
+  }
+}
+
+//Tabs home
+
+.tabshome{
+
+  .quicktabs_main.quicktabs-style-sky {
+    border: 1px solid #eee;
+    clear: both;
+    padding: 10px;
+    position: relative;
+    top: -0.1em;
+    background: #fff;
+  }
+
+  ul.quicktabs-tabs.quicktabs-style-sky {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  ul.quicktabs-tabs.quicktabs-style-sky li {
+    float: left;
+    font-weight: normal;
+    list-style: none;
+    margin: 0.3em 0 0 0;
+    height: 2.65em;
+    min-height: 2.95em;
+    padding: 0;
+  }
+
+  ul.quicktabs-tabs.quicktabs-style-sky li.active {
+    margin: 5px 0px;
+  }
+
+  ul.quicktabs-tabs.quicktabs-style-sky li a,
+  ul.quicktabs-tabs.quicktabs-style-sky li a:visited {
+    float: left;
+    display: block;
+    height: 2.65em;
+    min-height: 2.95em;
+    line-height: 2.95em;
+    padding: 0 1.3em;
+    text-decoration: none;
+    font-size: .84em;
+    background: #d1d1d1;
+    color: white;
+    position: relative;
+    text-transform: uppercase;
+  }
+
+  ul.quicktabs-tabs.quicktabs-style-sky li a:hover,
+  ul.quicktabs-tabs.quicktabs-style-sky li.active a:hover {
+    text-decoration: none;
+    background: #ff008a;
+    color: #fff;
+  }
+
+  ul.quicktabs-tabs.quicktabs-style-sky li.active a,
+  ul.quicktabs-tabs.quicktabs-style-sky li.active a:visited {
+    height: 2.65em;
+    min-height: 2.95em;
+    line-height: 2.95em;
+    font-weight: normal;
+    background: #ff008a;
+    color: #fff;
+    font-size: .84em;
+    font-weight: normal;
+  }
+
+  ul.quicktabs-tabs.quicktabs-style-sky li:first-child a {
+    border-left: solid 1px #eee;
+  }
+
+  ul.quicktabs-tabs.quicktabs-style-sky li.active a {
+    border-left: solid 0px #777;
+  }
+
+  ul.quicktabs-tabs.quicktabs-style-sky li a:focus,
+  ul.quicktabs-tabs.quicktabs-style-sky li a:active {
+    outline: none;
+
+  }
 }

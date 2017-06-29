@@ -29,8 +29,8 @@ foreach ( $view->result as $key => $item) {
     }
 
     $total = $total+$item->field_field_percentage[0]['raw']['value'];
-}
 
+}
 ?>
 
 <table class="rendimiento" width="100%">
