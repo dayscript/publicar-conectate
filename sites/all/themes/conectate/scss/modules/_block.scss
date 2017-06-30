@@ -150,7 +150,7 @@
   background: #2885b0;
   padding: 19px 14px 0px 24px;
   color: white;
-  margin: -45px 0px 21px 0px;
+  margin: 10px 0px 21px 0px;
   .puntos{
     font-family: $font-title;
     color: white;
@@ -176,6 +176,11 @@
   }
   @media (min-width: 600px){
     margin: 16px 0px;
+  }
+}
+.front{
+  .bk-puntos-2{
+    margin: -45px 0px 21px 0px;
   }
 }
 
