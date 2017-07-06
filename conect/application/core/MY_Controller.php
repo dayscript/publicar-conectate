@@ -26,6 +26,7 @@ class MY_Controller extends CI_Controller
         parent::__construct();
         $this->cargarVariablesGlobales();
         $this->load->model('crud/Crud_rol');
+        $this->load->library('agileRes/Curlwrap');
         $this->load->library('basic_RestClient/My_restclient','My_restclient');
     }
     public function cargarVariablesGlobales()
@@ -255,6 +256,184 @@ class MY_Controller extends CI_Controller
             'claveServicesDrupal'=>$this->claveServicesDrupal
         );
         return $this->my_restclient->crearUsuarioDrupal($datosConect,$metodo,$datos);
+    }
+    public function crearUsuario($contact_json = null,$metodoCarga = "POST"){
+        
+        $contact_json_input = json_encode($contact_json);
+        $contact4 = $this->curlwrap->curl_wrap("contacts", $contact_json_input, $metodoCarga, "application/json",$this->AGILE_DOMAIN,$this->AGILE_USER_EMAIL,$this->AGILE_REST_API_KEY);
+        
+        //echo $contact4;
+        switch ($contact4) {
+            case 'Sorry, duplicate contact found with the same email address.':
+                $envio = array('mensaje' => $contact4, 'estado'=> false);
+            break;
+            case '{"status":"401","exception message":"authentication issue"}':
+                echo $contact4;
+                $envio = array('mensaje' => $contact4, 'estado'=> false);
+            break;
+            default:
+                $envio = array('mensaje' => $contact4, 'estado'=> true);
+            break;
+        }
+        return $envio;
+    }
+    public function buscarUsuarioAgile($variable=null,$campo = null)
+    {
+        switch ($campo) {
+            case 'id':
+                $cadena = "contacts/".$variable;
+            break;    
+            default:
+                $cadena = "contacts/search/".$campo."/".$variable;
+            break;
+        }
+        if (!is_null($variable)) {
+            $contact1 = $this->curlwrap->curl_wrap($cadena, null, "GET", NULL,$this->AGILE_DOMAIN,$this->AGILE_USER_EMAIL,$this->AGILE_REST_API_KEY);
+            return $contact1;
+        }else
+        {
+            return 'error';
+        }
+    }
+    public function crearUsuarioAgile($datos,$cargamodulo = 'Archivo Carga',$idAgile = NULL,$etiquetaAdicional =  NULL){
+        if (!isset($datos->urlCorreoReferidos)) {
+            $referido = '';
+        }
+        else
+        {
+            $referido = $datos->urlCorreoReferidos;
+        }
+        if (is_null($etiquetaAdicional)) {
+            $insertar = array($cargamodulo,"Carga Inicial",$this->Crud_parametria->obtenerParametria('ambiente'));
+        }
+        else
+        {
+            $insertar = array($cargamodulo,$etiquetaAdicional,$this->Crud_parametria->obtenerParametria('ambiente'),$etiquetaAdicional);
+        }
+        $contact_json = array(
+            "lead_score" => "0",
+            "star_value" => "0",
+            "tags" => $insertar,
+            "properties" => array(
+                array(
+                    "name" => "first_name",
+                    "value" => $datos->usuario_nombre,
+                    "type" => "SYSTEM"
+                ),
+                array(
+                    "name" => "last_name",
+                    "value" => $datos->usuario_apellido,
+                    "type" => "SYSTEM"
+                ),
+                array(
+                    "name" => "email",
+                    "value" => $datos->usuario_correo,
+                    "subtype" => 'home',
+                    "type" => "SYSTEM"
+                )/*,
+                array(
+                    "name" => "email",
+                    "value" => $datos->usuario_codigounico,
+                    "subtype" => 'home',
+                    "type" => "SYSTEM"
+                )*/,
+                array(
+                    "name" => "company",
+                    "value" => 'PUBLICAR',
+                    "type" => "SYSTEM"
+                ),
+                array(
+                    "name" => "title",
+                    "value" => '',
+                    "type" => "SYSTEM"
+                ),
+                array(
+                    "name" => "address",
+                    "value" => json_encode(array(
+                        "address" => '',//$this->crearDirrecion($datos),
+                        "city" => $datos->ciudad_nombre,
+                        "country" => $datos->pais_nombre,
+                    )
+                ),
+                    "type" => "SYSTEM"
+                ),
+                array(
+                    "name" => "phone",
+                    "value" => $datos->usuario_celular,
+                    "type" => "SYSTEM"
+                ),
+                array(
+                    "name" => "habeasData",
+                    "value" => 'on',
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    "name" => "Actualizado",
+                    "value" => ($datos->usuario_actualizado) ? 'on' : 'off',
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    "name" => "Codigo_Unico",
+                    "value" => $datos->usuario_codigounico,
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    "name" => "EstadoUsuario",
+                    "value" => $datos->estado_nombre,
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    'name' => "Fecha de inicio",
+                    "value" => date_format(date_create($datos->usuario_ingreso), $this->formatoFechaAgile),
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    'name' => "Genero",
+                    "value" => $datos->genero_nombre,
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    'name' => "URLSISTEMA",
+                    "value" => $this->Crud_parametria->obtenerParametria('urlambiente'),
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    'name' => "Documento",
+                    "value" => $datos->usuario_documento,
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    'name' => "FechaNacimiento",
+                    "value" => date_format(date_create($datos->usuario_fechanacimiento), $this->formatoFechaAgile),
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    'name' => "Empresa legal",
+                    "value" => $datos->empresalegal_nombre,
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    'name' => "Posicion",
+                    "value" => $datos->posicion_nombre,
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    'name' => "Regional",
+                    "value" => $datos->regional_nombre,
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    'name' => "Tipo Vendedor",
+                    "value" => $datos->tipocontrato_nombre,
+                    "type" => "CUSTOM"
+                )
+            )
+        );
+        if (!is_null($idAgile)) {
+            $merge = array('id' => $idAgile);
+            $contact_json = array_merge($merge,$contact_json);
+        }
+        return $contact_json;
     }
 }
 ?>

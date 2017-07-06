@@ -15,6 +15,10 @@ class Job extends MY_Controller {
     {
         $this->cargaUsuarios();
     }
+    public function buscarUsu()
+    {
+        var_dump($this->buscarUsuarioAgile('idelvalle1@grupo-link.com','email'));
+    }
     public function cargaUsuarios()
     {
         $where = array('r.rol_id' => 7 ,'p.agile_estado_id' => 1);
@@ -25,14 +29,40 @@ class Job extends MY_Controller {
                 //var_dump($key->usuario_nombre);
                 $insertar = array(
                     'name' => $key->usuario_documento,
-                    'field_apellido' => array('und' => array('0' => array('value' => 'tempo'))),
-                    'field_nombre' => array('und' => array('0' => array('value' => 'tempo'))),
-                    'mail' => 'sasas@sassssasas.com',
+                    'field_apellido' => array('und' => array('0' => array('value' => $key->usuario_apellido))),
+                    'field_nombre' => array('und' => array('0' => array('value' => $key->usuario_nombre))),
+                    'mail' => $key->usuario_correo,
                     'pass' => $key->usuario_documento
                 );
                 $conteo = 2;
                 $result =  $this->restDrupal(json_encode($insertar),'post');
-                var_dump($result);
+                //var_dump($result->form_errors);
+                if (!isset($result->uid)) {
+                    $editar = array('drupal_estado_id' => 3,'drupal_id' => null);
+                    $busqueda = array('usuario_id' => $key->usuario_id);
+                    $this->Crud_usuario->editar($editar,$busqueda);
+                }else
+                {
+                    $editar = array('drupal_id' => $result->uid,'drupal_estado_id' => 2);
+                    $busqueda = array('usuario_id' => $key->usuario_id);
+                    $this->Crud_usuario->editar($editar,$busqueda);
+                }
+                $tempo = $this->crearUsuario($this->crearUsuarioAgile($key,'Archivo Plano',null,"Carga Manual"));
+                if(!$tempo['estado'])
+                {   
+                    $editar = array('agile_estado_id' => 4);
+                    $busqueda = array('usuario_id' => $key->usuario_id);
+                    $this->Crud_usuario->editar($editar,$busqueda);
+                }else
+                {   
+                    $editar = array(
+                        'agile_estado_id' => 3,
+                        'agile_id' => json_decode($tempo['mensaje'], true)["id"],
+                        'agile_fecha'=>date($this->formatoFecha)
+                    );
+                    $busqueda = array('usuario_id' => $key->usuario_id);
+                    $this->Crud_usuario->editar($editar,$busqueda);
+                }
             }
         }
     }

@@ -25,6 +25,11 @@ class Crud_usuario extends CI_Model {
         $joins[3]  = array('tabla' => 'basica_departamento de ','tipo_join' =>'left', 'conect'=>'de.departamento_id =  c.departamento_id');
         $joins[4]  = array('tabla' => 'basica_pais pa ','tipo_join' =>'left', 'conect'=>'pa.pais_id = de.pais_id');
         $joins[5]  = array('tabla' => 'basica_rol r ','tipo_join' =>'left', 'conect'=>'r.rol_id = p.rol_id');
+        $joins[6]  = array('tabla' => 'basica_empresalegal be ','tipo_join' =>'left', 'conect'=>'be.empresalegal_id =  p.empresalegal_id');
+        $joins[7]  = array('tabla' => 'basica_posicion bp  ','tipo_join' =>'left', 'conect'=>'bp.posicion_id =  p.posicion_id');
+        $joins[8]  = array('tabla' => 'basica_regional br ','tipo_join' =>'left', 'conect'=>'br.regional_id =  c.regional_id');
+        $joins[9]  = array('tabla' => 'basica_tipocontrato bt ','tipo_join' =>'left', 'conect'=>'bt.tipocontrato_id =  p.tipocontrato_id');
+
         if (is_null($whereArray)) {
             $where = array('estado_id' => 1);
         }
