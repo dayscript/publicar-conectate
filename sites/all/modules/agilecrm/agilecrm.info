@@ -1,0 +1,9 @@
+name = AgileCRM
+core = 7.x
+description = Agile CRM is an all-in-one, affordable and next-gen Customer Relationship Management (CRM) software with marketing, sales and service automation, built with love for small businesses.
+core = 7.x
+
+; Information added by Drupal.org packaging script on 2016-11-28
+version = "7.x-1.x-dev"
+core = "7.x"
+datestamp = "1480368784"

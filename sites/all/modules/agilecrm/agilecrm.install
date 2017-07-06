@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for Pathauto.
+ *
+ * @ingroup pathauto
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function agilecrm_schema() {
+  $schema['agilecrm_module'] = array(
+    'description' => t('Agile CRM Settings'),
+    'fields' => array(
+      'agilecrm_module_id' => array(
+        'description' => t('Agile CRM ID'),
+        'type' => 'serial',
+        'size' => 'big',
+        'unsigned' => true,
+        'not null' => true,
+      ),
+      'setting_domain' => array(
+        'description' => t('Domain Name'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+      ),
+      'setting_email' => array(
+        'description' => t('Email ID'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+      ),
+      'setting_password' => array(
+        'description' => t('Password'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+      ),
+      'setting_restapikey' => array(
+        'description' => t('Rest API Key'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+      ),
+      'setting_jsapikey' => array(
+        'description' => t('JS API Key'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+      ),
+      'setting_webstats' => array(
+        'description' => t('Web Stats'),
+        'type' => 'int',
+        'size' => 'big',
+        'unsigned' => true,
+        'not null' => true,
+      ),
+      'setting_webrules' => array(
+        'description' => t('Web Rules'),
+        'type' => 'int',
+        'size' => 'big',
+        'unsigned' => true,
+        'not null' => true,
+      ),
+    ),
+    'primary key' => array('agilecrm_module_id'),
+  );
+  return $schema;     
+}
+
+
+
+/**
+ * Implements hook_uninstall().
+ */
+function agilecrm_uninstall() {
+  // Delete all the pathauto variables and then clear the variable cache.
+  db_query("DELETE FROM {variable} WHERE name LIKE 'pathauto_%'");
+
+}
+
