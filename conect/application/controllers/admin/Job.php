@@ -14,6 +14,21 @@ class Job extends MY_Controller {
     public function index()
     {
         $this->cargaUsuarios();
+
+    }
+    public function prubaconectaincentive()
+    {
+        $docuemnto=  '2';
+        $envioDatos = array('value' => 85,'real' => 80,'goal' => 100,'date' => '2017-07-07');
+        /*
+        $datosConsulta = array(
+            'datos' => $this->consultaRest('/api/entities/'.$docuemnto,'GET')
+        );
+        */
+        //$datodCarga =  $this->consultaRest('/api/entities/'.$docuemnto.'/addvalue','POST',$envioDatos);
+        $datodCarga =  $this->consultaRest('/api/entities/'.$docuemnto.'/addgoalvalue','POST',$envioDatos);
+        var_dump(json_encode($datodCarga));
+
     }
     public function buscarUsu()
     {
@@ -63,6 +78,7 @@ class Job extends MY_Controller {
                     $busqueda = array('usuario_id' => $key->usuario_id);
                     $this->Crud_usuario->editar($editar,$busqueda);
                 }
+                $this->crearUsuarioincentive();
             }
         }
     }

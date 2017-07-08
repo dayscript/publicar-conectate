@@ -100,6 +100,10 @@ class MY_Controller extends CI_Controller
         $DatoRol = $this->Crud_rol->GetDatos($rol_id);
         redirect($DatoRol->rol_index);
     }
+    public function consultaRest($urlConsulta = '/api/test',$metodo = 'GET',$datos = null)
+    {
+        return json_decode($this->curlwrap->curl_wrapIncentive($this->incentive.$urlConsulta,$datos,$metodo),true);
+    }
     public function ordenarMenu($rol)
     {
         $where = array('l.estado_id' => 1,'pr.rol_id '=>$rol);
