@@ -135,7 +135,6 @@ class Cargatablas extends MY_Controller {
             endfor;
             if ($mensaje == '') 
             {
-                
                 $selectArray = "p.tabla_nombre ='".strtolower($tabla)."' and c.columna_tipo = 'fijo' or c.columna_tipo = 'random' ";
                 $valorCampoFijos = $this->Crud_tabla->GetDatos($selectArray,null,null,'*');
                 foreach ($valorCampoFijos as $key) {
@@ -150,15 +149,23 @@ class Cargatablas extends MY_Controller {
                     $in= $in+1;
                 }
                 for ($m = 2; $m <= $highestRow; $m++): // RECORRE EL NUMERO DE FILAS QUE TIENE EL ARCHIVO EXCEL
+                    //var_dump($columnaTitulo);
+                    //echo "<br>";
                     $columnaTitulo = $this->limpiarArray($columnaTitulo);
+                    //var_dump($columnaTitulo);
+                    //echo "<br>";
                     for ($i = 0; $i < $columnIndex; $i++): 
                         $columnString = PHPExcel_Cell::stringFromColumnIndex($i);
                         $columnaTitulo[$i]['valor'] = $sheet->getCell($columnString.$m)->getFormattedValue().'';
                     endfor;  
                     //var_dump(json_encode($columnaTitulo));  
                     $lista = $this->crearArray($columnaTitulo,strtolower($tabla));
+                    //var_dump(json_encode($lista));
+                    //echo "<br>";
                     //$this->Crud_ventas->Insertar($lista);
+                    //var_dump($this->Crud_model->agregarRegistro('produccion_'.strtolower($tabla),$lista));
                     $this->Crud_model->agregarRegistro('produccion_'.strtolower($tabla),$lista);
+                    //echo "<br>";
                 endfor;
                 $mensaje =-1;
                 $this->controlador($tabla,$mensaje);
