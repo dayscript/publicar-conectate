@@ -121,7 +121,7 @@ class Job extends MY_Controller {
     }
     public function cargarHtml($arrayDatos,$suma)
     {
-
+        setlocale(LC_MONETARY, 'en_US.UTF-8');
         $bandera = true;
         $html = '<table class="rendimiento" id="rendimiento" width="100%">
     <thead>
@@ -134,12 +134,12 @@ class Job extends MY_Controller {
                 if ($bandera) {
                     $html = $html.'
                 <tr>
-                    <td colspan="4" class="group">'.$key['menu'].'</td>
+                    <td colspan="4" class="group">'.$key['menuid'].'. '.$key['menu'].'</td>
                 </tr>
                 <tr>
                     <td>'.$key['indicarod'].'</td>
-                    <td align="">'.$key['meta'].'</td>
-                    <td align="">'.$key['cumplimiento'].'</td>
+                    <td align="">'.money_format('%(#10n',(int) $key['meta']).'</td>
+                    <td align="">'.money_format('%(#10n',(int) $key['cumplimiento']).'</td>
                     <td align="">'.$key['puntos'].'</td>
                 </tr>';
                     $bandera= false;
@@ -149,8 +149,8 @@ class Job extends MY_Controller {
                     $html = $html.'
                 <tr>
                     <td>'.$key['indicarod'].'</td>
-                    <td align="">'.$key['meta'].'</td>
-                    <td align="">'.$key['cumplimiento'].'</td>
+                    <td align="">'.money_format('%(#10n',(int) $key['meta']).'</td>
+                    <td align="">'.money_format('%(#10n',(int) $key['cumplimiento']).'</td>
                     <td align="">'.$key['puntos'].'</td>
                 </tr>';
                 }
@@ -158,12 +158,12 @@ class Job extends MY_Controller {
                 default:
                     $html = $html.'
                 <tr>
-                    <td colspan="4" class="group">'.$key['menu'].'</td>
+                    <td colspan="4" class="group">'.$key['menuid'].'. '.$key['menu'].'</td>
                 </tr>
                 <tr>
                     <td>'.$key['indicarod'].'</td>
-                    <td align="">'.$key['meta'].'</td>
-                    <td align="">'.$key['cumplimiento'].'</td>
+                    <td align="">'.money_format('%(#10n',(int) $key['meta']).'</td>
+                    <td align="">'.money_format('%(#10n',(int) $key['cumplimiento']).'</td>
                     <td align="">'.$key['puntos'].'</td>
                 </tr>';
                 break;
