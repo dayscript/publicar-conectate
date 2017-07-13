@@ -21,17 +21,37 @@ class Job extends MY_Controller {
     {
         var_dump($this->buscarUsuarioAgile('idelvalle1@grupo-link.com','email'));
     }
-    public function puntosPorUsuario($documento,$fecha = null)
+    public function puntosPorUsuario()
     {
+        if ($this->input->is_ajax_request()) {
+            $docuemnto = $this->input->post("documento", TRUE);
+            $dia = $this->input->post("dia", TRUE);
+            $mes = $this->input->post("mes", TRUE);
+            $ano = $this->input->post("ano", TRUE);
+            $mes = (strlen($mes) == 1) ? '0'.$mes : $mes;
+            $dia = (strlen($dia) == 1) ? '0'.$dia : $dia;
+            $mes =  01;
+            $fecha = $ano.'-'.$mes.'-'.$dia;
+            $datodCarga =  $this->consultaRest('/api/entities/'.$docuemnto);
+            $suma =  0;
+            foreach ($datodCarga['entity']["goalvalues"] as $key) 
+            {
+                if (date("m", strtotime($key["date"])) == date("m", strtotime($fecha))) {
+                    $suma = $suma+ $key["percentage_weighed"];
+                }
+            }
+            $return = array('estado' => true,'carga'=>$suma);
+            echo json_encode($return, JSON_FORCE_OBJECT);
+        }
+        /*
         $docuemnto = $documento;
         if (is_null($fecha)) {
             $fecha = date('m');
             $fecha = 1;
         }
         /*
-        if ($this->input->is_ajax_request()) {
+        
             if ($this->input->post('fecha') == 1) {
-        */
                 $datos = array();
                 $datodCarga =  $this->consultaRest('/api/entities/'.$docuemnto);
                 //var_dump($datodCarga["goalvalues"]);
@@ -41,7 +61,6 @@ class Job extends MY_Controller {
                     }
                 }
                 //echo json_encode($datodCarga);
-        /*
             }
         }
         */
