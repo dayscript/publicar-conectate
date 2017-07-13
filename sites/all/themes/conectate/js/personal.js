@@ -26,5 +26,18 @@
                 }
             }       
         });
+        $.ajax({
+            url: "http://"+URLactual+ "/conect/index.php/admin/job/metasPorUsuario",
+            type: 'post',
+            data: data,
+            success: function(info){
+                modResponse = $.parseJSON(info);
+                if (modResponse.estado=== false) {
+                    document.getElementById("rendimiento").outerHTML = '<div id="rendimiento">'+modResponse.carga+'</div>';
+                }else{
+                    document.getElementById("rendimiento").outerHTML = '<div id="rendimiento">'+modResponse.carga+'</div>';
+                }
+            }       
+        });
 	}); 
 })(jQuery);

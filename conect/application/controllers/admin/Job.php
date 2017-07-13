@@ -43,27 +43,135 @@ class Job extends MY_Controller {
             $return = array('estado' => true,'carga'=>$suma);
             echo json_encode($return, JSON_FORCE_OBJECT);
         }
-        /*
-        $docuemnto = $documento;
-        if (is_null($fecha)) {
-            $fecha = date('m');
-            $fecha = 1;
-        }
-        /*
-        
-            if ($this->input->post('fecha') == 1) {
-                $datos = array();
-                $datodCarga =  $this->consultaRest('/api/entities/'.$docuemnto);
-                //var_dump($datodCarga["goalvalues"]);
-                foreach ($datodCarga['entity']["goalvalues"] as $key) {
-                    if (date("m", strtotime($key["date"])) == $fecha) {
-                        var_dump($key);
-                    }
+    }
+    public function metasPorUsuario()
+    {
+        if ($this->input->is_ajax_request()) {
+            $docuemnto = $this->input->post("documento", TRUE);
+            $where = array('p.usuario_documento' => $docuemnto);
+            $datosUsuario = $this->Crud_usuario->GetDatos($where);
+            $dia = $this->input->post("dia", TRUE);
+            $mes = $this->input->post("mes", TRUE);
+            $ano = $this->input->post("ano", TRUE);
+            $mes = (strlen($mes) == 1) ? '0'.$mes : $mes;
+            $dia = (strlen($dia) == 1) ? '0'.$dia : $dia;
+            $mes =  01;
+            $fecha = $ano.'-'.$mes.'-'.$dia;
+            $datodCarga =  $this->consultaRest('/api/entities/'.$docuemnto);
+            $enviodatos = array();
+            $contador = 0;
+            $suma =  0;
+            foreach ($datodCarga['entity']["goalvalues"] as $key) 
+            {
+                if (date("m", strtotime($key["date"])) == date("m", strtotime($fecha))) {
+                    $datoIcentive = $this->buscarTipoDeCarga($key["goal_id"],$datosUsuario[0]->cargo_id);
+                    $arrayName = array(
+                        'menu' => $datoIcentive[0]->cargomenu_nombre, 
+                        'menuid' => $datoIcentive[0]->cargomenu_id, 
+                        'indicarod' => $datoIcentive[0]->cargosubmenu_nombre, 
+                        'meta' => $key["value"], 
+                        'cumplimiento' => $key["real"], 
+                        'puntos' => $key["percentage_weighed"]
+                    );
+                    $enviodatos[$contador] = $arrayName;
+                    $contador = $contador + 1;
+                    $suma = $suma+$key["percentage_weighed"];
+                    
                 }
-                //echo json_encode($datodCarga);
+            }
+            $htmlText = $this->cargarHtml($enviodatos,$suma);
+            $return = array('estado' => true,'carga'=>$htmlText);
+            echo json_encode($return, JSON_FORCE_OBJECT);
+        }
+    }
+    public function buscarTipoDeCarga($goal_id,$cargo_id)
+    {
+        $datoAjustedo = (($goal_id/5)-intval(($goal_id/5)))*100;
+        switch (strval($datoAjustedo)) 
+        {
+            case 20:
+                /*
+                $where = array('c.cargo_id' => $cargo_id);
+                $datosIncentive = $this->Crud_parametria->datosIncentive($where,'incentive_id_renovacion');
+                */
+                $where = array('c.cargosubmenu_id' => 1);
+                $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+            break;
+            case 40:
+
+                $where = array('c.cargosubmenu_id' => 2);
+                $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+            break;
+            case 60:
+
+                $where = array('c.cargosubmenu_id' => 3);
+                $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+            break;
+            case 80:
+
+                $where = array('c.cargosubmenu_id' => 4);
+                $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+            break;
+            case 0:
+                $where = array('c.cargosubmenu_id' => 5);
+                $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+            break;
+        }
+        return $datosIncentive;
+    }
+    public function cargarHtml($arrayDatos,$suma)
+    {
+
+        $bandera = true;
+        $html = '<table class="rendimiento" id="rendimiento" width="100%">
+    <thead>
+    <tr><th>indicador</th><th width="15%">meta</th><th width="15%">cumplimiento</th><th width="15%">Punto</th></tr>
+    </thead>
+    <tbody>';
+        foreach ($arrayDatos as $key) {
+            switch ($key['menuid']) {
+                case '1':
+                if ($bandera) {
+                    $html = $html.'
+                <tr>
+                    <td colspan="4" class="group">'.$key['menu'].'</td>
+                </tr>
+                <tr>
+                    <td>'.$key['indicarod'].'</td>
+                    <td align="">'.$key['meta'].'</td>
+                    <td align="">'.$key['cumplimiento'].'</td>
+                    <td align="">'.$key['puntos'].'</td>
+                </tr>';
+                    $bandera= false;
+                }
+                else
+                {
+                    $html = $html.'
+                <tr>
+                    <td>'.$key['indicarod'].'</td>
+                    <td align="">'.$key['meta'].'</td>
+                    <td align="">'.$key['cumplimiento'].'</td>
+                    <td align="">'.$key['puntos'].'</td>
+                </tr>';
+                }
+                break;
+                default:
+                    $html = $html.'
+                <tr>
+                    <td colspan="4" class="group">'.$key['menu'].'</td>
+                </tr>
+                <tr>
+                    <td>'.$key['indicarod'].'</td>
+                    <td align="">'.$key['meta'].'</td>
+                    <td align="">'.$key['cumplimiento'].'</td>
+                    <td align="">'.$key['puntos'].'</td>
+                </tr>';
+                break;
             }
         }
-        */
+        $html =  $html.'<tr><td class="total"> Total </td><td colspan="4" class="total percent" align="">'.$suma.'</td></tr></tbody>
+</table>';
+        return $html;
     }
     public function cargarCumplimientosVentas()
     {
