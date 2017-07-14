@@ -125,7 +125,7 @@ class Job extends MY_Controller {
         $bandera = true;
         $html = '<table class="rendimiento" id="rendimiento" width="100%">
     <thead>
-    <tr><th>indicador</th><th width="15%">meta</th><th width="15%">cumplimiento</th><th width="15%">Punto</th></tr>
+    <tr><th>indicador</th><th width="15%">meta</th><th width="15%">cumplimiento</th><th width="15%">Puntos</th></tr>
     </thead>
     <tbody>';
         foreach ($arrayDatos as $key) {
