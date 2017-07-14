@@ -48,6 +48,7 @@ class Job extends MY_Controller {
     {
         if ($this->input->is_ajax_request()) {
             $docuemnto = $this->input->post("documento", TRUE);
+            //$docuemnto = 1024839411;
             $where = array('p.usuario_documento' => $docuemnto);
             $datosUsuario = $this->Crud_usuario->GetDatos($where);
             $dia = $this->input->post("dia", TRUE);
@@ -55,7 +56,9 @@ class Job extends MY_Controller {
             $ano = $this->input->post("ano", TRUE);
             $mes = (strlen($mes) == 1) ? '0'.$mes : $mes;
             $dia = (strlen($dia) == 1) ? '0'.$dia : $dia;
+            //$dia =  01;
             $mes =  01;
+            //$ano =  2017;
             $fecha = $ano.'-'.$mes.'-'.$dia;
             $datodCarga =  $this->consultaRest('/api/entities/'.$docuemnto);
             $enviodatos = array();
@@ -71,12 +74,115 @@ class Job extends MY_Controller {
                         'indicarod' => $datoIcentive[0]->cargosubmenu_nombre, 
                         'meta' => $key["value"], 
                         'cumplimiento' => $key["real"], 
-                        'puntos' => $key["percentage_weighed"]
+                        'puntos' => $key["percentage_weighed"],
+                        'date'=> $key["date"]
                     );
                     $enviodatos[$contador] = $arrayName;
                     $contador = $contador + 1;
                     $suma = $suma+$key["percentage_weighed"];
                     
+                }
+            }
+            //var_dump($enviodatos);
+            $datosIncentive = $this->Crud_parametria->datosMenuIncentive();
+            //var_dump(json_encode($datosIncentive));
+            foreach ($datosIncentive as $key1) {
+                switch ($key1->cargomenu_id) {
+                    case '1':
+
+                    break;
+                    case '2':
+                        $bandera = true;
+                        $conta = 0;
+                        while ($bandera and count($enviodatos) > $conta ) {
+                            if ($enviodatos[$conta]["menuid"] == $key1->cargomenu_id) {
+                                $bandera = false;
+                            }
+                            $conta = $conta+1;
+                        }
+                        if ($bandera) {
+                            $arrayName = array(
+                                'menu' => $key1->cargomenu_nombre, 
+                                'menuid' => $key1->cargomenu_id, 
+                                'indicarod' => $key1->cargosubmenu_nombre, 
+                                'meta' => '', 
+                                'cumplimiento' => 0, 
+                                'puntos' => 0,
+                                'date'=> ''
+                            );
+                            $enviodatos[$contador] = $arrayName;
+                            $contador = $contador + 1;
+                        }
+                    break;
+                    case '3':
+                        $bandera = true;
+                        $conta = 0;
+                        while ($bandera and count($enviodatos) > $conta ) {
+                            if ($enviodatos[$conta]["menuid"] == $key1->cargomenu_id) {
+                                $bandera = false;
+                            }
+                            $conta = $conta+1;
+                        }
+                        if ($bandera) {
+                            $arrayName = array(
+                                'menu' => $key1->cargomenu_nombre, 
+                                'menuid' => $key1->cargomenu_id, 
+                                'indicarod' => $key1->cargosubmenu_nombre, 
+                                'meta' => '', 
+                                'cumplimiento' => 0, 
+                                'puntos' => 0,
+                                'date'=> ''
+                            );
+                            $enviodatos[$contador] = $arrayName;
+                            $contador = $contador + 1;
+                        }
+                    break;
+                    case '4':
+                        $bandera = true;
+                        $conta = 0;
+                        while ($bandera and count($enviodatos) > $conta ) {
+                            if ($enviodatos[$conta]["menuid"] == $key1->cargomenu_id) {
+                                $bandera = false;
+                            }
+                            $conta = $conta+1;
+                        }
+                        if ($bandera) {
+                            $arrayName = array(
+                                'menu' => $key1->cargomenu_nombre, 
+                                'menuid' => $key1->cargomenu_id, 
+                                'indicarod' => $key1->cargosubmenu_nombre, 
+                                'meta' => '', 
+                                'cumplimiento' => 0, 
+                                'puntos' => 0,
+                                'date'=> ''
+                            );
+                            $enviodatos[$contador] = $arrayName;
+                            $contador = $contador + 1;
+                        }
+                    break;
+                    case '5':
+                        $bandera = true;
+                        $conta = 0;
+                        while ($bandera and count($enviodatos) > $conta ) {
+                            if ($enviodatos[$conta]["menuid"] == $key1->cargomenu_id) {
+                                $bandera = false;
+                            }
+                            $conta = $conta+1;
+                        }
+                        if ($bandera) {
+                            $arrayName = array(
+                                'menu' => $key1->cargomenu_nombre, 
+                                'menuid' => $key1->cargomenu_id, 
+                                'indicarod' => $key1->cargosubmenu_nombre, 
+                                'meta' => '', 
+                                'cumplimiento' => 0, 
+                                'puntos' => 0,
+                                'date'=> ''
+                            );
+                            $enviodatos[$contador] = $arrayName;
+                            $contador = $contador + 1;
+                        }
+                    break;
                 }
             }
             $htmlText = $this->cargarHtml($enviodatos,$suma);

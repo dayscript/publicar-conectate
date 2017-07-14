@@ -39,12 +39,12 @@ class Crud_parametria extends CI_Model {
         return $this->Crud_model->actualizarRegistro('parametria_aplicacion',$dataclave,$where);
     }
 
-    public function datosIncentive($whereArray = null,$select){
+    public function datosIncentive($whereArray = null,$select=null){
         $joins[0]  = array('tabla' => 'basica_cargo c','tipo_join' =>'inner','conect'=>'c.cargo_id=p.cargo_id');
         $group = null;
         return $this->Crud_model->obtenerRegistros('parametria_incentive',$whereArray,$select,null,null,$joins,$group);
     }
-    public function datosMenuIncentive($whereArray = null,$select){
+    public function datosMenuIncentive($whereArray = null,$select=null){
         $joins[0]  = array('tabla' => 'basica_cargosubmenu c','tipo_join' =>'inner','conect'=>'p.cargomenu_id =  c.cargomenu_id');
         $group = null;
         return $this->Crud_model->obtenerRegistros('basica_cargomenu',$whereArray,$select,null,null,$joins,$group);
