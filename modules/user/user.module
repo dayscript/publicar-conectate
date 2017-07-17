@@ -1352,6 +1352,11 @@ function user_login_block($form) {
     '#size' => 15,
     '#required' => TRUE,
   );
+  $form['cbox1'] = array('#type' => 'checkbox',
+    '#title' => t('Al ingresar a esta plataforma;'),
+    '#size' => 15,
+    '#required' => TRUE,
+  );
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['submit'] = array('#type' => 'submit',
     '#value' => t('Log in'),
