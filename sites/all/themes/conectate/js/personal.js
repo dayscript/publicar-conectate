@@ -6,7 +6,8 @@
         if ((window.location.pathname == '/' || window.location.pathname == '/node') && document.getElementById("usuario_id") == null) 
         {
             if (typeof $(".first") !== 'undefined') {
-              $(".first")[0].outerHTML = '<li class="first last" style="font-size: 10px;">usted acepta los <a href="http://conectatepublicar.linkpruebas.com/sites/default/files/conectate-terminos.pdf" title="" target="_blank">Términos y Condiciones</a> y la <a href="http://conectatepublicar.web/sites/default/files/politicadeprivacidad.pdf" target="_blank" title="">Política de Privacidad</a> del Programa "Conéctate Publicar"</li>';
+              //$(".first")[0].outerHTML = '<li class="first last" style="font-size: 10px;">usted acepta los <a href="http://conectatepublicar.linkpruebas.com/sites/default/files/conectate-terminos.pdf" title="" target="_blank">Términos y Condiciones</a> y la <a href="http://conectatepublicar.web/sites/default/files/politicadeprivacidad.pdf" target="_blank" title="">Política de Privacidad</a> del Programa "Conéctate Publicar"</li>';
+              $(".first")[0].outerHTML = '';
             }
         }
         if (document.getElementById("administrarimagen") != null) {

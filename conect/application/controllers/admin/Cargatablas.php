@@ -104,7 +104,6 @@ class Cargatablas extends MY_Controller {
             if (!file_exists($data)) {
                 exit("Please run 14excel5.php first.\n");
             }
-
             $objPHPExcel = PHPExcel_IOFactory::load($data);
             $sheet = $objPHPExcel->getSheet(0);
             $highestRow = $sheet->getHighestRow();
@@ -133,6 +132,7 @@ class Cargatablas extends MY_Controller {
                     );
                 }
             endfor;
+            //var_dump($columnaTitulo);
             if ($mensaje == '') 
             {
                 $selectArray = "p.tabla_nombre ='".strtolower($tabla)."' and c.columna_tipo = 'fijo' or c.columna_tipo = 'random' ";
@@ -148,6 +148,7 @@ class Cargatablas extends MY_Controller {
                     );
                     $in= $in+1;
                 }
+                
                 for ($m = 2; $m <= $highestRow; $m++): // RECORRE EL NUMERO DE FILAS QUE TIENE EL ARCHIVO EXCEL
                     //var_dump($columnaTitulo);
                     //echo "<br>";

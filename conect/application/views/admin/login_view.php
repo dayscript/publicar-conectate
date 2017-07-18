@@ -30,16 +30,16 @@ $dataInputClave = array(
     <title><?= $this->Titulo; ?></title>
 
     <!-- Bootstrap -->
-    <link href="<?php echo base_url('file'); ?>/plugin/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?php echo base_url('File'); ?>/plugin/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="<?php echo base_url('file'); ?>/plugin/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="<?php echo base_url('File'); ?>/plugin/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
-    <link href="<?php echo base_url('file'); ?>/plugin/nprogress/nprogress.css" rel="stylesheet">
+    <link href="<?php echo base_url('File'); ?>/plugin/nprogress/nprogress.css" rel="stylesheet">
     <!-- Animate.css -->
-    <link href="<?php echo base_url('file'); ?>/plugin/animate.css/animate.min.css" rel="stylesheet">
+    <link href="<?php echo base_url('File'); ?>/plugin/animate.css/animate.min.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
-    <link href="<?php echo base_url('file'); ?>/css/admin/custom.min.css" rel="stylesheet">
+    <link href="<?php echo base_url('File'); ?>/css/admin/custom.min.css" rel="stylesheet">
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

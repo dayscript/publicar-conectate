@@ -17,7 +17,7 @@ class Job extends MY_Controller {
         $this->cargaUsuarios();
         $this->cargarCumplimientosVentas();
         $this->cargarCumplimientosVisitas();
-
+        $this->cargarCumplimientoGrupo();
     }
     public function buscarUsu()
     {
@@ -134,18 +134,35 @@ class Job extends MY_Controller {
                         if ($bandera) {
                             $whereTempo = array('metaventa_mes' => $mes,'usuario_id'=> $datosUsuario[0]->usuario_id);
                             $datosDemetas = $this->Crud_model->obtenerRegistros('produccion_metaventa',$whereTempo);
+                            $whereTempo = array('cargosubmenu_id' => $key1->cargosubmenu_id);
+                            $datosTempoUno = $this->Crud_parametria->datosMenuIncentive($whereTempo);
                             if (!is_null($datosDemetas)) {
                                 $merta = $datosDemetas[0]->metaventa_recompra;
+                                $merta1 = $datosDemetas[0]->metaventa_nuevas;
                             }
                             else
                             {
                                 $merta =0;
+                                $merta1 = 0;
                             }
                             $arrayName = array(
                                 'menu' => $key1->cargomenu_nombre, 
                                 'menuid' => $key1->cargomenu_id, 
                                 'indicarod' => $key1->cargosubmenu_nombre, 
                                 'meta' => $merta, 
+                                'cumplimiento' => 0, 
+                                'puntos' => 0,
+                                'date'=> ''
+                            );
+                            $enviodatos[$contador] = $arrayName;
+                            $contador = $contador + 1;
+                            $whereTempo = array('cargosubmenu_id' => $key1->cargosubmenu_id+1);
+                            $datosTempoUno = $this->Crud_parametria->datosMenuIncentive($whereTempo);
+                            $arrayName = array(
+                                'menu' => $key1->cargomenu_nombre, 
+                                'menuid' => $key1->cargomenu_id, 
+                                'indicarod' => $datosTempoUno[0]->cargosubmenu_nombre, 
+                                'meta' => $merta1, 
                                 'cumplimiento' => 0, 
                                 'puntos' => 0,
                                 'date'=> ''
@@ -357,12 +374,50 @@ class Job extends MY_Controller {
     }
     public function cargarCumplimientoGrupo()
     {
-        var_dump($this->Crud_grupo->GetDatosMetaGrupo(7));
-        $datodCarga['goal_values'] =  $this->consultaRest('/api/clients/3/dategoalvalues/2017-01-01','GET');
-        //var_dump(json_encode($datodCarga['goal_values']['goal_values']));
-        foreach ($datodCarga['goal_values']['goal_values'] as $key) {
-            var_dump(($key));
-            echo "<br>";
+        $mes = 07;
+        $datosUsuario = $this->Crud_usuario->GetDatos(array('p.estado_id' => 1,'p.rol_id' => 7));
+        if (!is_null($datosUsuario)) {
+            foreach ($datosUsuario as $key) 
+            {
+                $metas = $this->Crud_grupo->GetDatosMetaGrupo($mes,$key->grupo_id);
+                $venta = $this->Crud_grupo->GetDatosVentaGrupo($mes,$key->grupo_id);
+                if (!is_null($metas) and !is_null($venta)) {
+                    $metasTotal = (int) $metas[0]->metasumaRecompra+(int) $metas[0]->metasumaNuevo;
+                    $ventatotal = (int) $venta[0]->ventasumaRecompra +(int) $venta[0]->ventasumaNuevo;
+                    $envioDatos = array(
+                        'value' => $metasTotal,
+                        'real' => $ventatotal,
+                        'goal' => $key->incentive_id_grupo,
+                        'date' => '2017-'.$mes.'-01'
+                    );
+                    $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                    $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_grupo, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
+                    $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
+                    if (is_null($datosCumplimiento)) {
+                        $insertar = array(
+                            'usuario_id' => $key->usuario_id, 
+                            'tipocumplimiento_id' => $key->incentive_id_grupo,
+                            'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                            'cumplimiento_fecha' => '2017-'.$mes.'-01',
+                            'incentive_id' => $datodCarga["value"]["id"],
+                            'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                            'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                        );
+                        //var_dump($insertar);
+                        $this->Crud_cumplimiento->Insertar($insertar);
+                    }
+                    else
+                    {
+                        $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
+                        $edit = array(
+                            'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                            'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                            'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                        );
+                        $this->Crud_cumplimiento->editar($edit,$where);
+                    }
+                }
+            }
         }
     }
     public function cargarCumplimientosVentas()
@@ -378,6 +433,7 @@ class Job extends MY_Controller {
                     'date' => '2017-'.$key->metaventa_mes.'-01'
                 );
                 $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                var_dump($datodCarga);
                 $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_renovacion, 'cumplimiento_fecha' => '2017-'.$key->metaventa_mes.'-01',);
                 $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
                 if (is_null($datosCumplimiento)) {
@@ -433,42 +489,6 @@ class Job extends MY_Controller {
                     );
                     $this->Crud_cumplimiento->editar($edit,$where);
                 }
-                //cargar cumplimiento grupal
-                $metas = $this->Crud_grupo->GetDatosMetaGrupo($key->metaventa_mes,$key->grupo_id);
-                $venta = $this->Crud_grupo->GetDatosVentaGrupo($key->metaventa_mes,$key->grupo_id);
-                $metasTotal = (int) $metas[0]->metasumaRecompra+(int) $metas[0]->metasumaNuevo;
-                $ventatotal = (int) $venta[0]->ventasumaRecompra +(int) $venta[0]->ventasumaNuevo;
-                $envioDatos = array(
-                    'value' => $metasTotal,
-                    'real' => $ventatotal,
-                    'goal' => $key->incentive_id_grupo,
-                    'date' => '2017-'.$key->metaventa_mes.'-01'
-                );
-                $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
-                $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_grupo, 'cumplimiento_fecha' => '2017-'.$key->metaventa_mes.'-01',);
-                $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
-                if (is_null($datosCumplimiento)) {
-                    $insertar = array(
-                        'usuario_id' => $key->usuario_id, 
-                        'tipocumplimiento_id' => $key->incentive_id_grupo,
-                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                        'cumplimiento_fecha' => '2017-'.$key->metaventa_mes.'-01',
-                        'incentive_id' => $datodCarga["value"]["id"],
-                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
-                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
-                    );
-                    $this->Crud_cumplimiento->Insertar($insertar);
-                }
-                else
-                {
-                    $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
-                    $edit = array(
-                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
-                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
-                    );
-                    $this->Crud_cumplimiento->editar($edit,$where);
-                }
                 $actualiza = array('estado_id' => 2);
                 $whereMetas = array('metaventa_id' => $key->metaventa_id);
                 $whereVenta = array('venta_id' => $key->venta_id);
@@ -478,7 +498,7 @@ class Job extends MY_Controller {
         }
         else
         {
-            echo "sin datos Ventas";
+            echo "sin datos Ventas<br>";
         }
     }
     public function cargarCumplimientosVisitas()
@@ -527,7 +547,7 @@ class Job extends MY_Controller {
         }
         else
         {
-            echo "sin datos Ventas";
+            echo "sin datos Visitas<br>";
         }
     }
     public function cargaUsuarios()
@@ -547,7 +567,6 @@ class Job extends MY_Controller {
                     );
                     $conteo = 2;
                     $result =  $this->restDrupal(json_encode($insertar),'post');
-                    //var_dump($result->form_errors);
                     if (!isset($result->uid)) {
                         $editar = array('drupal_estado_id' => 3,'drupal_id' => null);
                         $busqueda = array('usuario_id' => $key->usuario_id);
@@ -593,6 +612,10 @@ class Job extends MY_Controller {
                 }
             }
         }
+    }
+    public function pruebausuari($docuemnto =1018403599,$fecha=null)
+    {
+
     }
     public function borrarDatos()
     {

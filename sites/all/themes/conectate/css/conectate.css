@@ -294,5 +294,10 @@ line-height: 20px;
 .t-puntos {
 text-align: center;
 }
+.option
+{
+	font-size: 10px;
+	width: 80%;
+}
 
 

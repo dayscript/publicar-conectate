@@ -1353,7 +1353,7 @@ function user_login_block($form) {
     '#required' => TRUE,
   );
   $form['cbox1'] = array('#type' => 'checkbox',
-    '#title' => t('Al ingresar a esta plataforma;'),
+    '#title' => t('Al ingresar a esta plataforma; usted acepta los <a href="http://conectatepublicar.linkpruebas.com/sites/default/files/conectate-terminos.pdf" title="" target="_blank">Términos y Condiciones</a> y la <a href="http://conectatepublicar.web/sites/default/files/politicadeprivacidad.pdf" target="_blank" title="">Política de Privacidad</a> del Programa "Conéctate Publicar"'),
     '#size' => 15,
     '#required' => TRUE,
   );
