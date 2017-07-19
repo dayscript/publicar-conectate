@@ -1,108 +1,26 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/local/bin/node',
-1 verbose cli   '/usr/local/bin/npm',
-1 verbose cli   'install',
-1 verbose cli   'sass-grunt',
-1 verbose cli   '--save' ]
-2 info using npm@2.11.3
-3 info using node@v0.12.7
-4 verbose install initial load of /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/package.json
-5 warn package.json conectate@0.0.2 No repository field.
-6 warn package.json conectate@0.0.2 No license field.
-7 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/grunt/package.json
-8 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/grunt-contrib-jshint/package.json
-9 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/grunt-contrib-uglify/package.json
-10 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/grunt-contrib-watch/package.json
-11 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/grunt-drush/package.json
-12 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/grunt-sass/package.json
-13 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/load-grunt-tasks/package.json
-14 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/node-bourbon/package.json
-15 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/node-sass/package.json
-16 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/sass/package.json
-17 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/sass.js/package.json
-18 verbose installManyTop reading scoped package data from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/node_modules/save/package.json
-19 info package.json grunt@0.4.5 No license field.
-20 info package.json grunt-contrib-uglify@0.5.1 No license field.
-21 info package.json grunt-contrib-jshint@0.10.0 No license field.
-22 info package.json grunt-contrib-watch@0.6.1 No license field.
-23 info package.json grunt-drush@0.0.7 No license field.
-24 info package.json sass@0.5.0 No repository field.
-25 info package.json sass@0.5.0 No license field.
-26 verbose readDependencies loading dependencies from /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate/package.json
-27 silly cache add args [ 'sass-grunt', null ]
-28 verbose cache add spec sass-grunt
-29 silly cache add parsed spec { raw: 'sass-grunt',
-29 silly cache add   scope: null,
-29 silly cache add   name: 'sass-grunt',
-29 silly cache add   rawSpec: '',
-29 silly cache add   spec: '*',
-29 silly cache add   type: 'range' }
-30 silly addNamed sass-grunt@*
-31 verbose addNamed "*" is a valid semver range for sass-grunt
-32 silly addNameRange { name: 'sass-grunt', range: '*', hasData: false }
-33 silly mapToRegistry name sass-grunt
-34 silly mapToRegistry using default registry
-35 silly mapToRegistry registry https://registry.npmjs.org/
-36 silly mapToRegistry uri https://registry.npmjs.org/sass-grunt
-37 verbose addNameRange registry:https://registry.npmjs.org/sass-grunt not in flight; fetching
-38 verbose request uri https://registry.npmjs.org/sass-grunt
-39 verbose request no auth needed
-40 info attempt registry request try #1 at 4:53:59 PM
-41 verbose request id 856490a21df31c15
-42 http request GET https://registry.npmjs.org/sass-grunt
-43 http 404 https://registry.npmjs.org/sass-grunt
-44 verbose headers { 'content-type': 'application/json',
-44 verbose headers   'cache-control': 'max-age=0',
-44 verbose headers   'content-length': '2',
-44 verbose headers   'accept-ranges': 'bytes',
-44 verbose headers   date: 'Fri, 16 Jun 2017 21:54:00 GMT',
-44 verbose headers   via: '1.1 varnish',
-44 verbose headers   age: '0',
-44 verbose headers   connection: 'keep-alive',
-44 verbose headers   'x-served-by': 'cache-atl6237-ATL',
-44 verbose headers   'x-cache': 'MISS',
-44 verbose headers   'x-cache-hits': '0',
-44 verbose headers   'x-timer': 'S1497650040.338696,VS0,VE590',
-44 verbose headers   vary: 'Accept-Encoding' }
-45 silly get cb [ 404,
-45 silly get   { 'content-type': 'application/json',
-45 silly get     'cache-control': 'max-age=0',
-45 silly get     'content-length': '2',
-45 silly get     'accept-ranges': 'bytes',
-45 silly get     date: 'Fri, 16 Jun 2017 21:54:00 GMT',
-45 silly get     via: '1.1 varnish',
-45 silly get     age: '0',
-45 silly get     connection: 'keep-alive',
-45 silly get     'x-served-by': 'cache-atl6237-ATL',
-45 silly get     'x-cache': 'MISS',
-45 silly get     'x-cache-hits': '0',
-45 silly get     'x-timer': 'S1497650040.338696,VS0,VE590',
-45 silly get     vary: 'Accept-Encoding' } ]
-46 verbose stack Error: Registry returned 404 for GET on https://registry.npmjs.org/sass-grunt
-46 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:239:14)
-46 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:170:14)
-46 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:354:22)
-46 verbose stack     at Request.emit (events.js:110:17)
-46 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1207:14)
-46 verbose stack     at Request.emit (events.js:129:20)
-46 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1153:12)
-46 verbose stack     at IncomingMessage.emit (events.js:129:20)
-46 verbose stack     at _stream_readable.js:908:16
-46 verbose stack     at process._tickCallback (node.js:355:11)
-47 verbose statusCode 404
-48 verbose pkgid sass-grunt
-49 verbose cwd /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate
-50 error Darwin 16.6.0
-51 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "install" "sass-grunt" "--save"
-52 error node v0.12.7
-53 error npm  v2.11.3
-54 error code E404
-55 error 404 Registry returned 404 for GET on https://registry.npmjs.org/sass-grunt
-55 error 404
-55 error 404 'sass-grunt' is not in the npm registry.
-55 error 404 You should bug the author to publish it (or use the name yourself!)
-55 error 404 It was specified as a dependency of 'conectate'
-55 error 404
-55 error 404 Note that you can also install from a
-55 error 404 tarball, folder, http url, or git url.
-56 verbose exit [ 1, true ]
+1 verbose cli [ '/Users/user/.nvm/versions/node/v6.9.4/bin/node',
+1 verbose cli   '/Users/user/.nvm/versions/node/v6.9.4/bin/npm',
+1 verbose cli   'start' ]
+2 info using npm@3.10.10
+3 info using node@v6.9.4
+4 verbose stack Error: missing script: start
+4 verbose stack     at run (/Users/user/.nvm/versions/node/v6.9.4/lib/node_modules/npm/lib/run-script.js:151:19)
+4 verbose stack     at /Users/user/.nvm/versions/node/v6.9.4/lib/node_modules/npm/lib/run-script.js:61:5
+4 verbose stack     at /Users/user/.nvm/versions/node/v6.9.4/lib/node_modules/npm/node_modules/read-package-json/read-json.js:356:5
+4 verbose stack     at checkBinReferences_ (/Users/user/.nvm/versions/node/v6.9.4/lib/node_modules/npm/node_modules/read-package-json/read-json.js:320:45)
+4 verbose stack     at final (/Users/user/.nvm/versions/node/v6.9.4/lib/node_modules/npm/node_modules/read-package-json/read-json.js:354:3)
+4 verbose stack     at then (/Users/user/.nvm/versions/node/v6.9.4/lib/node_modules/npm/node_modules/read-package-json/read-json.js:124:5)
+4 verbose stack     at /Users/user/.nvm/versions/node/v6.9.4/lib/node_modules/npm/node_modules/read-package-json/read-json.js:243:12
+4 verbose stack     at /Users/user/.nvm/versions/node/v6.9.4/lib/node_modules/npm/node_modules/graceful-fs/graceful-fs.js:78:16
+4 verbose stack     at tryToString (fs.js:455:3)
+4 verbose stack     at FSReqWrap.readFileAfterClose [as oncomplete] (fs.js:442:12)
+5 verbose cwd /Applications/MAMP/htdocs/conectate/sites/all/themes/conectate
+6 error Darwin 16.6.0
+7 error argv "/Users/user/.nvm/versions/node/v6.9.4/bin/node" "/Users/user/.nvm/versions/node/v6.9.4/bin/npm" "start"
+8 error node v6.9.4
+9 error npm  v3.10.10
+10 error missing script: start
+11 error If you need help, you may report this error at:
+11 error     <https://github.com/npm/npm/issues>
+12 verbose exit [ 1, true ]

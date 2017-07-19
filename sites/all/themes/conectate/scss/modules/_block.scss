@@ -271,6 +271,7 @@ table tr th, table tr td {
 //Tabs home
 
 .tabshome{
+  margin-top: 18px;
 
   .quicktabs_main.quicktabs-style-sky {
     border: 1px solid #eee;
@@ -348,5 +349,398 @@ table tr th, table tr td {
   ul.quicktabs-tabs.quicktabs-style-sky li a:active {
     outline: none;
 
+  }
+}
+
+//Estilos Ivan
+
+
+.t-puntos {
+  display: block;
+  line-height: 107px;
+  margin-top: 74px;
+}
+
+
+.sec-que-es {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_01.png") repeat scroll 0 0;
+  height: 244px;
+  padding: 54px 46px 3px 111px;
+  width: 671px;
+}
+
+.sec-que-es h1 {
+  font-size: 48px;
+  line-height: 39px;
+  color:#fff;
+}
+
+.sec-que-es {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_01.png") no-repeat scroll 0 0;
+  height: 244px;
+  padding: 54px 46px 3px 111px;
+  position: relative;
+  width: 671px;
+  z-index: 7;
+}
+
+.sec-vigencia {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_02.png") no-repeat scroll right center;
+  float: right;
+  height: 153px;
+  margin-top: -18px;
+  padding: 25px 80px 0 0;
+  position: relative;
+  text-align: right;
+  width: 100%;
+  z-index: 6;
+}
+
+.sec-participa {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_03.png") no-repeat scroll 0 0;
+  float: left;
+  height: 184px;
+  margin-top: -29px;
+  padding: 40px 0 3px 87px;
+  position: relative;
+  text-align: left;
+  width: 100%;
+  z-index: 4;
+}
+.sec-premio {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_04.png") no-repeat scroll right center;
+  color: #fff;
+  float: right;
+  height: 193px;
+  margin-top: -28px;
+  padding: 40px 100px 0 30px;
+  position: relative;
+  text-align: right;
+  width: 100%;
+  z-index: 2;
+}
+
+.condicional {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_10.png") no-repeat scroll right center;
+  float: right;
+  height: 193px;
+  margin-top: -28px;
+  padding: 50px 100px 0 30px;
+  position: relative;
+  text-align: right;
+  width: 100%;
+  z-index: 2;
+}
+
+.condicional p {
+  color:#fff;
+}
+
+
+
+.sec-mensuales {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_05.png") no-repeat scroll 0 0;
+  color: #fff;
+  float: left;
+  height: 193px;
+  margin-top: -32px;
+  padding: 42px 52px 0 105px;
+  text-align: left;
+  width: 100%;
+}
+
+.liquidacion {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_11.png") no-repeat scroll 0 0;
+  float: left;
+  height: 281px;
+  margin-top: -32px;
+  padding: 59px 52px 0 113px;
+  text-align: left;
+  width: 100%;
+}
+
+.liquidacion p{
+  color: #fff;
+}
+
+.liquidacion h1{
+  color: #fff;
+  line-height: 20px;
+}
+
+
+.sec-mensuales p {
+  color: #fff;
+}
+
+.sec-premio p {
+  color: #fff;
+}
+
+.sec-mensuales h6 {
+  color: #fff;
+  font-size: 19px;
+  line-height: 1px;
+  margin-bottom: 19px;
+}
+
+.sec-mensuales h1 {
+  line-height: 10px;
+}
+
+.sec-que-es2 {background: #eee}
+
+.q-conect p {
+  font-family: "Roboto-Regular";
+  font-size: 15px;
+  line-height: 19px;
+}
+
+.q-conect .sec-que-es p {
+  color: #000;
+}
+
+.q-conect .sec-vigencia p {
+  color: #fff;
+}
+
+.q-conect .sec-participa p {
+  color: #000;
+}
+
+.q-conect .sec-que-es strong {
+  color: #E10098;
+}
+
+.q-conect h1 {
+  color: #fff;
+  font-size: 48px;
+  line-height: 46px;
+}
+
+.titulo-con {
+  width: 100%;
+  background: #000;
+}
+
+.ventas {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_06.png") no-repeat scroll 0 0;
+  padding: 53px 12px;
+  text-align: center;
+}
+.operaciones {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_07.png") no-repeat scroll 0 0;
+  padding: 53px 12px;
+  text-align: center;
+}
+.conocimiento {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_08.png") no-repeat scroll 0 0;
+  padding: 53px 12px;
+  text-align: center;
+}
+.equipo {
+  background: rgba(0, 0, 0, 0) url("../../../../../sites/default/files/que-es-conectate/img_09.png") no-repeat scroll 0 0;
+  padding: 53px 7px;
+  text-align: center;
+}
+.c {
+  float: left;
+  height: 167px;
+  margin: 20px;
+  width: 170px;
+}
+
+.c p {
+  color: #000;
+  line-height: 18px;
+}
+
+@media (min-width: 0px) and (max-width: 1024px) {
+  .sec-que-es {
+    background: #ffc934 none repeat scroll 0 0;
+    height: auto;
+    line-height: 1px;
+    padding: 5%;
+    position: relative;
+    text-align: center;
+    width: 100%;
+    z-index: 7;
+  }
+
+  .sec-vigencia {
+    background: #00d739 none repeat scroll 0 0;
+    float: right;
+    height: auto;
+    margin-top: 0;
+    padding: 5%;
+    position: relative;
+    text-align: center;
+    width: 100%;
+    z-index: 6;
+  }
+
+  .sec-participa {
+    background: #00cae9 none repeat scroll 0 0;
+    float: left;
+    height: 184px;
+    margin-top: 0;
+    padding: 5%;
+    position: relative;
+    text-align: center;
+    width: 100%;
+    z-index: 4;
+  }
+  .sec-premio {
+    background: #ff009c none repeat scroll 0 0;
+    color: #fff;
+    float: right;
+    height: auto;
+    margin-top: 0;
+    padding: 5%;
+    position: relative;
+    text-align: center;
+    width: 100%;
+    z-index: 2;
+  }
+
+  .sec-mensuales {
+    background: #1a6da7 none repeat scroll 0 0;
+    color: #fff;
+    float: left;
+    height: auto;
+    margin-top: 0;
+    padding: 3%;
+    text-align: center;
+    width: 100%;
+  }
+
+  .c {
+    float: initial;
+    height: 167px;
+    margin: 1px auto;
+    width: 170px;
+  }
+
+  .condicional {
+    background: #ff009c none repeat scroll 0 0;
+    float: right;
+    height: auto;
+    margin-top: 0px;
+    padding: 5%;
+    position: relative;
+    text-align: center;
+    width: 100%;
+    z-index: 2;
+  }
+
+  .liquidacion {
+    background: #00cae9 none repeat scroll 0 0;
+    float: left;
+    height: auto;
+    margin-top: 0;
+    padding: 5%;
+    text-align: center;
+    width: 100%;
+  }
+
+}
+
+
+.t-puntos {
+  text-align: center;
+}
+.option
+{
+  font-size: 10px;
+  width: 80%;
+}
+
+//Ajustes
+
+.alert-box.alert {
+  background-color: $primary-color;
+  border-color: $primary-color;
+  color: #fff;
+  font-size: 0.9em !important;
+  text-align: center;
+  ul{
+    font-size: 0.9em;
+  }
+  a{
+    color: black;
+    &:hover{
+      color: white;
+    }
+  }
+}
+
+#edit-cbox1 {
+  text-align: center;
+  display: block;
+  float: left;
+  margin-left: 10px;
+}
+
+.tabla-rendimiento{
+  table thead tr td {
+    font-size: .8rem;
+    font-weight: normal;
+    color: white;
+    text-align: center;
+  }
+  table tr td {
+    padding: .5625rem .625rem;
+    font-size: .65rem;
+    color: #666;
+    @media (min-width: 600px){
+      font-size: .8rem;
+    }
+  }
+  .puntos{
+    text-align: right !important;
+    font-family: $font-bold !important;
+    color: $primary-color;
+  }
+  .encabezado{
+    text-align: center !important;
+    font-size: .6rem;
+    @media (min-width: 600px){
+      font-size: .8rem;
+    }
+  }
+}
+
+
+.tabshome .quicktabs_main.quicktabs-style-sky {
+  border: 1px solid #eee;
+  clear: both;
+  padding: 2px;
+  position: relative;
+  top: -0.1em;
+  background: #fff;
+}
+
+.ui-accordion .ui-accordion-content {
+  padding: 0.3em;
+  border-top: 0;
+  overflow: auto;
+}
+
+//Edit cuenta
+.page-user-edit{
+  .row.l-main {
+    width: 100%;
+    @media (min-width: 600px){
+      width: 35%;
+    }
+  }
+  .confirm-parent, .password-parent {
+    width: 100%;
+  }
+}
+
+#superfish-1{
+  .sf-clone-parent{
+    display: none;
   }
 }
