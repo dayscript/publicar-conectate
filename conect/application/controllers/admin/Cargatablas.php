@@ -161,12 +161,14 @@ class Cargatablas extends MY_Controller {
                     endfor;  
                     //var_dump(json_encode($columnaTitulo));  
                     $lista = $this->crearArray($columnaTitulo,strtolower($tabla));
-                    //var_dump(json_encode($lista));
-                    //echo "<br>";
-                    //$this->Crud_ventas->Insertar($lista);
-                    //var_dump($this->Crud_model->agregarRegistro('produccion_'.strtolower($tabla),$lista));
-                    $this->Crud_model->agregarRegistro('produccion_'.strtolower($tabla),$lista);
-                    //echo "<br>";
+                    if (count($lista) == 0) {
+
+                    }
+                    else
+                    {
+                        //var_dump($lista);
+                        $this->Crud_model->agregarRegistro('produccion_'.strtolower($tabla),$lista);
+                    }
                 endfor;
                 $mensaje =-1;
                 $this->controlador($tabla,$mensaje);
@@ -199,6 +201,18 @@ class Cargatablas extends MY_Controller {
                         case 'boolean':
                             $retorno = ($columnaTitulo1[$i]['valor'] == '0') ? false : true ;
                             $lista =array_merge($lista, array($columnaTitulo1[$i]['columnatabla'] => $retorno));
+                        break;
+                        case 'unico':
+                            $buscar = array($columnaTitulo1[$i]["columnatabla"] => $columnaTitulo1[$i]["valor"]);
+                            $datosBuscar = $this->Crud_model->obtenerRegistros('produccion_'.strtolower($tabla),$buscar);
+                            if (is_null($datosBuscar)) {
+                                $lista =array_merge($lista, array($columnaTitulo1[$i]['columnatabla'] => $columnaTitulo1[$i]['valor']));
+                            }
+                            else
+                            {
+                                $lista = array();
+                                return $lista;
+                            }
                         break;
                         case 'busqueda':
                             $wheredinamico = array($columnaTitulo1[$i]["columna_remplasa"] => $columnaTitulo1[$i]["valor"]);

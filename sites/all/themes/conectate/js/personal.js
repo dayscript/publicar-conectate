@@ -30,13 +30,28 @@
             success: function(info){
             	modResponse = $.parseJSON(info);
                 if (modResponse.estado=== false) {
-                    for (i = 0; i < $(".puntos").length; i++) {
-					    $(".puntos")[i].textContent = 0;
+                    for (i = 0; i < $(".puntosTotal").length; i++) {
+					    $(".puntosTotal")[i].textContent = 0;
 					}
                 }else{
-                    for (i = 0; i < $(".puntos").length; i++) {
-					    $(".puntos")[i].textContent = modResponse.carga;
+                    for (i = 0; i < $(".puntosTotal").length; i++) {
+					    $(".puntosTotal")[i].textContent = modResponse.carga;
 					} 
+                }
+            }       
+        });
+        $.ajax({
+            url: "http://"+URLactual+ "/conect/index.php/admin/job/metasPorUsuario/1",
+            type: 'post',
+            data: data,
+            success: function(info){
+                modResponse = $.parseJSON(info);
+                if (modResponse.estado=== false) {
+                    document.getElementById("rendimiento").outerHTML = '<div id="rendimiento">'+modResponse.carga+'</div>';
+                }else{
+                    for (i = 0; i < $("#rendimiento").length; i++) {
+                        $("#rendimiento")[i].outerHTML = '<div id="rendimiento">'+modResponse.carga+'</div>';
+                    }
                 }
             }       
         });
@@ -47,10 +62,10 @@
             success: function(info){
                 modResponse = $.parseJSON(info);
                 if (modResponse.estado=== false) {
-                    document.getElementById("rendimiento").outerHTML = '<div id="rendimiento">'+modResponse.carga+'</div>';
+                    document.getElementById("rendimientoTotal").outerHTML = '<div id="rendimientoTotal">'+modResponse.carga+'</div>';
                 }else{
-                    for (i = 0; i < $("#rendimiento").length; i++) {
-                        $("#rendimiento")[0].outerHTML = '<div id="rendimiento">'+modResponse.carga+'</div>';
+                    for (i = 0; i < $(".rendimientoTotal").length; i++) {
+                        $(".rendimientoTotal")[i].outerHTML = '<div id="rendimientoTotal">'+modResponse.carga+'</div>';
                     }
                 }
             }       

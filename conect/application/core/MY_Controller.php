@@ -102,7 +102,28 @@ class MY_Controller extends CI_Controller
     }
     public function consultaRest($urlConsulta = '/api/test',$metodo = 'GET',$datos = null)
     {
-        return json_decode($this->curlwrap->curl_wrapIncentive($this->incentive.$urlConsulta,$datos,$metodo),true);
+        $datosRetorno = $this->curlwrap->curl_wrapIncentive($this->incentive.$urlConsulta,$datos,$metodo);
+        $retornoValidar = json_decode($datosRetorno,true);
+
+        if (is_null($retornoValidar)) 
+        {
+            echo "datos de respuesta";
+            var_dump($datos);
+            echo "<br>";
+            echo "datos de url";
+            var_dump($urlConsulta);
+            echo "<br>";
+            echo "datos de metodo";
+            var_dump($metodo);
+            echo "<br>";
+            echo "datos de datos";
+            var_dump($datos);
+            echo "<br>";
+            return $retornoValidar;
+        }else
+        {
+            return $retornoValidar;
+        }
     }
     public function ordenarMenu($rol)
     {
@@ -418,7 +439,7 @@ class MY_Controller extends CI_Controller
                 ),
                 array(
                     'name' => "Posicion",
-                    "value" => $datos->posicion_nombre,
+                    "value" => $datos->cargo_nombre,
                     "type" => "CUSTOM"
                 ),
                 array(
@@ -429,6 +450,11 @@ class MY_Controller extends CI_Controller
                 array(
                     'name' => "Tipo Vendedor",
                     "value" => $datos->tipocontrato_nombre,
+                    "type" => "CUSTOM"
+                ),
+                array(
+                    'name' => "Grupo",
+                    "value" => $datos->grupo_nombre,
                     "type" => "CUSTOM"
                 )
             )

@@ -67,17 +67,21 @@ class Job extends MY_Controller {
             $fecha = $ano.'-'.$mes.'-'.$dia;
             $datodCarga =  $this->consultaRest('/api/entities/'.$docuemnto);
             $suma =  0;
-            foreach ($datodCarga['entity']["goalvalues"] as $key) 
-            {
-                if (date("m", strtotime($key["date"])) == date("m", strtotime($fecha))) {
-                    $suma = $suma+ $key["percentage_weighed"];
+            if (!isset($datodCarga["message"])) {
+                foreach ($datodCarga['entity']["goalvalues"] as $key) 
+                {
+                    if (date("m", strtotime($key["date"])) == date("m", strtotime($fecha))) {
+                        //var_dump($key);
+                        $suma = $suma+ $key["percentage_weighed"];
+                    }
                 }
+                $suma = number_format($suma, 1);
             }
             $return = array('estado' => true,'carga'=>$suma);
             echo json_encode($return, JSON_FORCE_OBJECT);
         }
     }
-    public function metasPorUsuario()
+    public function metasPorUsuario($carga = null)
     {
         if ($this->input->is_ajax_request()) {
             $docuemnto = $this->input->post("documento", TRUE);
@@ -265,10 +269,66 @@ class Job extends MY_Controller {
                     break;
                 }
             }
-            $htmlText = $this->cargarHtml($enviodatos,$suma);
+            if (is_null($carga)) {
+                $enviodatos = $this->ordenar($enviodatos);
+                $htmlText = $this->cargarHtml($enviodatos,$suma);
+            }
+            else
+            {
+                $enviodatos = $this->ordenar($enviodatos);
+                $htmlText = $this->cargarHtmlComprimido($enviodatos,$suma);   
+            }
             $return = array('estado' => true,'carga'=>$htmlText);
             echo json_encode($return, JSON_FORCE_OBJECT);
         }
+    }
+    public function ordenar($ordenar)
+    {
+        $datos = array();
+        $datos1 = array();
+        $contador =1;
+        $bandera = true;
+        $tempo =0;
+        $contadorArray = 1;
+        while ($contador <= 5) 
+        { 
+            for ($i=0; $i < count($ordenar); $i++) { 
+                if ($ordenar[$i]['menuid'] == $contador) 
+                {
+                    if ($ordenar[$i]['menuid']  != 1) 
+                    {
+                        $datos[$contadorArray] = $ordenar[$i];
+                        $ordenar[$i] = null;
+                        $contadorArray = $contadorArray+1;
+                    }
+                    else
+                    {
+                        if ($tempo == 0) {
+                            $datos[$contadorArray] = $ordenar[$i];
+                            $ordenar[$i] = null;
+                            $contadorArray = $contadorArray+1;
+                            $tempo =1;
+                        }
+                        else
+                        {
+                            
+                            $datos[$contadorArray] = $ordenar[$i];
+                            $ordenar[$i] = null;
+                            $contadorArray = $contadorArray+1;
+                            /*
+                            $datos[$contadorArray-1]["indicarod"] = 'Presupuesto de venta';
+                            $datos[$contadorArray-1]["meta"] = (int) $datos[$contadorArray-1]["meta"] +(int) $ordenar[$i]['meta'];
+                            $datos[$contadorArray-1]["cumplimiento"] = (int) $datos[$contadorArray-1]["cumplimiento"]+(int) $ordenar[$i]['cumplimiento'];
+                            $datos[$contadorArray-1]["puntos"] = (int) $datos[$contadorArray-1]["puntos"]+(int) $ordenar[$i]['puntos'];
+                            */
+                        }
+                    }
+                    
+                }
+            }
+            $contador=$contador+1;
+        }
+        return $datos;
     }
     public function buscarTipoDeCarga($goal_id,$cargo_id)
     {
@@ -305,13 +365,80 @@ class Job extends MY_Controller {
         }
         return $datosIncentive;
     }
+    public function cargarHtmlComprimido($arrayDatos,$suma)
+    {
+        setlocale(LC_MONETARY, 'en_US.UTF-8');
+        $bandera = true;
+        $html = '<table class="rendimientoMini" id="rendimientoMini"  border="0" cellpadding="1" cellspacing="1" style="width:320px">
+        <thead>
+        <tr>
+            <th width="200" class="encabezado">Indicador</th>
+            <th class="encabezado">Puntos</th>
+        </tr>
+        </thead>
+        <tbody>';
+        foreach ($arrayDatos as $key) {
+            switch ($key['menuid']) {
+                case '1':
+                    if ($bandera) {
+                        $html = $html.'
+                    <tr>
+                        <td colspan="2" class="group">'.$key['menuid'].'. '.$key['menu'].'</td>
+                    </tr>
+                    <tr>
+                        <td height="36">'.$key['indicarod'].'</td>
+                        <td align="right" class="puntos" center>'.number_format($key['puntos'],1).'</td>
+                    </tr>';
+                        $bandera= false;
+                    }
+                    else
+                    {
+                        $html = $html.'
+                    <tr>
+                        <td height="36">'.$key['indicarod'].'</td>
+                        <td align="right" class="puntos" center>'.number_format($key['puntos'],1).'</td>
+                    </tr>';
+                    }
+                break;
+                case '4':
+                    $html = $html.'
+                        <tr>
+                            <td colspan="2" class="group">'.$key['menuid'].'. '.$key['menu'].'</td>
+                        </tr>
+                        <tr>
+                            <td height="36">'.$key['indicarod'].'</td>
+                            <td align="right" class="puntos" center>'.number_format($key['puntos'],1).'</td>
+                        </tr>';
+                break;
+
+                default:
+                        $html = $html.'
+                        <tr>
+                            <td colspan="2" class="group">'.$key['menuid'].'. '.$key['menu'].'</td>
+                        </tr>
+                        <tr>
+                            <td height="36">'.$key['indicarod'].'</td>
+                            <td align="right" class="puntos" center>'.number_format($key['puntos'],1).'</td>
+                        </tr>';
+                    
+                break;
+            }
+        }
+        $html =  $html.'<hr><tr><td > Total </td><td colspan="4"  align="" class="puntos">'.number_format($suma,1).'</td></tr></tbody></table>';
+        return $html;
+    }
     public function cargarHtml($arrayDatos,$suma)
     {
         setlocale(LC_MONETARY, 'en_US.UTF-8');
         $bandera = true;
-        $html = '<table class="rendimiento" id="rendimiento" width="100%">
+        $html = '<table class="responsive rendimientoTotal" border="0" cellpadding="1" cellspacing="1" style="width:100%">
         <thead>
-        <tr><th>indicador</th><th width="15%">meta</th><th width="15%">cumplimiento</th><th width="15%">Puntos</th></tr>
+            <tr>
+                <th width="40%" class="encabezado">Indicador</th>
+                <th class="encabezado">Meta</th>
+                <th class="encabezado">Cumplimiento</th>
+                <th class="encabezado">Puntos</th>
+            </tr>
         </thead>
         <tbody>';
         foreach ($arrayDatos as $key) {
@@ -323,10 +450,10 @@ class Job extends MY_Controller {
                         <td colspan="4" class="group">'.$key['menuid'].'. '.$key['menu'].'</td>
                     </tr>
                     <tr>
-                        <td>'.$key['indicarod'].'</td>
-                        <td align="">'.money_format('%(#10n',(int) $key['meta']).'</td>
-                        <td align="">'.money_format('%(#10n',(int) $key['cumplimiento']).'</td>
-                        <td align="">'.$key['puntos'].'</td>
+                        <td height="36">'.$key['indicarod'].'</td>
+                        <td>'.money_format('%(#10n',(int) $key['meta']).'</td>
+                        <td>'.money_format('%(#10n',(int) $key['cumplimiento']).'</td>
+                        <td align="right" class="puntos">'.number_format($key['puntos'],1).'</td>
                     </tr>';
                         $bandera= false;
                     }
@@ -334,10 +461,10 @@ class Job extends MY_Controller {
                     {
                         $html = $html.'
                     <tr>
-                        <td>'.$key['indicarod'].'</td>
-                        <td align="">'.money_format('%(#10n',(int) $key['meta']).'</td>
-                        <td align="">'.money_format('%(#10n',(int) $key['cumplimiento']).'</td>
-                        <td align="">'.$key['puntos'].'</td>
+                        <td height="36">'.$key['indicarod'].'</td>
+                        <td>'.money_format('%(#10n',(int) $key['meta']).'</td>
+                        <td>'.money_format('%(#10n',(int) $key['cumplimiento']).'</td>
+                        <td align="right" class="puntos">'.number_format($key['puntos'],1).'</td>
                     </tr>';
                     }
                 break;
@@ -347,10 +474,10 @@ class Job extends MY_Controller {
                             <td colspan="4" class="group">'.$key['menuid'].'. '.$key['menu'].'</td>
                         </tr>
                         <tr>
-                            <td>'.$key['indicarod'].'</td>
-                            <td align="">'.money_format('%(#10n',(int) $key['meta']).'</td>
-                            <td align="">'.money_format('%(#10n',(int) $key['cumplimiento']).'</td>
-                            <td align="">'.$key['puntos'].'</td>
+                            <td height="36">'.$key['indicarod'].'</td>
+                            <td>'.money_format('%(#10n',(int) $key['meta']).'</td>
+                            <td>'.money_format('%(#10n',(int) $key['cumplimiento']).'</td>
+                            <td align="right" class="puntos">'.number_format($key['puntos'],1).'</td>
                         </tr>';
                 break;
 
@@ -360,29 +487,31 @@ class Job extends MY_Controller {
                             <td colspan="4" class="group">'.$key['menuid'].'. '.$key['menu'].'</td>
                         </tr>
                         <tr>
-                            <td>'.$key['indicarod'].'</td>
-                            <td align="">'.(int) $key['meta'].'</td>
-                            <td align="">'.(int) $key['cumplimiento'].'</td>
-                            <td align="">'.$key['puntos'].'</td>
+                            <td height="36">'.$key['indicarod'].'</td>
+                            <td>'.(int) $key['meta'].'</td>
+                            <td>'.(int) $key['cumplimiento'].'</td>
+                            <td align="right" class="puntos">'.number_format($key['puntos'],1).'</td>
                         </tr>';
                     
                 break;
             }
         }
-        $html =  $html.'<tr><td class="total"> Total </td><td colspan="4" class="total percent" align="">'.$suma.'</td></tr></tbody></table>';
+        $html =  $html.'<tr><td class="encabezado" colspan="3"> Total </td><td class="encabezado puntos" align="">'.number_format($suma,1).'</td></tr></tbody></table>';
         return $html;
     }
     public function cargarCumplimientoGrupo()
     {
-        $mes = 07;
+        $mes = '07';
         $datosUsuario = $this->Crud_usuario->GetDatos(array('p.estado_id' => 1,'p.rol_id' => 7));
         if (!is_null($datosUsuario)) {
             foreach ($datosUsuario as $key) 
             {
-                $metas = $this->Crud_grupo->GetDatosMetaGrupo($mes,$key->grupo_id);
-                $venta = $this->Crud_grupo->GetDatosVentaGrupo($mes,$key->grupo_id);
+                $where = array('p.metagrupo_mes' => $mes,'p.grupo_id' => $key->grupo_id); 
+                $metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
+                $where = array('p.venta_mes' => $mes,'g.grupo_id' => $key->grupo_id); 
+                $venta = $this->Crud_grupo->GetDatosVentaGrupo($where);
                 if (!is_null($metas) and !is_null($venta)) {
-                    $metasTotal = (int) $metas[0]->metasumaRecompra+(int) $metas[0]->metasumaNuevo;
+                    $metasTotal = (int) $metas[0]->metagrupo_meta;
                     $ventatotal = (int) $venta[0]->ventasumaRecompra +(int) $venta[0]->ventasumaNuevo;
                     $envioDatos = array(
                         'value' => $metasTotal,
@@ -391,6 +520,7 @@ class Job extends MY_Controller {
                         'date' => '2017-'.$mes.'-01'
                     );
                     $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                    $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
                     $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_grupo, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
                     $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
                     if (is_null($datosCumplimiento)) {
@@ -416,7 +546,76 @@ class Job extends MY_Controller {
                         );
                         $this->Crud_cumplimiento->editar($edit,$where);
                     }
+                    if ($key->cargo_id == 6 || $key->cargo_id == 7) {
+                        $ventatotal = (int) $venta[0]->ventasumaRecompra;
+                        $envioDatos = array(
+                            'value' => $metasTotal,
+                            'real' => $ventatotal,
+                            'goal' => $key->incentive_id_renovacion,
+                            'date' => '2017-'.$mes.'-01'
+                        );
+                        $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                        $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
+                        $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_renovacion, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
+                        if (is_null($datosCumplimiento)) {
+                            $insertar = array(
+                                'usuario_id' => $key->usuario_id, 
+                                'tipocumplimiento_id' => $key->incentive_id_renovacion,
+                                'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                'cumplimiento_fecha' => '2017-'.$mes.'-01',
+                                'incentive_id' => $datodCarga["value"]["id"],
+                                'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                            );
+                            //var_dump($insertar);
+                            $this->Crud_cumplimiento->Insertar($insertar);
+                        }
+                        else
+                        {
+                            $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
+                            $edit = array(
+                                'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                            );
+                            $this->Crud_cumplimiento->editar($edit,$where);
+                        }
+                        $ventatotal = (int) $venta[0]->ventasumaNuevo;
+                        $envioDatos = array(
+                            'value' => $metasTotal,
+                            'real' => $ventatotal,
+                            'goal' => $key->incentive_id_nueva,
+                            'date' => '2017-'.$mes.'-01'
+                        );
+                        $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                        $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
+                        $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_nueva, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
+                        if (is_null($datosCumplimiento)) {
+                            $insertar = array(
+                                'usuario_id' => $key->usuario_id, 
+                                'tipocumplimiento_id' => $key->incentive_id_nueva,
+                                'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                'cumplimiento_fecha' => '2017-'.$mes.'-01',
+                                'incentive_id' => $datodCarga["value"]["id"],
+                                'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                            );
+                            //var_dump($insertar);
+                            $this->Crud_cumplimiento->Insertar($insertar);
+                        }
+                        else
+                        {
+                            $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
+                            $edit = array(
+                                'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                            );
+                            $this->Crud_cumplimiento->editar($edit,$where);
+                        }
+                    }
                 }
+                
             }
         }
     }
@@ -433,7 +632,7 @@ class Job extends MY_Controller {
                     'date' => '2017-'.$key->metaventa_mes.'-01'
                 );
                 $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
-                var_dump($datodCarga);
+                $this->Crud_log->Insertar('ventas incentive',$key->usuario_id,json_encode($datodCarga));
                 $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_renovacion, 'cumplimiento_fecha' => '2017-'.$key->metaventa_mes.'-01',);
                 $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
                 if (is_null($datosCumplimiento)) {
@@ -465,6 +664,7 @@ class Job extends MY_Controller {
                     'date' => '2017-'.$key->metaventa_mes.'-01'
                 );
                 $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                $this->Crud_log->Insertar('ventas incentive',$key->usuario_id,json_encode($datodCarga));
                 $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_nueva, 'cumplimiento_fecha' => '2017-'.$key->metaventa_mes.'-01',);
                 $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
                 if (is_null($datosCumplimiento)) {
@@ -514,6 +714,7 @@ class Job extends MY_Controller {
                     'date' => '2017-'.$key->metavisita_mes.'-01'
                 );
                 $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                $this->Crud_log->Insertar('visitas incentive',$key->usuario_id,json_encode($datodCarga));
                 $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_citas, 'cumplimiento_fecha' => '2017-'.$key->metavisita_mes.'-01',);
                 $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
                 if (is_null($datosCumplimiento)) {
@@ -571,11 +772,13 @@ class Job extends MY_Controller {
                         $editar = array('drupal_estado_id' => 3,'drupal_id' => null);
                         $busqueda = array('usuario_id' => $key->usuario_id);
                         $this->Crud_usuario->editar($editar,$busqueda);
+                        $this->Crud_log->Insertar('usuario drupal',$key->usuario_id,json_encode($result));
                     }else
                     {
-                        $editar = array('drupal_id' => $result->uid,'drupal_estado_id' => 2);
+                        $editar = array('drupal_id' => $result->uid,'drupal_estado_id' => 4);
                         $busqueda = array('usuario_id' => $key->usuario_id);
                         $this->Crud_usuario->editar($editar,$busqueda);
+                        $this->Crud_log->Insertar('usuario drupal',$key->usuario_id,json_encode($result));
                     }
                     $tempo = $this->crearUsuario($this->crearUsuarioAgile($key,'Archivo Plano',null,"Carga Manual"));
                     if(!$tempo['estado'])
@@ -583,6 +786,7 @@ class Job extends MY_Controller {
                         $editar = array('agile_estado_id' => 4);
                         $busqueda = array('usuario_id' => $key->usuario_id);
                         $this->Crud_usuario->editar($editar,$busqueda);
+                        $this->Crud_log->Insertar('usuario agile',$key->usuario_id,json_encode($tempo));
                     }else
                     {   
                         $editar = array(
@@ -592,6 +796,7 @@ class Job extends MY_Controller {
                         );
                         $busqueda = array('usuario_id' => $key->usuario_id);
                         $this->Crud_usuario->editar($editar,$busqueda);
+                        $this->Crud_log->Insertar('usuario agile',$key->usuario_id,json_encode($tempo));
                     }
             }
         }
@@ -633,6 +838,12 @@ class Job extends MY_Controller {
     public function archivos()
     {
         echo $this->listar_archivos(getcwd(),"/File/uploader/courier");
+    }
+    public function pruebaregistros()
+    {
+        $where = array('r.rol_id' => 7 ,'p.agile_estado_id' => 1);
+        $datosUsuario = $this->Crud_usuario->GetDatos($where);
+        var_dump($datosUsuario);
     }
 }
 
