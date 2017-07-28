@@ -157,7 +157,7 @@ function ds_conectate_preprocess_node(&$vars) {
 /**
  * Implements hook_form_alter().
  */
-function ds_conectate_form_alter(&$form, &$form_state, $form_id) {
+/*function ds_conectate_form_alter(&$form, &$form_state, $form_id) {
 
   switch ($form_id) {
     case 'user_login':
@@ -206,7 +206,7 @@ function ds_conectate_form_alter(&$form, &$form_state, $form_id) {
       break;
 
   }
-}
+}*/
 
 /**
  * Implements hook_form_alter().
