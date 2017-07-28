@@ -1,0 +1,316 @@
+<?php
+
+/**
+ * @file
+ * This is the file that provides a quick look to show the main Drupal hooks for presenting to sobre_ruedas
+ *
+ * @author Edwin Vega Moreno ('Developer Web Junior('Drupal')')
+ */
+
+module_load_include('inc', 'sobre_ruedas', 'includes/sobre_ruedas_callbacks');
+
+/**
+ * Implements hook_help().
+ */
+function sobre_ruedas_help($path, $arg) {
+   switch ($path) {
+     case 'admin/help#sobre_ruedas':
+       return check_markup(file_get_contents( dirname(__FILE__) . "/README.txt") );
+   }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function sobre_ruedas_views_api() {
+  return array(
+    'api' => '3.0',
+    'path' => drupal_get_path('module', 'sobre_ruedas') . '/views',
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function sobre_ruedas_theme($existing, $type, $theme, $path){
+
+    return array(
+      'sobre_ruedas_info_segmento' => array(
+        'variables' => array(),
+        'template' => 'templates/block-info-segmento'
+      ),
+    );
+}
+
+
+/**
+ * Implements hook_block_info().
+ */
+function sobre_ruedas_block_info(){
+  $blocks = array();
+  $blocks['sobre_ruedas_quiz_image'] = array(
+    'info' => t('Quiz Image'),
+  );
+
+   $blocks['sobre_ruedas_info_segmento'] = array(
+    'info' => t('Info Segmento'),
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function sobre_ruedas_block_view($delta = '') {
+  // This example is adapted from node.module.
+  $block = array();
+
+  switch ($delta) {
+    case 'sobre_ruedas_quiz_image':
+      $node = menu_get_object();
+
+      if($node && $node->type == 'quiz'){
+        $html = '';
+        $image = field_get_items('node',$node,'field_image');
+
+        if($image){
+          $html = theme('image_style', array('path' => $image[0]['uri'], 'style_name' => "interna_quiz"));
+        }
+
+        // $block['subject'] = t('Quiz Image');
+        $block['content'] = array(
+          '#markup' => $html,
+        );
+      }
+
+      break;
+    case 'sobre_ruedas_info_segmento':
+      $block['content'] = sobre_ruedas_info_segmento();
+      break;
+
+  }
+
+  return $block;
+}
+
+/**
+* Implements hook_menu().
+*/
+function sobre_ruedas_menu() {
+    $items['sobre_ruedas/redimir/%/%'] = array(
+        'title' => 'Redeem benefit',
+        'page callback' => '_sobre_ruedas_redeem_benefit',
+        'access callback' => TRUE,
+        'page arguments' => array(2,3),
+        'type' => MENU_CALLBACK,
+    );
+
+    $items['sobre_ruedas/quiz/get_last'] = array(
+        'title' => 'Creation of node',
+        'page callback' => '_sobre_ruedas_go_to_last_quiz',
+        'access callback' => TRUE,
+        'page arguments' => array(),
+        'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function sobre_ruedas_preprocess_node(&$vars) {
+    if(isset($vars['preprocess_fields'])){
+        foreach ($vars['preprocess_fields'] as $field) {
+            switch ($field) {
+                case 'redeem':
+                    global $user;
+                    global $base_url;
+                    $account = user_load($user->uid);
+                    $authorize = _sobre_ruedas_authorize_redemption($account, $vars["node"]);
+
+                    if($authorize){
+                        $query = new EntityFieldQuery();
+                        $query->entityCondition('entity_type', 'node')
+                            ->entityCondition('bundle', 'redemption')
+                            ->propertyCondition('uid', $user->uid)
+                            ->fieldCondition('field_benefits', 'target_id', $vars['node']->nid);
+
+                        $result = $query->execute();
+
+                        $text = t("Redeem");
+                        $url = $base_url."/sobre_ruedas/redimir/".$vars['node']->nid.'/'.$user->uid;
+
+                        $vars[$field] = '<a class="button" href="'.$url.'">'.$text.'</a>';
+
+                        if (isset($result['node'])) {
+                            $text = t("Redeemed");
+                            $vars[$field] = '<a class="button disabled">'.$text.'</a>';
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function sobre_ruedas_form_alter(&$form, &$form_state, $form_id) {
+
+  switch ($form_id) {
+    case 'user_login':
+      $form['title'] = array('#markup' => t('Login to my account'));
+      $form['title']['#weight'] = -1;
+      $form['name']['#title'] = '';
+      $form['pass']['#title'] = '';
+      $form['name']['#description'] = '';
+      $form['pass']['#description'] = '';
+      $form['name']['#attributes']['placeholder'] = t( 'Identification card' );
+      $form['pass']['#attributes']['placeholder'] = t( 'Password' );
+      $form['actions']['submit']['#value'] = t('Enter');
+      $form['link'] = array('#markup' => l(t('I forgot my password'),'/login/password/'));
+      break;
+    case 'user_pass':
+      $form['name']['#title'] = '';
+      $form['name']['#attributes']['placeholder'] = t( 'Email');
+      $form['actions']['submit']['#value'] = t('Send me my password');
+      break;
+    case 'views_exposed_form':
+      global $user;
+      $account = user_load($user->uid);
+      $field_workshop = field_get_items('user', $account, 'field_workshop_type');
+
+      ksort($form['field_segment_tid']['#options']);
+
+      if(isset($form['field_segment_tid']) && $field_workshop && $field_workshop[0]['value'] == 'diesel'){
+        $options = &$form['field_segment_tid']['#options'];
+
+        foreach ($options as $key => &$value) {
+          $term = taxonomy_term_load($key);
+          $diesel_name = field_get_items('taxonomy_term', $term, 'field_name');
+
+          if($diesel_name){
+            $value = $diesel_name[0]['value'];
+          }
+        }
+      }
+
+      if(empty($_GET['field_segment_tid'])){
+        $field_segment_user = field_get_items('user', $account, 'field_segment');
+        if($field_segment_user){
+          $form_state['input']['field_segment_tid'] = $field_segment_user[0]['tid'];
+        }
+      }
+      break;
+
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function sobre_ruedas_entity_view_mode_alter(&$view_mode, $context){
+  // For nodes, change the view mode when it is teaser.
+  if ($context['entity_type'] == 'node' && $view_mode == 'benefits_list') {
+    global $user;
+    $account = user_load($user->uid);
+    $node = $context['entity'];
+  }
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function sobre_ruedas_views_pre_render(&$view) {
+  if ($view->name == 'benefits' && ($view->current_display == 'block' || $view->current_display == 'block_2') ) {
+    global $user;
+    $account = user_load($user->uid);
+
+    if(isset($view->exposed_raw_input['field_segment_tid'])){
+      $term = taxonomy_term_load($view->exposed_raw_input['field_segment_tid']);
+      $field_workshop = field_get_items('user', $account, 'field_workshop_type');
+      $title = '<h2>'.$term->name.'</h2><hr>';
+      if($field_workshop && $field_workshop[0]['value'] == 'diesel'){
+        $diesel_name = field_get_items('taxonomy_term', $term, 'field_name');
+
+        if($diesel_name){
+          $title = '<h2>'.$diesel_name[0]['value'].'</h2><hr>';
+        }
+      }
+      $view->attachment_before = $title;
+    }
+  }
+
+}
+
+function sobre_ruedas_info_segmento(){
+
+  global $user;
+
+  $user = user_load($user->uid);
+  $user_type = $user->field_workshop_type['und'][0]['value'];
+  $user_taller = $user->field_workshop['und'][0]['target_id'];
+  $vocabulary = taxonomy_get_tree(taxonomy_vocabulary_machine_name_load('segment')->vid);
+  foreach($vocabulary as $key => $taxonomy){
+    $segments[] = taxonomy_term_load($taxonomy->tid);
+  }
+  $user_segmento = ( isset( $user->field_segment['und'][0]['value'] ) ) ? $user->field_segment['und'][0]['value']:'---';
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'liquidacion')
+      ->fieldCondition('field_workshop', 'target_id',$user_taller);
+  $nids = array_keys($query->execute()['node']);
+
+  $liquidations = node_load_multiple($nids , $conditions = array(), $reset = FALSE);
+  $value_total = 0;
+  foreach ($liquidations as $key => $liquidation) {
+      $value_total += $liquidation->field_points['und'][0]['value'];
+  }
+  #Revisar cuando supere los 50 Millones
+  $user_segmento = calc_segment($segments,$value_total,$user_type);
+
+  $next_category = taxonomy_get_parents($user_segmento['tid']);
+
+  if($user_type == 'gasoline'){
+    $diference_value = $next_category[key($next_category)]->field_valor_minimo['und'][0]['value'] - $value_total;
+  }
+  if($user_type == 'diesel'){
+    $diference_value = $next_category[key($next_category)]->field_valor_minimo_diesel['und'][0]['value'] - $value_total;
+  }
+
+
+
+  if(count($next_category) == 0){
+    $diference_value = taxonomy_term_load(21)->field_valor_minimo['und'][0]['value'] - $value_total;
+  }
+
+  $user->field_segment['und'][0]['tid'] = $user_segmento['tid'];
+  user_save($user);
+
+  return  theme('sobre_ruedas_info_segmento',
+                array(
+                      'user_segmento'=>$user_segmento['name'],
+                      'value_total'=>$value_total,
+                      'diference_value'=>$diference_value,
+                      'title' => ( $user_segmento['name'] == 'Sin segmento') ? '¿Para saber como subir de segmento consulta los términios y condiciones':''
+ºººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººººº                      )
+                );
+}
+
+function calc_segment($segments,$value_total,$user_type){
+  foreach ($segments as $key => $segment) {
+      if($user_type == 'gasoline'){
+        if( $value_total >= $segment->field_valor_minimo['und'][0]['value'] && $value_total <= $segment->field_valor_maximo['und'][0]['value'] ){
+            return array('name'=>$segment->name,'tid'=>$segment->tid);
+        }
+      }
+      if($user_type == 'diesel'){
+        if( $value_total >= $segment->field_valor_minimo_diesel['und'][0]['value'] && $value_total <= $segment->field_valor_maximo_diesel['und'][0]['value'] ){
+            return array('name'=>$segment->field_name['und'][0]['value'],'tid'=>$segment->tid);
+        }
+      }
+  }
+  return array('name'=>'---','tid'=> NUll);
+}

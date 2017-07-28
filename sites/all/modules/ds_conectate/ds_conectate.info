@@ -1,0 +1,11 @@
+name = Ds Conectate
+description = Módulo custom que permite añadir funcionalidades extras al sistema.
+version = "7.x.0.1"
+core = 7.x
+package = Sobre ruedas
+
+files[] = includes/ds_conectate_callbacks.inc
+files[] = views/ds_conectate_views_handler_field_redeem.inc
+files[] = views/ds_conectate_views_handler_field_title.inc
+files[] = views/ds_conectate_views_handler_field_description.inc
+files[] = views/ds_conectate_views_handler_field_active_quiz_link.inc

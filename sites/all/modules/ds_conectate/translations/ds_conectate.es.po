@@ -1,0 +1,114 @@
+# $Id$
+#
+# Spanish translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  sobre_ruedas.module: n/a
+#  views/sobre_ruedas.views.inc: n/a
+#  views/sobre_ruedas_views_handler_field_redeem.inc: n/a
+#  sobre_ruedas.info: n/a
+#  includes/sobre_ruedas_callbacks.inc: n/a
+#  views/sobre_ruedas_views_handler_field_description.inc: n/a
+#  views/sobre_ruedas_views_handler_field_title.inc: n/a
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2017-03-02 12:32-0500\n"
+"PO-Revision-Date: 2017-03-02 12:32-0500\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Spanish <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+
+#: sobre_ruedas.module:65 views/sobre_ruedas.views.inc:6 views/sobre_ruedas_views_handler_field_redeem.inc:40
+msgid "Redeem"
+msgstr "Redimir"
+
+#: sobre_ruedas.module:71 views/sobre_ruedas_views_handler_field_redeem.inc:45
+msgid "Redeemed"
+msgstr "Redimido"
+
+#: sobre_ruedas.module:87
+msgid "Login to my account"
+msgstr "Ingresar a mi cuenta"
+
+#: sobre_ruedas.module:93
+msgid "Identification card"
+msgstr "Número de Identificación"
+
+#: sobre_ruedas.module:94
+msgid "Password"
+msgstr "Contraseña"
+
+#: sobre_ruedas.module:95
+msgid "Enter"
+msgstr ""
+
+#: sobre_ruedas.module:96
+msgid "I forgot my password"
+msgstr "Olvidé mi Contraseña"
+
+#: sobre_ruedas.module:100
+msgid "Email"
+msgstr ""
+
+#: sobre_ruedas.module:101
+msgid "Send me my password"
+msgstr "Enviarme mi contraseña"
+
+#: sobre_ruedas.module:34
+msgid "Creation of node"
+msgstr ""
+
+#: sobre_ruedas.info:0;0
+msgid "Sobre ruedas"
+msgstr ""
+
+#: sobre_ruedas.info:0
+msgid "Módulo custom que permite añadir funcionalidades extras al sistema."
+msgstr ""
+
+#: includes/sobre_ruedas_callbacks.inc:19
+msgid "The benefit is already redeemed."
+msgstr "Este benficio ya fue redimido."
+
+#: includes/sobre_ruedas_callbacks.inc:46
+msgid "The benefit has been successfully redeemed."
+msgstr "Se ha redimido el beneficio con éxito."
+
+#: includes/sobre_ruedas_callbacks.inc:48
+msgid "Unauthorized."
+msgstr "No autorizado"
+
+#: views/sobre_ruedas.views.inc:7
+msgid "Clickable button to redeem benefits."
+msgstr "Botón para redimir beneficios."
+
+#: views/sobre_ruedas.views.inc:16
+msgid "Benefit Title"
+msgstr "Título del beneficio"
+
+#: views/sobre_ruedas.views.inc:17
+msgid "Benefit Title or surprise title."
+msgstr "Título del beneficio o título sorpresa"
+
+#: views/sobre_ruedas.views.inc:26
+msgid "Benefit Description"
+msgstr "Descripción del beneficio"
+
+#: views/sobre_ruedas.views.inc:27
+msgid "Benefit description or surprise description."
+msgstr ""
+
+#: views/sobre_ruedas_views_handler_field_description.inc:33
+msgid "Redeem this benefit to know it."
+msgstr "Redime este beneficio para conocerlo."
+
+#: views/sobre_ruedas_views_handler_field_title.inc:34
+msgid "Surprise Benefit"
+msgstr "Beneficio sorpresa"
+
