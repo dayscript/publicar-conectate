@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Handles the layout of the quiz_directions answering form.

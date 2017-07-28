@@ -2,16 +2,12 @@
 
 /**
  * @file
- * Theme functions for the short_answer question type.
+ * Theme functions for short_answer.
  */
 
 /**
- * Theme the short_answer answer.
- *
- * @param array $variables
- *
- * @return string
- *   An HTML string.
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
  */
 function theme_short_answer_user_answer($variables) {
   $answer = $variables['answer'];
@@ -22,12 +18,10 @@ function theme_short_answer_user_answer($variables) {
 }
 
 /**
- * Theme the short_answer response form.
+ * Theme the short_answer response form
  *
- * @param array $variables
- *
- * @return string
- *   An HTML string.
+ * @param $form
+ *  The response form
  */
 function theme_short_answer_response_form($variables) {
   $form = $variables['form'];

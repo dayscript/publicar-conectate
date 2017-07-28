@@ -1,10 +1,9 @@
 <?php
 
 /**
- * @file
- * TrueFalse classes.
+ * Defines the classes necessary for a True/False quiz.
  *
- * This module uses the question interface to define the True/False question type.
+ * @file
  */
 
 /**
@@ -15,7 +14,7 @@ class TrueFalseQuestion extends QuizQuestion {
   /**
    * Implementation of saveNodeProperties().
    *
-   * @see QuizQuestion::saveNodeProperties()
+   * @see QuizQuestion#saveNodeProperties($is_new)
    */
   public function saveNodeProperties($is_new = FALSE) {
     db_merge('quiz_truefalse_node')->
@@ -34,16 +33,16 @@ class TrueFalseQuestion extends QuizQuestion {
   /**
    * Implementation of validateNode().
    *
-   * @see QuizQuestion::validateNode()
+   * @see QuizQuestion#validateNode($form)
    */
   public function validateNode(array &$form) {
     // This space intentionally left blank. :)
   }
 
   /**
-   * Implementation of delete().
+   * Implementation of delete
    *
-   * @see QuizQuestion::delete()
+   * @see QuizQuestion#delete($only_this_version)
    */
   public function delete($only_this_version = FALSE) {
     $delete_node = db_delete('quiz_truefalse_node');
@@ -57,9 +56,9 @@ class TrueFalseQuestion extends QuizQuestion {
   }
 
   /**
-   * Implementation of getNodeProperties().
+   * Implementation of getNodeProperties
    *
-   * @see QuizQuestion::getNodeProperties()
+   * @see QuizQuestion#getNodeProperties()
    */
   public function getNodeProperties() {
     if (isset($this->nodeProperties)) {
@@ -77,9 +76,9 @@ class TrueFalseQuestion extends QuizQuestion {
   }
 
   /**
-   * Implementation of getNodeView().
+   * Implementation of getNodeView
    *
-   * @see QuizQuestion::getNodeView()
+   * @see QuizQuestion#getNodeView()
    */
   public function getNodeView() {
     $content = parent::getNodeView();
@@ -98,9 +97,9 @@ class TrueFalseQuestion extends QuizQuestion {
   }
 
   /**
-   * Implementation of getAnsweringForm().
+   * Implementation of getAnsweringForm
    *
-   * @see QuizQuestion::getAnsweringForm()
+   * @see QuizQuestion#getAnsweringForm($form_state, $result_id)
    */
   public function getAnsweringForm(array $form_state = NULL, $result_id) {
     $element = parent::getAnsweringForm($form_state, $result_id);
@@ -123,7 +122,7 @@ class TrueFalseQuestion extends QuizQuestion {
   }
 
   /**
-   * Question response validator.
+   * Implementation of getAnsweringFormValidate().
    */
   public function getAnsweringFormValidate(array &$element, &$value) {
     if (is_null($value)) {
@@ -134,7 +133,7 @@ class TrueFalseQuestion extends QuizQuestion {
   /**
    * Implementation of getBodyFieldTitle().
    *
-   * @see QuizQuestion::getBodyFieldTitle()
+   * @see QuizQuestion#getBodyFieldTitle()
    */
   public function getBodyFieldTitle() {
     return t('True/false statement');
@@ -143,7 +142,7 @@ class TrueFalseQuestion extends QuizQuestion {
   /**
    * Implementation of getCreationForm().
    *
-   * @see QuizQuestion::getCreationForm()
+   * @see QuizQuestion#getCreationForm($form_state)
    */
   public function getCreationForm(array &$form_state = NULL) {
     $form['correct_answer'] = array(
@@ -164,19 +163,16 @@ class TrueFalseQuestion extends QuizQuestion {
   /**
    * Implementation of getMaximumScore().
    *
-   * @see QuizQuestion::getMaximumScore()
+   * @see QuizQuestion#getMaximumScore()
    */
   public function getMaximumScore() {
     return 1;
   }
 
   /**
-   * Get the correct answer to this question.
+   * Get the answer to this question.
    *
    * This is a utility function. It is not defined in the interface.
-   *
-   * @return bool
-   *   Boolean indicating if the correct answer is TRUE or FALSE
    */
   public function getCorrectAnswer() {
     return db_query('SELECT correct_answer FROM {quiz_truefalse_node} WHERE nid = :nid AND vid = :vid', array(':nid' => $this->node->nid, ':vid' => $this->node->vid))->fetchField();
@@ -190,20 +186,12 @@ class TrueFalseQuestion extends QuizQuestion {
 class TrueFalseResponse extends QuizQuestionResponse {
 
   /**
-   * Constructor.
-   *
-   * @param int $result_id
-   *   The result ID for the user's result set. There is one result ID per time
-   *   the user takes a quiz.
-   * @param stdClass $question_node
-   *   The question node.
-   * @param mixed $values
-   *   Array with values
+   * Constructor
    */
   public function __construct($result_id, stdClass $question_node, $answer = NULL) {
     parent::__construct($result_id, $question_node, $answer);
     if (!isset($answer)) {
-      // Get from DB.
+      // Get from DB
       $r = $this->getUserAnswer();
       if (!empty($r)) {
         $this->answer = $r->answer;
@@ -211,7 +199,7 @@ class TrueFalseResponse extends QuizQuestionResponse {
       }
     }
     else {
-      // Load from input.
+      // Load from input
       $this->answer = $answer;
     }
   }
@@ -219,7 +207,7 @@ class TrueFalseResponse extends QuizQuestionResponse {
   /**
    * Implementation of save().
    *
-   * @see QuizQuestionResponse::save()
+   * @see QuizQuestionResponse#save()
    */
   public function save() {
     db_merge('quiz_truefalse_user_answers')
@@ -235,7 +223,7 @@ class TrueFalseResponse extends QuizQuestionResponse {
   /**
    * Implementation of delete().
    *
-   * @see QuizQuestionResponse::delete()
+   * @see QuizQuestionResponse#delete()
    */
   public function delete() {
     db_delete('quiz_truefalse_user_answers')
@@ -246,7 +234,7 @@ class TrueFalseResponse extends QuizQuestionResponse {
   /**
    * Implementation of score().
    *
-   * @see QuizQuestionResponse::score()
+   * @see QuizQuestionResponse#score()
    */
   public function score() {
     $tfQuestion = new TrueFalseQuestion($this->question);
@@ -254,9 +242,9 @@ class TrueFalseResponse extends QuizQuestionResponse {
   }
 
   /**
-   * Implementation of getResponse().
+   * Implementation of getResponse
    *
-   * @see QuizQuestionResponse::getResponse()
+   * @see QuizQuestionResponse#getResponse()
    */
   public function getResponse() {
     return $this->answer;
@@ -264,9 +252,6 @@ class TrueFalseResponse extends QuizQuestionResponse {
 
   /**
    * Get the user's answer from the database.
-   *
-   * @return array
-   *   An array containing both the answer and the score
    */
   public function getUserAnswer() {
     if (isset($this->result_answer_id)) {
@@ -276,8 +261,6 @@ class TrueFalseResponse extends QuizQuestionResponse {
 
   /**
    * Implementation of getFeedbackValues().
-   *
-   * @see QuizQuestionResponse::getFeedbackValues()
    */
   public function getFeedbackValues() {
 

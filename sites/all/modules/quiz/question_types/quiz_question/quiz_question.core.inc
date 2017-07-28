@@ -31,7 +31,7 @@
  * It is required that Question types extend this abstract class.
  *
  * This class has default behaviour that all question types must have. It also handles the node API, but
- * gives the question types opportunity to save, delete and provide data specific to the question types.
+ * gives the question types oppurtunity to save, delete and provide data specific to the question types.
  *
  * This abstract class also declares several abstract functions forcing question-types to implement required
  * methods.
@@ -65,7 +65,7 @@ abstract class QuizQuestion {
   /**
    * Allow question types to override the body field title
    *
-   * @return string
+   * @return
    *  The title for the body field
    */
   public function getBodyFieldTitle() {
@@ -75,20 +75,18 @@ abstract class QuizQuestion {
   /**
    * Returns a node form to quiz_question_form
    *
-   * Adds default form elements, and fetches question type specific elements
-   * from their implementation of getCreationForm
+   * Adds default form elements, and fetches question type specific elements from their
+   * implementation of getCreationForm
    *
    * @param array $form_state
-   * @return array
-   *   An renderable FAPI array
+   * @return unknown_type
    */
   public function getNodeForm(array &$form_state = NULL) {
     global $user;
     $form = array();
 
-    // mark this form to be processed by quiz_form_alter. quiz_form_alter will
-    // among other things hide the revision fieldset if the user don't have
-    // permission to control the revisioning manually.
+    // mark this form to be processed by quiz_form_alter. quiz_form_alter will among other things
+    // hide the revion fieldset if the user don't have permission to controll the revisioning manually.
     $form['#quiz_check_revision_access'] = TRUE;
 
     // Allow user to set title?
@@ -142,7 +140,7 @@ abstract class QuizQuestion {
       '#description' => t('This feedback will show when configured and the user answers a question, regardless of correctness.'),
     );
 
-    // Add question type specific content
+    //Add question type specific content
     $form = array_merge($form, $this->getCreationForm($form_state));
 
     if (variable_get('quiz_auto_revisioning', 1) && $this->hasBeenAnswered()) {
@@ -159,7 +157,7 @@ abstract class QuizQuestion {
    *
    * (This data is generally added to the node's extra field.)
    *
-   * @return array
+   * @return
    *  Content array
    */
   public function getNodeView() {
@@ -173,7 +171,6 @@ abstract class QuizQuestion {
    * @see load hook in quiz_question.module (quiz_question_load)
    *
    * @return array
-   *   Array with all additional node properties
    */
   public function getNodeProperties() {
     if (isset($this->nodeProperties)) {
@@ -214,7 +211,7 @@ abstract class QuizQuestion {
    *
    * @see hook_update and hook_insert in quiz_question.module
    *
-   * @param bool $is_new
+   * @param $is_new
    *  TRUE when the node is initially created.
    */
   public function save($is_new = FALSE) {
@@ -256,7 +253,7 @@ abstract class QuizQuestion {
    * Called by quiz_question_delete (hook_delete).
    * Child classes must call super
    *
-   * @param bool $only_this_version
+   * @param $only_this_version
    *  If the $only_this_version flag is TRUE, then only the particular
    *  nid/vid combo should be deleted. Otherwise, all questions with the
    *  current nid can be deleted.
@@ -274,10 +271,10 @@ abstract class QuizQuestion {
   /**
    * Provides validation for question before it is created.
    *
-   * When a new question is created and initially submitted, this is
-   * called to validate that the settings are acceptable.
+   * When a new question is created and initially submited, this is
+   * called to validate that the settings are acceptible.
    *
-   * @param array $form
+   * @param $form
    *  The processed form.
    */
   abstract public function validateNode(array &$form);
@@ -285,12 +282,12 @@ abstract class QuizQuestion {
   /**
    * Get the form through which the user will answer the question.
    *
-   * @param array $form_state
+   * @param $form_state
    *  The FAPI form_state array
-   * @param int $result_id
+   * @param $result_id
    *  The result id.
-   * @return array
-   *  An renderable FAPI array
+   * @return
+   *  Must return a FAPI array.
    */
   public function getAnsweringForm(array $form_state = NULL, $result_id) {
     $form = array();
@@ -301,17 +298,15 @@ abstract class QuizQuestion {
   /**
    * Get the form used to create a new question.
    *
-   * @param array $form_state
-   *  The FAPI form_state array
-   * @return array
-   *  An renderable FAPI array
+   * @param
+   *  FAPI form state
+   * @return
+   *  Must return a FAPI array.
    */
   abstract public function getCreationForm(array &$form_state = NULL);
 
   /**
    * Get the maximum possible score for this question.
-   *
-   * @return int
    */
   abstract public function getMaximumScore();
 
@@ -322,11 +317,6 @@ abstract class QuizQuestion {
 
   /**
    * Save this Question to the specified Quiz.
-   *
-   * @param $nid
-   *   The node ID.
-   * @param $vid
-   *   The revision ID.
    */
   function saveRelationships($nid, $vid) {
     $quiz_node = node_load($nid, $vid);
@@ -379,8 +369,8 @@ abstract class QuizQuestion {
    * Even if the question itself haven't been answered. This is because the question might have
    * been rendered and a user is about to answer it...
    *
-   * @return bool
-   *   TRUE if question has been answered or is about to be answered...
+   * @return
+   *   true if question has been answered or is about to be answered...
    */
   public function hasBeenAnswered() {
     if (!isset($this->node->vid)) {
@@ -395,11 +385,14 @@ abstract class QuizQuestion {
   /**
    * Determines if the user can view the correct answers
    *
-   * @return TRUE|NULL
-   *   TRUE if the view may include the correct answers to the question
+   * @todo grabbing the node context here probably isn't a great idea
+   *
+   * @return boolean
+   *   true iff the view may include the correct answers to the question
    */
   public function viewCanRevealCorrect() {
     global $user;
+    $quiz_node = node_load(arg(1));
 
     $reveal_correct[] = user_access('view any quiz question correct response');
     $reveal_correct[] = ($user->uid == $this->node->uid);
@@ -410,9 +403,6 @@ abstract class QuizQuestion {
 
   /**
    * Utility function that returns the format of the node body
-   *
-   * @return string|NULL
-   *   The format of the node body
    */
   protected function getFormat() {
     $node = isset($this->node) ? $this->node : $this->question;
@@ -424,8 +414,6 @@ abstract class QuizQuestion {
    * This may be overridden in subclasses. If it returns true,
    * it means the max_score is updated for all occurrences of
    * this question in quizzes.
-   *
-   * @return bool
    */
   protected function autoUpdateMaxScore() {
     return FALSE;
@@ -482,6 +470,21 @@ abstract class QuizQuestion {
   public function isQuestion() {
     return TRUE;
   }
+
+  /**
+   * If this question type has answers to report on, this is necessary to do it
+   * from within Views.
+   *
+   * Question types should return an array expected by
+   * views_handler_field_prerender_list().
+   *
+   * @param type $result_ids
+   *   An array of result IDs.
+   * @param type $nid
+   *   The question node ID.
+   * @param type $vid
+   *   The question node revision ID.
+   */
 }
 
 /**
@@ -505,12 +508,12 @@ abstract class QuizQuestionResponse {
   /**
    * Create a new user response.
    *
-   * @param int $result_id
+   * @param $result_id
    *  The result ID for the user's result set. There is one result ID per time
    *  the user takes a quiz.
-   * @param stdClass $question_node
+   * @param $question_node
    *  The question node.
-   * @param mixed $answer
+   * @param $answer
    *  The answer (dependent on question type).
    */
   public function __construct($result_id, stdClass $question_node, $answer = NULL) {
@@ -528,7 +531,6 @@ abstract class QuizQuestionResponse {
   }
 
   /**
-   * Get the question of this question response.
    *
    * @return QuizQuestion
    */
@@ -539,7 +541,7 @@ abstract class QuizQuestionResponse {
   /**
    * Used to refresh this instances question node in case drupal has changed it.
    *
-   * @param stdClass $newNode
+   * @param $newNode
    *  Question node
    */
   public function refreshQuestionNode($newNode) {
@@ -550,8 +552,6 @@ abstract class QuizQuestionResponse {
    * Indicate whether the response has been evaluated (scored) yet.
    * Questions that require human scoring (e.g. essays) may need to manually
    * toggle this.
-   *
-   * @return bool
    */
   public function isEvaluated() {
     return (bool) $this->evaluated;
@@ -560,11 +560,9 @@ abstract class QuizQuestionResponse {
   /**
    * Check to see if the answer is marked as correct.
    *
-   * This default version returns TRUE if the score is equal to the maximum
+   * This default version returns TRUE iff the score is equal to the maximum
    * possible score. Each question type can determine on its own if the question
    * response is "correct".
-   *
-   * @return bool
    */
   function isCorrect() {
     return ($this->getMaxScore(FALSE) == $this->getScore(FALSE));
@@ -573,7 +571,7 @@ abstract class QuizQuestionResponse {
   /**
    * Get the score of this question response.
    *
-   * @param bool $weight_adjusted
+   * @param bool $weighted
    *   If the score should be scaled based on the Quiz question max score.
    *
    * @return int
@@ -581,16 +579,24 @@ abstract class QuizQuestionResponse {
    */
   function getScore($weight_adjusted = TRUE) {
     if ($weight_adjusted) {
-      $ratio = $this->getWeightedRatio();
-      return $this->score() * $ratio;
+      if (!empty($this->points_awarded)) {
+        // This is already weighted.
+        return $this->points_awarded;
+      }
+      else {
+        // No stored score yet.
+        $ratio = $this->getWeightedRatio();
+        return $this->score() * $ratio;
+      }
     }
+
     return $this->score();
   }
 
   /**
    * Get the max score of this question response.
    *
-   * @param bool $weight_adjusted
+   * @param bool $weighted
    *   If the max score should be scaled based on the Quiz question max score.
    *
    * @return int
@@ -635,16 +641,10 @@ abstract class QuizQuestionResponse {
    *
    * Convert data to an object that has the following properties:
    * - $score
+   * - $result_id
    * - $nid
    * - $vid
-   * - $result_id
    * - $is_correct
-   * - $is_evaluated
-   * - $is_skipped
-   * - $is_doubtful
-   * - $tid
-   *
-   * @return stdClass
    */
   function toBareObject() {
     $obj = new stdClass();
@@ -662,8 +662,15 @@ abstract class QuizQuestionResponse {
 
   /**
    * Get data suitable for reporting a user's score on the question.
+   * This expects an object with the following attributes:
    *
-   * @return array
+   *  answer_id; // The answer ID
+   *  answer; // The full text of the answer
+   *  is_evaluated; // 0 if the question has not been evaluated, 1 if it has
+   *  score; // The score the evaluator gave the user; this should be 0 if is_evaluated is 0.
+   *  question_vid
+   *  question_nid
+   *  result_id
    */
   public function getReport() {
     // Basically, we encode internal information in a
@@ -686,11 +693,13 @@ abstract class QuizQuestionResponse {
    *
    * The report is a form to allow editing scores and the likes while viewing the report form
    *
-   * @return array|NULL
-   *   An renderable FAPI array
+   * @return $form
+   *  Drupal form array
    */
   public function getReportForm() {
-    // Add general data, and data from the question type implementation
+    /*
+     * Add general data, and data from the question type implementation
+     */
     $form = array();
 
     $form['nid'] = array(
@@ -729,13 +738,13 @@ abstract class QuizQuestionResponse {
 
   /**
    * Get the response part of the report form
-   *
-   * @return array
+
+   * @return
    *  Array of response data, with each item being an answer to a response. For
-   *  an example, see MultichoiceResponse::getFeedbackValues(). The sub
+   *  an example, see MultichoiceResponse::getReportFormResponse(). The sub
    *  items are keyed by the feedback type. Providing a NULL option means that
-   *  feedback will not be shown. See an example at
-   *  LongAnswerResponse::getFeedbackValues().
+   *  feedback will not be shown. Seen an example at
+   *  LongAnswerResponse::getReportFormResponse().
    */
   public function getFeedbackValues() {
     $data = array();
@@ -754,12 +763,6 @@ abstract class QuizQuestionResponse {
     return $data;
   }
 
-  /**
-   * Get the feedback form for the reportForm
-   *
-   * @return array|FALSE
-   *   An renderable FAPI array, or FALSE if no answer form
-   */
   public function getReportFormAnswerFeedback() {
     return FALSE;
   }
@@ -767,7 +770,7 @@ abstract class QuizQuestionResponse {
   /**
    * Get the submit function for the reportForm
    *
-   * @return string|FALSE
+   * @return
    *  Submit function as a string, or FALSE if no submit function
    */
   public function getReportFormSubmit() {
@@ -777,10 +780,8 @@ abstract class QuizQuestionResponse {
   /**
    * Get the validate function for the reportForm
    *
-   * @param array $element
-   *   The form element of this question.
-   * @param array $form_state
-   *   The FAPI form_state array
+   * @return
+   *  Validate function as a string, or FALSE if no validate function
    */
   public function getReportFormValidate(&$element, &$form_state) {
     // Check to make sure that entered score is not higher than max allowed score.
@@ -791,9 +792,6 @@ abstract class QuizQuestionResponse {
 
   /**
    * Utility function that returns the format of the node body
-   *
-   * @return string|NULL
-   *   The format of the node body
    */
   protected function getFormat() {
     $body = field_get_items('node', $this->question, 'body');
@@ -817,18 +815,11 @@ abstract class QuizQuestionResponse {
 
   /**
    * Get the user's response.
-   *
-   * @return mixed
-   *   The answer given by the user
    */
   abstract public function getResponse();
 
   /**
    * Can the quiz taker view the requested review?
-   *
-   * @param string $option
-   *   An option key
-   * @return bool
    */
   public function canReview($option) {
     $can_review = &drupal_static(__METHOD__, array());
@@ -842,9 +833,9 @@ abstract class QuizQuestionResponse {
   }
 
   /**
-   * Implementation of getReportFormScore().
+   * Implementation of getReportFormScore
    *
-   * @see QuizQuestionResponse::getReportFormScore()
+   * @see QuizQuestionResponse#getReportFormScore()
    */
   public function getReportFormScore() {
     $score = ($this->isEvaluated()) ? $this->getScore() : '';
@@ -864,8 +855,6 @@ abstract class QuizQuestionResponse {
    * Set the target result answer ID for this Question response.
    *
    * Useful for cloning entire result sets.
-   *
-   * @param int $result_answer_id
    */
   public function setResultAnswerId($result_answer_id) {
     $this->result_answer_id = $result_answer_id;
@@ -885,15 +874,17 @@ abstract class QuizQuestionResponse {
    *
    * @see views_handler_field_prerender_list for the expected return value.
    *
-   * @see MultichoiceResponse::viewsGetAnswers() for a correct approach
-   * @see TrueFalseResponse::viewsGetAnswers() for a correct approach
+   * @see MultichoiceResponse::viewsGetAnswers for a correct approach
+   * @see TrueFalseResponse::viewsGetAnswers for a correct approach
+   * @todo in the future, we should be able to do an
+   * entity_load('quiz_result_answer', $result_answer_ids)
    */
   public static function viewsGetAnswers(array $result_answer_ids = array()) {
     $items = array();
     foreach ($result_answer_ids as $result_answer_id) {
       $ra = entity_load_single('quiz_result_answer', $result_answer_id);
       $question = node_load($ra->question_nid, $ra->question_vid);
-      /** @var $ra_i QuizQuestionResponse */
+      /** var $ra_i QuizQuestionResponse */
       $ra_i = _quiz_question_response_get_instance($ra->result_id, $question);
       $items[$ra->result_id][] = array('answer' => $ra_i->getResponse());
     }
@@ -907,7 +898,7 @@ abstract class QuizQuestionResponse {
    * ratio is 3.33.
    *
    * @return float
-   *   The weight of the question
+   *   The weight of the question/
    */
   public function getWeightedRatio() {
     if ($this->getMaxScore(FALSE) == 0) {
@@ -921,37 +912,22 @@ abstract class QuizQuestionResponse {
 
 class QuizQuestionBroken extends QuizQuestion {
 
-  /**
-   * @see QuizQuestion::getCreationForm()
-   */
   public function getCreationForm(array &$form_state = NULL) {
 
   }
 
-  /**
-   * @see QuizQuestion::getMaximumScore()
-   */
   public function getMaximumScore() {
 
   }
 
-  /**
-   * @see QuizQuestion::saveNodeProperties()
-   */
   public function saveNodeProperties() {
 
   }
 
-  /**
-   * @see QuizQuestion::validateNode()
-   */
   public function validateNode(array &$form) {
 
   }
 
-  /**
-   * @see QuizQuestion::hasFeedback()
-   */
   public function hasFeedback() {
     return FALSE;
   }
@@ -960,9 +936,6 @@ class QuizQuestionBroken extends QuizQuestion {
 
 class QuizQuestionResponseBroken extends QuizQuestionResponse {
 
-  /**
-   * @see QuizQuestionResponse::getReport()
-   */
   public function getReport() {
     return array(
       'answer_id' => 0,
@@ -970,52 +943,26 @@ class QuizQuestionResponseBroken extends QuizQuestionResponse {
     );
   }
 
-  /**
-   * Create a new user response.
-   *
-   * @param int $result_id
-   *  The result ID for the user's result set. There is one result ID per time
-   *  the user takes a quiz.
-   * @param stdClass $question_node
-   *  The question node.
-   * @param mixed $answer
-   *  The answer (dependent on question type).
-   */
   public function __construct($result_id, stdClass $question_node, $answer = NULL) {
     $this->quizQuestion = _quiz_question_get_instance($question_node);
   }
 
-  /**
-   * @see QuizQuestionResponse::delete()
-   */
   public function delete() {
 
   }
 
-  /**
-   * @see QuizQuestionResponse::getResponse()
-   */
   public function getResponse() {
 
   }
 
-  /**
-   * @see QuizQuestionResponse::save()
-   */
   public function save() {
 
   }
 
-  /**
-   * @see QuizQuestionResponse::score()
-   */
   public function score() {
 
   }
 
-  /**
-   * @see QuizQuestionResponse::getMaxScore()
-   */
   public function getMaxScore($weight_adjusted = TRUE) {
     return 0;
   }

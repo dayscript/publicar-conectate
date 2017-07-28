@@ -4,8 +4,9 @@
  * @file
  * Handles the layout of the choice creation form.
  *
+ *
  * Variables available:
- * - $form.
+ * - $form
  */
 foreach (element_children($form) as $key) {
   if (is_numeric($key)) {

@@ -1,0 +1,91 @@
+@font-face { 
+  font-family: "RobotoCondensed-Bold";    
+  src: url(../fonts/RobotoCondensed-Bold.ttf);
+}
+
+@font-face { 
+  font-family: "RobotoCondensed-Regular";    
+  src: url(../fonts/RobotoCondensed-Regular.ttf);
+}
+
+.form-signin {
+  max-width: 500px;
+  padding: 15px;
+  margin: 10% auto 5%;
+  border-bottom: solid 2px #E00209;
+  border-right: solid 2px #E00209;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+  font-family: "RobotoCondensed-Bold";
+  color: #E00209;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 2%;
+  color: #E00209;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="text"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-bottom: 2%;
+  border-bottom: solid 2px #E00209;
+  border-right: solid 2px #E00209;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom: solid 2px #E00209;
+  border-right: solid 2px #E00209;
+}
+
+.form-signin input[type="password"]::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #E00209;
+}
+.form-signin input[type="password"]::-moz-placeholder { /* Firefox 19+ */
+  color: #E00209;
+}
+.form-signin input[type="password"]::-ms-input-placeholder { /* IE 10+ */
+  color: #E00209;
+}
+.form-signin input[type="password"]::-moz-placeholder { /* Firefox 18- */
+  color: #E00209;
+}
+
+.form-signin input[type="text"]::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #E00209;
+}
+.form-signin input[type="text"]::-moz-placeholder { /* Firefox 19+ */
+  color: #E00209;
+}
+.form-signin input[type="text"]::-ms-input-placeholder { /* IE 10+ */
+  color: #E00209;
+}
+.form-signin input[type="text"]::-moz-placeholder { /* Firefox 18- */
+  color: #E00209;
+}
+
+.btn-login{
+  background: #E00209;
+  color: #fff;
+}
+
+.btn-login:hover{
+  background: #ffffff;
+  color: #E00209;
+}

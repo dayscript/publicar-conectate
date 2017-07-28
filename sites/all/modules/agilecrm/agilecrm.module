@@ -1,0 +1,766 @@
+<?php
+function agilecrm_menu () {
+  $items = array();
+  $items['admin/agilecrm'] = array(
+      'title' => 'Agile CRM',
+      'description' => 'Agile CRM',
+      'position' => 'left',
+      'weight' => -100,
+      'page callback' => 'system_admin_menu_block_page',
+      'access arguments' => array('administer site configuration'),
+      'file' => 'system.admin.inc',
+      'file path' => drupal_get_path('module', 'system'),
+  );
+  //We need at least one child item, otherwise parent will not show up
+  $items['admin/agilecrm/home'] = array(
+      'title' => 'Home',
+      'description' => 'Home',
+      'page callback' => 'agilecrm_dashborad_form',
+      'access arguments' => array('access administration pages'),
+  );
+   $items['admin/agilecrm/web-rules'] = array(
+      'title' => 'Web Rules',
+      'description' => 'Web Rules',
+      'page callback' => 'agilecrm_webrules',
+      'access arguments' => array('access administration pages'),
+  );
+  $items['admin/agilecrm/form-builder'] = array(
+      'title' => 'Form Builder',
+      'description' => 'Form Builder',
+      'page callback' => 'agile_formbuilder',
+      'access arguments' => array('access administration pages'),
+  );
+  $items['admin/agilecrm/landing-pages'] = array(
+      'title' => 'Landing Pages',
+      'description' => 'Landing Pages',
+      'page callback' => 'agile_landingpages',
+      'access arguments' => array('access administration pages'),
+  );
+  $items['admin/agilecrm/email-campaings'] = array(
+      'title' => 'Email Campaings',
+      'description' => 'Email Campaings',
+      'page callback' => 'agile_campaings',
+      'access arguments' => array('access administration pages'),
+  );
+  $items['admin/agilecrm/web-stats'] = array(
+      'title' => 'Web Stats',
+      'description' => 'Web Stats',
+      'page callback' => 'agile_webstatus',
+      'access arguments' => array('access administration pages'),
+  );
+  $items['admin/agilecrm/refer-friend'] = array(
+      'title' => 'Refer a Friend',
+      'description' => 'Refer a Friend',
+      'page callback' => 'agile_referafriend',
+      'page arguments' => array('agilecrm_my_form'),
+      'access arguments' => array('access administration pages'),
+  );
+  $items['admin/agilecrm/settings'] = array(
+      'title' => 'Settings',
+      'description' => 'Settings',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('agilecrm_my_form'),
+      'access arguments' => array('access administration pages'),
+  );
+
+  return $items;
+}
+
+/**
+ * Get the Agile settings Value from the "agilecrm_module" table
+ */
+function getSettings(){
+ $result = db_select('agilecrm_module', 't_alias')->fields('t_alias', array('setting_domain', ' setting_email','setting_password','setting_restapikey','setting_jsapikey','setting_webstats','setting_webrules'))->execute()->fetchAll();
+
+return $result;
+}
+
+
+/** Optional callback to manipulate and set variables */
+function agilecrm_preprocess_my_custom_gallery(&$vars) {
+  // This variable will be available in the template file as $custom_value
+  $vars['custom_value'] = 'Hello!';
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function agilecrm_theme($existing, $type, $theme, $path) {
+  return array(
+    // Name to be called with theme(). theme('my_custom_gallery', $images)
+    'agile_home_dashboard' => array(
+      'template' => 'agile-home-dashboard',
+      'path' => drupal_get_path('module', 'agilecrm') . '/templates'),
+    'agile_web_rules' => array(
+      'template' => 'agile-web-rules',
+      'path' => drupal_get_path('module', 'agilecrm') . '/templates'),
+    'agile_form_builder' => array(
+      'template' => 'agile-form-builder',
+      'path' => drupal_get_path('module', 'agilecrm') . '/templates'),
+    'agile_landing_pages' => array(
+      'template' => 'agile-landing-pages',
+      'path' => drupal_get_path('module', 'agilecrm') . '/templates'),
+    'agile_email_campaings' => array(
+      'template' => 'agile-email-campaings',
+      'path' => drupal_get_path('module', 'agilecrm') . '/templates'),
+    'agile_web_status' => array(
+      'template' => 'agile-web-status',
+      'path' => drupal_get_path('module', 'agilecrm') . '/templates'),
+    'agile_refer_friend' => array(
+      'template' => 'agile-refer-friend',
+      'path' => drupal_get_path('module', 'agilecrm') . '/templates'),
+  );
+}
+
+function agilecrm_init(){
+  drupal_add_css(drupal_get_path('module', 'agilecrm') .'/agilecrm.css');
+}
+
+function agilecrm_dashborad_form(){
+  $result = getSettings();
+ foreach ($result as $value) {
+      $domain = $value->setting_domain;
+      $email = $value->setting_email;
+      $password = $value->setting_password;
+      $restapkey = $value->setting_restapikey;
+      $jsapikey = $value->setting_jsapikey;
+      $webstats = $value->setting_webstats;
+      $webrules = $value->setting_webrules;
+ }
+ if($restapkey){ 
+  $form1 = drupal_get_form('myforms');
+
+  $output = drupal_render($form1) ;
+
+ $content = theme('agile_home_dashboard',array('output' => $output));
+
+  return $content;
+  }else{
+     $query = drupal_get_destination();
+      drupal_goto('admin/agilecrm/settings',$query);
+    }
+}
+
+function myforms($form, &$form_submit = NULL){
+$result = getSettings();
+ foreach ($result as $value) {
+      $domain = $value->setting_domain;
+      $email = $value->setting_email;
+      $password = $value->setting_password;
+      $restapkey = $value->setting_restapikey;
+      $jsapikey = $value->setting_jsapikey;
+      $webstats = $value->setting_webstats;
+      $webrules = $value->setting_webrules;
+ }
+    if($webstats == '1'){
+        $form['general']['webstats'] = array(
+          '#type' => 'checkbox',
+          '#name' => 'webstats',
+          '#id' => 'edit-webstats',
+          '#attributes' => array('checked' => 'checked'),
+          '#default_value' =>$webstats,
+        );
+      }else{
+        $form['general']['webstats'] = array(
+          '#type' => 'checkbox',
+          '#name' => 'webstats',
+          '#id' => 'edit-webstats',
+          '#default_value' =>$webstats,
+          );
+      }
+      if($webrules == '1'){
+         $form['general']['webrules'] = array(
+          '#type' => 'checkbox',
+          '#name' => 'webrules',
+          '#id' => 'edit-webrules',
+          '#attributes' => array('checked' => 'checked'),
+          '#default_value' =>$webrules,
+        );
+      }else{
+        $form['general']['webrules'] = array(
+          '#type' => 'checkbox',
+          '#name' => 'webrules',
+          '#id' => 'edit-webrules',
+          '#default_value' =>$webrules,
+          );
+      }
+return $form;
+} 
+
+function myforms_validate($form, &$form_state) {  
+    $webrules = $form_state['values']['webrules'];
+    $webstats = $form_state['values']['webstats'];
+    db_update('agilecrm_module')
+         ->fields(array(
+         'setting_webstats' => $webstats, 
+         'setting_webrules' => $webrules,
+        )) ->condition('agilecrm_module_id', '1')->execute();
+}
+function myforms_submit($form, &$form_state) {
+    echo $webrules = $form_state['values']['webrules'];
+    echo $webstats = $form_state['values']['webstats'];
+}
+
+function agilecrm_webrules(){
+ $result = getSettings();
+ foreach ($result as $value) {
+      $domain = $value->setting_domain;
+      $email = $value->setting_email;
+      $password = $value->setting_password;
+      $restapkey = $value->setting_restapikey;
+      $jsapikey = $value->setting_jsapikey;
+ }
+ if($restapkey){ 
+define("AGILE_USER_EMAIL",$email);
+define("AGILE_REST_API_KEY",$restapkey);
+define("AGILE_DOMAIN",$domain);
+$form_result = curl_wrap("webrule", null, "GET", "application/json");
+$form_result_data = json_decode($form_result, false);
+ $output = theme('agile_web_rules', array('output' => $result,'form_output' => $form_result_data));
+  return $output;
+  }else{
+     $query = drupal_get_destination();
+      drupal_goto('admin/agilecrm/settings',$query);
+    }
+}
+function agile_formbuilder(){
+ $result = getSettings();
+ foreach ($result as $value) {
+      $domain = $value->setting_domain;
+      $email = $value->setting_email;
+      $password = $value->setting_password;
+      $restapkey = $value->setting_restapikey;
+      $jsapikey = $value->setting_jsapikey;
+ }
+ if($restapkey){
+define("AGILE_USER_EMAIL",$email);
+define("AGILE_REST_API_KEY",$restapkey);
+define("AGILE_DOMAIN",$domain);
+$form_result = curl_wrap("forms", null, "GET", "application/json");
+if (version_compare(PHP_VERSION, '5.4.0', '>=') && !(defined('JSON_C_VERSION') && PHP_INT_SIZE > 4)) {
+  $form_result_data = json_decode($form_result, false, 512, JSON_BIGINT_AS_STRING);
+} else {
+   $form_result_data = json_decode($form_result, false);
+}
+
+ 
+/* if (is_object($result[0])) {
+        $output = get_object_vars($result[0]);
+    }*/
+$output = theme('agile_form_builder' , array('output' => $result,'form_output' => $form_result_data));
+ return $output;
+ }else{
+     $query = drupal_get_destination();
+      drupal_goto('admin/agilecrm/settings',$query);
+    }
+} 
+function agile_landingpages(){
+   $result = getSettings();
+ foreach ($result as $value) {
+      $domain = $value->setting_domain;
+      $email = $value->setting_email;
+      $password = $value->setting_password;
+      $restapkey = $value->setting_restapikey;
+      $jsapikey = $value->setting_jsapikey;
+ }
+ if($restapkey){
+define("AGILE_USER_EMAIL",$email);
+define("AGILE_REST_API_KEY",$restapkey);
+define("AGILE_DOMAIN",$domain);
+$form_result = curl_wrap("landingpages", null, "GET", "application/json");
+if (version_compare(PHP_VERSION, '5.4.0', '>=') && !(defined('JSON_C_VERSION') && PHP_INT_SIZE > 4)) {
+  $form_result_data = json_decode($form_result, false, 512, JSON_BIGINT_AS_STRING);
+} else {
+   $form_result_data = json_decode($form_result, false);
+}
+ $output = theme('agile_landing_pages' , array('output' => $result,'form_output' => $form_result_data));
+  return $output;
+  }else{
+     $query = drupal_get_destination();
+      drupal_goto('admin/agilecrm/settings',$query);
+    }
+} 
+function agile_campaings(){
+$result = getSettings();
+ foreach ($result as $value) {
+      $domain = $value->setting_domain;
+      $email = $value->setting_email;
+      $password = $value->setting_password;
+      $restapkey = $value->setting_restapikey;
+      $jsapikey = $value->setting_jsapikey;
+   }
+   if($restapkey){
+  define("AGILE_USER_EMAIL",$email);
+  define("AGILE_REST_API_KEY",$restapkey);
+  define("AGILE_DOMAIN",$domain);
+  $form_result = curl_wrap("workflows", null, "GET", "application/json");
+  $form_result_data = json_decode($form_result, false);
+   $output = theme('agile_email_campaings', array('output' => $result,'form_output' => $form_result_data));
+    return $output;
+   }else{
+     $query = drupal_get_destination();
+      drupal_goto('admin/agilecrm/settings',$query);
+    }
+} 
+function agile_webstatus(){
+$result = getSettings();
+    foreach ($result as $value) {
+      $domain = $value->setting_domain;
+      $email = $value->setting_email;
+      $password = $value->setting_password;
+      $restapkey = $value->setting_restapikey;
+      $jsapikey = $value->setting_jsapikey;
+    }
+    if($restapkey){
+  $form1 = drupal_get_form('myforms');
+
+  $another_output = drupal_render($form1) ;
+
+ $output = theme('agile_web_status',array('output' => $another_output));
+  return $output;
+  }else{
+   $query = drupal_get_destination();
+    drupal_goto('admin/agilecrm/settings',$query);
+  }
+} 
+function agile_referafriend(){
+ $output = theme('agile_refer_friend');
+  return $output;
+}
+
+
+
+/**
+ * Agile CRM Drupal Settings Page
+ */
+
+function agilecrm_my_form($form, &$form_state) {
+
+   $result = getSettings();
+    foreach ($result as $value) {
+      $domain = $value->setting_domain;
+      $email = $value->setting_email;
+      $password = $value->setting_password;
+      $restapkey = $value->setting_restapikey;
+      $jsapikey = $value->setting_jsapikey;
+    }
+
+  $form['name'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Agile CRM settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+     '#prefix' => '<div style="float:left;width:47%;padding:0px 5px;">',
+  );
+  $form['name']['domain'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Enter Domain Name:'),
+    '#required' => TRUE,
+    '#default_value' => $domain,
+  );
+  $form['name']['email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('User ID (Email Address):'),
+    '#required' => TRUE,
+    '#default_value' => $email,
+  );
+  $form['name']['password'] = array(
+    '#type' => 'password',
+    '#title' => t('Password:'),
+    '#required' => TRUE,
+  );  
+  $form['name']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+    '#suffix' => '</div>',
+  );
+  $form['general'] = array(
+     '#prefix' => '<div style="float:left;width:47%;padding:0px 5px;">',
+  );
+  $form['general']['text'] = array(
+      '#type' => 'markup',
+      '#markup' => t('<div class="">
+  <div class="box-right" style="margin-left: 4px;text-align:left;">        
+      <h3 class="m-t-none h4 m-b-sm">Benefits of Agile CRM Plugin</h3>
+      <ul class="listitem">
+     <li>Simple to integrate web rule & web stats, no need of coding knowledge.</li>
+ <li>  Show real-time web popups to get more info about your website visitors and also increase the number of subscriptions or sign ups.</li>
+ <li>  Easily integrate customized web forms to your website or app to create or update contacts and log subsquent web activity. </li>
+ <li>  Easily integrate attractive landing pages with your website using this plugin.</li>
+ <li> Schedule bulk Email Campaigns for newsletters or other marketing activity, with simple drag-and-drop features.</li>
+</ul>
+  </div>
+</div>'),
+      '#suffix' => '</div>',
+    );
+  return $form;
+}
+
+function agilecrm_my_form_validate($form, &$form_state) {
+  $email = $form_state['values']['email'];
+  if (!valid_email_address($email)) {
+    form_set_error('[name][email]', t('The email address appears to be invalid.'));
+  }
+  $domain = $form_state['values']['domain'];
+  $password = $form_state['values']['password'];
+  define("AGILE_DOMAIN", $domain);  
+  define("AGILE_USER_EMAIL", $email);
+  define("AGILE_REST_API_KEY", $password);
+  $result = curl_wrap("api-key", null, "GET", "application/json");
+  $arr = json_decode($result, TRUE);
+  $count_array = count($arr);
+  if($count_array != 0){
+  extract($arr);
+      $rest_api = isset($api_key);
+	  $js_api = isset($js_api_key);
+	  if($rest_api == ''){
+	     form_set_error('[name][domain]',t("Invalid Domain Name, Email or Password"));
+	  }
+  }
+ 
+}
+
+function agilecrm_my_form_submit($form, &$form_state) {
+$domain = $form_state['values']['domain'];
+$email = $form_state['values']['email'];
+$password = $form_state['values']['password'];
+define("AGILE_DOMAIN", $domain);  
+define("AGILE_USER_EMAIL", $email);
+define("AGILE_REST_API_KEY", $password);
+$result = curl_wrap("api-key", null, "GET", "application/json");
+$arr1 = json_decode($result, TRUE);
+extract($arr1);
+$rest_api = $api_key;
+$js_api = $js_api_key;
+$result = getSettings();
+ foreach ($result as $value) {
+      $domain_database = $value->setting_domain;
+      $email_database = $value->setting_email;
+      $password_database = $value->setting_password;
+      $restapkey_database = $value->setting_restapikey;
+      $jsapikey_database = $value->setting_jsapikey;
+ }
+  if($domain_database != "") {
+          db_update('agilecrm_module')
+    ->fields(array(
+      'setting_domain' => $domain,
+      'setting_email' => $email,
+      'setting_password' => $password,
+      'setting_restapikey' => $rest_api,
+      'setting_jsapikey' => $js_api,
+      'setting_webstats' => '1', 
+      'setting_webrules' => '1',     
+    ))->condition('agilecrm_module_id', '1')->execute();
+    drupal_set_message("Your settings have been updated successfully");
+  }else{
+$nid = db_insert('agilecrm_module')->fields(array('setting_domain' => $domain,'setting_email' => $email,'setting_password' => $password,'setting_restapikey' => $rest_api,'setting_jsapikey' => $js_api,'setting_webstats' => '1','setting_webrules' => '1',))->execute();
+drupal_set_message(t('The form has been submitted.'));
+}
+}
+
+
+function agile_curl_wrap($entity, $data, $method, $content_type) {
+    if ($content_type == NULL) {
+        $content_type = "application/json";
+    }
+    
+    //$agile_url = "https://" . AGILE_DOMAIN . "-dot-sandbox-dot-agilecrmbeta.appspot.com/dev/api/" . $entity;
+    $agile_url = "https://" . AGILE_DOMAIN_CHECK . ".agilecrm.com/dev/api/" . $entity;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+    curl_setopt($ch, CURLOPT_UNRESTRICTED_AUTH, true);
+    switch ($method) {
+        case "POST":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            break;
+        case "GET":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+            break;
+        case "PUT":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            break;
+        case "DELETE":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+            break;
+        default:
+            break;
+    }
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        "Content-type : $content_type;", 'Accept : application/json'
+    ));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_USERPWD, AGILE_USER_EMAIL_CHECK . ':' . AGILE_REST_API_KEY_CHECK);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    $output = curl_exec($ch);
+    curl_close($ch);
+    return $output;
+}
+
+
+function curl_wrap($entity, $data, $method, $content_type) {
+  if(defined('AGILE_DOMAIN')){
+    if ($content_type == NULL) {
+        $content_type = "application/json";
+    }
+    
+    //$agile_url = "https://" . AGILE_DOMAIN . "-dot-sandbox-dot-agilecrmbeta.appspot.com/dev/api/" . $entity;
+    $agile_url = "https://" . AGILE_DOMAIN . ".agilecrm.com/dev/api/" . $entity;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+    curl_setopt($ch, CURLOPT_UNRESTRICTED_AUTH, true);
+    switch ($method) {
+        case "POST":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            break;
+        case "GET":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+            break;
+        case "PUT":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            break;
+        case "DELETE":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+            break;
+        default:
+            break;
+    }
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        "Content-type : $content_type;", 'Accept : application/json'
+    ));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_USERPWD, AGILE_USER_EMAIL . ':' . AGILE_REST_API_KEY);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    $output = curl_exec($ch);
+    curl_close($ch);
+    return $output;
+  }
+}
+
+function agilelanding_curl_wrap($entity, $data, $method, $content_type) {
+  if(defined('AGILE_LANDING_DOMAIN')){
+    if ($content_type == NULL) {
+        $content_type = "application/json";
+    }
+    
+    //$agile_url = "https://" . AGILE_DOMAIN . "-dot-sandbox-dot-agilecrmbeta.appspot.com/dev/api/" . $entity;
+    $agile_url = "https://" . AGILE_LANDING_DOMAIN . ".agilecrm.com/dev/api/" . $entity;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+    curl_setopt($ch, CURLOPT_UNRESTRICTED_AUTH, true);
+    switch ($method) {
+        case "POST":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            break;
+        case "GET":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+            break;
+        case "PUT":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            break;
+        case "DELETE":
+            $url = $agile_url;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+            break;
+        default:
+            break;
+    }
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        "Content-type : $content_type;", 'Accept : application/json'
+    ));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_USERPWD, AGILE_LANDING_USER_EMAIL . ':' . AGILE_LANDING_REST_API_KEY);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    $output = curl_exec($ch);
+    curl_close($ch);
+    return $output;
+  }
+}
+
+/*function agilecrm_ckeditor_plugin() {
+   return array(
+      'landing_page' => array(
+         // Plugin name.
+            'name' => 'landing_page',
+            // Plugin description - it will be displayed in the plugins management section of the profile settings.
+            'desc' => t('Plugin for adding Agile CRM Landing Page.'),
+            // The full path to the CKEditor plugin directory, trailing slash included.
+            'path' => drupal_get_path('module', 'agilecrm') . '/plugins/',
+            // Plugin buttons definition (optional).
+            'buttons' => array(
+               'landing_page' => array('label' => 'Landing Page', 'icon' => 'icons/browser.png'),
+            )
+        ),
+      'form_builder' => array(
+         // Plugin name.
+            'name' => 'form_builder',
+            // Plugin description - it will be displayed in the plugins management section of the profile settings.
+            'desc' => t('Plugin for adding Agile CRM Form Builder.'),
+            // The full path to the CKEditor plugin directory, trailing slash included.
+            'path' => drupal_get_path('module', 'agilecrm') . '/plugins/',
+            // Plugin buttons definition (optional).
+            'buttons' => array(
+               'form_builder' => array('label' => 'Form Builder', 'icon' => 'icons/googleforms.png'),
+            )
+        )
+    );
+}*/
+/*function agilecrm_getConfig(Editor $editor) {
+ $result = getSettings();
+ foreach ($result as $value) {
+      $domain = $value->setting_domain;
+      $email = $value->setting_email;
+      $password = $value->setting_password;
+      $restapkey = $value->setting_restapikey;
+      $jsapikey = $value->setting_jsapikey;
+ }
+  $scripta = 'var domain = '.$domain;
+ drupal_add_js($script, array('scope' => 'header', 'type' => 'inline', 'requires_jquery' => FALSE));
+}
+*/
+
+function agilecrm_ckeditor_plugin() {
+ return array(
+      'my_plugin' => array(
+         // Plugin name.
+            'name' => 'my_plugin',
+            // Plugin description - it will be displayed in the plugins management section of the profile settings.
+            'desc' => t('Plugin for adding Agile CRM Landing Page.'),
+            // The full path to the CKEditor plugin directory, trailing slash included.
+            'path' => drupal_get_path('module', 'agilecrm') . '/plugins/',
+            // Plugin buttons definition (optional).
+            'buttons' => array(
+               'my_plugin_button' => array('label' => 'Landing Page', 'icon' => 'icons/browser.png'),'form_builder_button' => array('label' => 'Form Builder', 'icon' => 'icons/googleforms.png')
+            )
+        )
+    );
+ 
+}
+
+function agilecrm_node_view($node, $view_mode) {
+           $result = getSettings();
+           foreach ($result as $value) {
+                $domain = $value->setting_domain;
+                $email = $value->setting_email;
+                $password = $value->setting_password;
+                $restapkey = $value->setting_restapikey;
+                $jsapikey = $value->setting_jsapikey;
+           }
+           $bodycontent = $node->body;
+            foreach ($bodycontent as $v) {
+                  foreach ($v as $k) {
+                 $value  = $k['value'];
+               }
+            }
+            $url = $_SERVER['REQUEST_URI'];
+            $num = intval(substr($url, strrpos($url, '/') + 1));
+            preg_match_all('/{agilelandingpage_id}(.*?){\/agilelandingpage_id}/is',$value,$matches);
+            $i=0;
+             foreach($matches[0] as $match){
+                $usrname=$matches[1][$i];
+                $usrname = strip_tags($usrname);
+                $textout = $usrname;
+                $i++;
+              }
+            if(is_numeric($num)){
+            if(isset($domain) != "" && isset($email) != "" && isset($restapkey) != "" && isset($textout) != "") {
+                echo file_get_contents('https://'.$domain.'.agilecrm.com/landing/'.$textout);
+                die();
+            }
+          }
+}
+
+
+/**
+ * Implements hook_page_alter() to insert JavaScript to the appropriate scope/region of the page.
+ */
+function agilecrm_page_alter(&$page) {
+  global $user;
+   $result = getSettings();
+    foreach ($result as $value) {
+      $domain = $value->setting_domain;
+      $email = $value->setting_email;
+      $password = $value->setting_password;
+      $restapkey = $value->setting_restapikey;
+      $jsapikey = $value->setting_jsapikey;
+      $webstats = $value->setting_webstats;
+      $webrules = $value->setting_webrules;
+    } 
+
+    drupal_add_js('https://'.$domain.'.agilecrm.com/stats/min/agile-min.js', 'external');
+    if($webstats == '1' && $webrules == '1')
+    {
+    // Build tracker code.
+    $script = '_agile.set_account("'.$jsapikey.'", "'.$domain.'"); _agile.track_page_view(); _agile_execute_web_rules();';
+    } else if($webstats == '1'){
+      $script = '_agile.set_account("'.$jsapikey.'", "'.$domain.'"); _agile.track_page_view();';
+    }else if($webrules == '1'){
+      $script = '_agile.set_account("'.$jsapikey.'", "'.$domain.'");_agile_execute_web_rules();';
+    }else{
+      $script = '_agile.set_account("'.$jsapikey.'", "'.$domain.'");';
+    }
+    drupal_add_js($script, array('scope' => 'header', 'type' => 'inline', 'requires_jquery' => FALSE));
+    $scripta = 'var domain = "'.$domain.'";';
+    define("AGILE_USER_EMAIL_CHECK",$email);
+    define("AGILE_REST_API_KEY_CHECK",$restapkey);
+    define("AGILE_DOMAIN_CHECK",$domain);
+    $form_result = agile_curl_wrap("forms", null, "GET", "application/json");
+    if (version_compare(PHP_VERSION, '5.4.0', '>=') && !(defined('JSON_C_VERSION') && PHP_INT_SIZE > 4)) {
+      $form_result_data = json_decode($form_result, false, 512, JSON_BIGINT_AS_STRING);
+    } else {
+       $form_result_data = json_decode($form_result, false);
+    }
+    $scriptform = 'var formdata = '. json_encode( $form_result_data) .';';
+    
+    define("AGILE_LANDING_USER_EMAIL",$email);
+    define("AGILE_LANDING_REST_API_KEY",$restapkey);
+    define("AGILE_LANDING_DOMAIN",$domain);
+    $landing_result = agilelanding_curl_wrap("landingpages", null, "GET", "application/json");
+    //$landing_result_data = json_decode($landing_result, false, 512, JSON_BIGINT_AS_STRING);
+    if (version_compare(PHP_VERSION, '5.4.0', '>=') && !(defined('JSON_C_VERSION') && PHP_INT_SIZE > 4)) {
+      $landing_result_data = json_decode($landing_result, false, 512, JSON_BIGINT_AS_STRING);
+    } else {
+       $landing_result_data = json_decode($landing_result, false);
+    }
+    $scriptlanding = 'var landingdata = '. json_encode($landing_result_data) .';';
+    drupal_add_js($scriptform, array('scope' => 'footer', 'type' => 'inline', 'requires_jquery' => FALSE));
+    drupal_add_js($scriptlanding, array('scope' => 'footer', 'type' => 'inline', 'requires_jquery' => FALSE));
+    $scriptdomain = 'var domain = "'.$domain.'";';
+    drupal_add_js($scriptdomain, array('scope' => 'footer', 'type' => 'inline', 'requires_jquery' => FALSE));
+}
+ 
+?>

@@ -11,11 +11,13 @@
  * Form for deciding what to do with the quizzes a question is member of when the question is
  * revised
  *
- * @param array $form
- * @param array $form_state
- * @param stdClass $question_node
- * @return array
- *   An renderable FAPI array
+ * @param $form_state
+ * @param $nid
+ *  Question node id
+ * @param $vid
+ *  Question node version id
+ * @return
+ *  FAPI form array
  */
 function quiz_question_revision_actions_form($form, $form_state, $question_node) {
   $efq = new EntityFieldQuery;
