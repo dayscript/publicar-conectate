@@ -53,7 +53,9 @@ class Crud_model extends CI_Model {
         //group by
         if (!is_null($group)) 
         {
-            $this->db->select($group);
+            if (is_null($pSelect)) {
+                $this->db->select($group);
+            }            
             $this->db->group_by($group); 
         }
         //Order by
@@ -101,6 +103,12 @@ class Crud_model extends CI_Model {
         //hago la actualización
         $actualizar = $this->db->where($pArrayWhere);
         return $actualizar = $this->db->update($pTabla, $pArrayActualizar);
+    }
+    public function queryConsulta($string)
+    {
+        //hago la actualización
+        $datosquery = $this->db->query($string);
+        return $datosquery->result_array();
     }
 
 }

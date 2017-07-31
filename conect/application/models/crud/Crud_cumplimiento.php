@@ -10,7 +10,7 @@ class Crud_cumplimiento extends CI_Model {
         
     }
 
-    public function datosPendientecarga($whereArray = null)
+    public function datosPendientecarga($whereArray = null,$select = '*',$group = null)
     {
         $joins[0]  = array('tabla' => 'produccion_venta v ','tipo_join' =>'inner', 'conect'=>'v.usuario_id = p.usuario_id AND p.metaventa_mes = v.venta_mes');
         $joins[1]  = array('tabla' => 'produccion_usuario u ','tipo_join' =>'inner', 'conect'=>'u.usuario_id =  p.usuario_id');
@@ -23,9 +23,9 @@ class Crud_cumplimiento extends CI_Model {
         {
             $where=$whereArray;
         }
-        return $this->Crud_model->obtenerRegistros('produccion_metaventa',$where,'*', NULL,NULL, $joins);
+        return $this->Crud_model->obtenerRegistros('produccion_metaventa',$where,$select, NULL,'p.metaventa_id desc', $joins,$group);
     }
-    public function datosPendientecargaVisitas($whereArray = null)
+    public function datosPendientecargaVisitas($whereArray = null,$select = '*',$group = null)
     {
         $joins[0]  = array('tabla' => 'produccion_visita v ','tipo_join' =>'inner', 'conect'=>'v.usuario_id = p.usuario_id AND p.metavisita_mes = v.visita_mes');
         $joins[1]  = array('tabla' => 'produccion_usuario u ','tipo_join' =>'inner', 'conect'=>'u.usuario_id =  p.usuario_id');
@@ -38,7 +38,7 @@ class Crud_cumplimiento extends CI_Model {
         {
             $where=$whereArray;
         }
-        return $this->Crud_model->obtenerRegistros('produccion_metavisita',$where,'*', NULL,NULL, $joins);
+        return $this->Crud_model->obtenerRegistros('produccion_metavisita',$where,$select, NULL,NULL, $joins,$group);
     }
     public function GetDatosTotal(){
         return $this->Crud_model->obtenerRegistros('produccion_cumplimiento',null,'*');

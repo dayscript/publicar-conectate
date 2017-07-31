@@ -170,6 +170,7 @@ class Cargatablas extends MY_Controller {
                         $this->Crud_model->agregarRegistro('produccion_'.strtolower($tabla),$lista);
                     }
                 endfor;
+                $this->Crud_log->Insertar('Carga '.$tabla,1,json_encode(date('Y-m-d')));
                 $mensaje =-1;
                 $this->controlador($tabla,$mensaje);
             }else
