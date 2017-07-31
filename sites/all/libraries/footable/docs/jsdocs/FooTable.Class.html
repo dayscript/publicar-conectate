@@ -384,7 +384,7 @@
     Class
     </h2>
     
-        <div class="class-description">This class is based off of John Resig's <a href="http://ejohn.org/blog/simple-javascript-inheritance">Simple JavaScript Inheritance</a> but it has been updated to be ES 5.1compatible by implementing an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create#Polyfill">Object.create polyfill</a>for older browsers.</div>
+        <div class="class-description">This class is based off of John Resig's <a href="http://ejohn.org/blog/simple-javascript-inheritance">Simple JavaScript Inheritance</a> but it has been updated to be ES 5.1compatible by implementing an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create#Polyfill">Object.create polyfill</a>for older browsers.</div>
     
 </header>
 
@@ -671,7 +671,7 @@
         
         <p class="code-caption">The below shows an example of how to implement inheritance using this method.</p>
     
-    <pre class="sunlight-highlight-javascript">var Person = FooTable.Class.extend({  construct: function(isDancing){    this.dancing = isDancing;  },  dance: function(){    return this.dancing;  }});var Ninja = Person.extend({  construct: function(){    this._super( false );  },  dance: function(){    // Call the inherited version of dance()    return this._super();  },  swingSword: function(){    return true;  }});var p = new Person(true);p.dance(); // =&gt; truevar n = new Ninja();n.dance(); // =&gt; falsen.swingSword(); // =&gt; true// Should all be truep instanceof Person &amp;&amp; p instanceof FooTable.Class &amp;&amp;n instanceof Ninja &amp;&amp; n instanceof Person &amp;&amp; n instanceof FooTable.Class</pre>
+    <pre class="sunlight-highlight-javascript">var Person = FooTable.Class.extend({  construct: function(isDancing){    this.dancing = isDancing;  },  dance: function(){    return this.dancing;  }});var Ninja = Person.extend({  construct: function(){    this._super( false );  },  dance: function(){    // Call the inherited version of dance()    return this._super();  },  swingSword: function(){    return true;  }});var p = new Person(true);p.dance(); // =&gt; truevar n = new Ninja();n.dance(); // =&gt; falsen.swingSword(); // =&gt; true// Should all be truep instanceof Person &amp;&amp; p instanceof FooTable.Class &amp;&amp;n instanceof Ninja &amp;&amp; n instanceof Person &amp;&amp; n instanceof FooTable.Class</pre>
 
 
     

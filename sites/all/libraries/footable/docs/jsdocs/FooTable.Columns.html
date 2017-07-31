@@ -1298,7 +1298,7 @@
     
     
     <div class="description">
-        Attempts to return a <a href="FooTable.Column.html">FooTable.Column</a> instance when passed the <a href="FooTable.Column.html">FooTable.Column</a> instance, the <a href="FooTable.Column.html#name">FooTable.Column#name</a> string or the <a href="FooTable.Column.html#index">FooTable.Column#index</a> number.If supplied a function this will return an array by iterating all columns passing the index and column itself to the supplied callback as arguments.Returning true in the callback will include the column in the result.
+        Attempts to return a <a href="FooTable.Column.html">FooTable.Column</a> instance when passed the <a href="FooTable.Column.html">FooTable.Column</a> instance, the <a href="FooTable.Column.html#name">FooTable.Column#name</a> string or the <a href="FooTable.Column.html#index">FooTable.Column#index</a> number.If supplied a function this will return an array by iterating all columns passing the index and column itself to the supplied callback as arguments.Returning true in the callback will include the column in the result.
     </div>
     
 
@@ -1443,7 +1443,7 @@
         
         <p class="code-caption">This example shows retrieving a column by name assuming a column called "id" exists. The <code>columns</code> object is an instance of <a href="FooTable.Columns.html">FooTable.Columns</a>.</p>
     
-    <pre class="sunlight-highlight-javascript">var column = columns.get(&#x27;id&#x27;);if (column instanceof FooTable.Column){	// found the &quot;id&quot; column} else {	// no column with a name of &quot;id&quot; exists}// to get an array of all hidden columnsvar columns = columns.get(function(col){ return col.hidden;});</pre>
+    <pre class="sunlight-highlight-javascript">var column = columns.get(&#x27;id&#x27;);if (column instanceof FooTable.Column){	// found the &quot;id&quot; column} else {	// no column with a name of &quot;id&quot; exists}// to get an array of all hidden columnsvar columns = columns.get(function(col){ return col.hidden;});</pre>
 
 
     
@@ -1672,7 +1672,7 @@
     
     
     <div class="description">
-        Used to finalize the parsing of columns it is supplied the parse deferred object which must be resolved with an array of <a href="FooTable.Column.html">FooTable.Column</a> objectsor rejected with an error.
+        Used to finalize the parsing of columns it is supplied the parse deferred object which must be resolved with an array of <a href="FooTable.Column.html">FooTable.Column</a> objectsor rejected with an error.
     </div>
     
 
