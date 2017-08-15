@@ -17,5 +17,9 @@ class Crud_log extends CI_Model {
         $insertar = array('tabla' => $tabla,'id'=> $id,'mensaje'=>$contenido);
         return $this->Crud_model->agregarRegistro('produccion_log',$insertar);
     }
+    public function GetDatos($where)
+    {
+        return $this->Crud_model->obtenerRegistros('produccion_log',$where,NULL, NULL,'fecha_carga desc', NULL,NULL);
+    }
 }
 ?>

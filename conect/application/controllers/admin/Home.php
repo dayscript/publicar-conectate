@@ -9,7 +9,7 @@ class Home extends MY_Controller {
         $this->load->model('crud/Crud_menu');
         $this->load->library('Array_conevrt');
         if (is_null($this->session->userdata('id'))) {
-        	redirect($this->index);
+        	redirect('Login');
         }
     }
 

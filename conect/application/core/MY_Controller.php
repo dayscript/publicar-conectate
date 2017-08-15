@@ -107,6 +107,7 @@ class MY_Controller extends CI_Controller
 
         if (is_null($retornoValidar)) 
         {
+            echo "<br>";
             echo "datos de respuesta";
             var_dump($datos);
             echo "<br>";
@@ -464,6 +465,91 @@ class MY_Controller extends CI_Controller
             $contact_json = array_merge($merge,$contact_json);
         }
         return $contact_json;
+    }
+    public function buscarParametria($dato)
+    {   
+        $info = array();
+        $where = array('tabla_nombre' => $dato);
+        $datosTabla = $this->Crud_tabla->getTablas($where);
+        if (!is_null($datosTabla)) {
+            $datosLista= null;
+            $info = array(
+                'js' => $datosTabla[0]->tabla_js,
+                'tabla' => $dato,
+                'controlador' => $datosTabla[0]->tabla_controlador,
+                'general'=> $datosLista,
+                'mensaje' =>  $datosTabla[0]->tabla_mesaje,
+                'datosEditar' => null,
+                'tipoaccion' => $datosTabla[0]->tipoaccion_id
+            );
+        }
+        return $info;
+    }
+    public function returnIdentificacion($key1)
+    {
+        foreach ($key1 as $valoressuma) {
+            $identificacion = $valoressuma['identification'];
+            return $identificacion;
+        }
+    }
+    public function idCategoria($meta_id)
+    {
+        if ($meta_id <= 5) {
+            return 1;
+        } elseif ($meta_id <= 10) {
+            return 2;
+        } elseif ($meta_id <= 15) {
+            return 3;
+        } elseif ($meta_id <= 20) {
+            return 4;
+        } elseif ($meta_id <= 25) {
+            return 5;
+        } elseif ($meta_id <= 30) {
+            return 6;
+        } elseif ($meta_id <= 35) {
+            return 7;
+        }
+    }
+    public function traerNombremes($mes)
+    {
+        switch ($mes) {
+            case 1:
+                return 'Enero';
+            break;
+            case 2:
+                return 'Febrero';
+            break;
+            case 3:
+                return 'Marzo';
+            break;
+            case 4:
+                return 'Abril';
+            break;
+            case 5:
+                return 'Mayo';
+            break;
+            case 6:
+                return 'Junio';
+            break;
+            case 7:
+                return 'Julio';
+            break;
+            case 8:
+                return 'Agosto';
+            break;
+            case 9:
+                return 'Septiembre';
+            break;
+            case 10:
+                return 'Octubre';
+            break;
+            case 11:
+                return 'Noviembre';
+            break;
+            case 12:
+                return 'Diciembre';
+            break;
+        }
     }
 }
 ?>

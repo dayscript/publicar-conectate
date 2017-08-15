@@ -8,9 +8,9 @@ dependencies[] = quiz_question
 files[] = scale.classes.inc
 files[] = scale.test
 
-; Information added by Drupal.org packaging script on 2016-10-19
-version = "7.x-5.0"
+; Information added by Drupal.org packaging script on 2017-03-16
+version = "7.x-5.1"
 core = "7.x"
 project = "quiz"
-datestamp = "1476893944"
+datestamp = "1489693108"
 

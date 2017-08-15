@@ -2,14 +2,16 @@
 
 /**
  * @file
- * Theme functions for long_answer.
+ * Theme functions for the long_answer question type.
  */
 
 /**
- * Theme the long_answer response form
+ * Theme the long_answer response form.
  *
- * @param $form
- *  The response form
+ * @param array $variables
+ *
+ * @return string
+ *   An HTML string.
  */
 function theme_long_answer_response_form($variables) {
   $form = $variables['form'];
