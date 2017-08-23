@@ -1,0 +1,24 @@
+.footer-container{
+  margin-top: 16px;
+  background-color: #f6f6f6;
+  text-align: center;
+  .l-footer{
+    padding: 10px 0;
+    color: white;
+    font-size: 14px;
+    p{
+      margin: 0;
+      padding: 0;
+      color: #666;
+    }
+    a{
+      color: $secondary-color;
+    }
+.logo-footer, .info-footer{
+  margin: 16px 0;
+}
+  }
+  @media (min-width: 600px){
+    text-align: left;
+  }
+}

@@ -1,0 +1,112 @@
+// Non-modular or client styles for .l-header region.
+.l-header-region {
+  padding: 18px 0px;
+  height: 120px;
+  @media (min-width: 600px){
+    height: inherit;
+  }
+}
+.not-logged-in{
+  .l-header-region {
+    padding: 18px 0px;
+    height: 152px;
+    @media (min-width: 600px){
+      height: inherit;
+    }
+  }
+}
+
+
+.main-container{
+    background: url(../images/bk-conecta.jpg) left 0px no-repeat;
+    padding-top: 0px;
+    min-height: auto;
+  margin-bottom: 16px;
+
+  @media (min-width: 600px){
+    padding-top: 30px;
+    min-height: 100px;
+  }
+}
+
+//Slide
+.flexslider{
+  margin: 0 0 10px;
+}
+.flex-control-nav {
+  bottom: 0;
+  z-index: 10;
+}
+.flex-control-paging li a.flex-active {
+  background: rgba(205, 25, 65, 0.9);
+  cursor: default;
+}
+//Menu
+#superfish-1{
+  margin-top:40px;
+  font-size: 1em;
+  float: left;
+  li{
+    text-transform: uppercase;
+    a{
+      color: #333;
+      &:hover{
+        color: $primary-color;
+      }
+    }
+    .sf-depth-1.active {
+      color: $primary-color;
+    }
+    &:last-child{
+      color: white;
+      a{
+        color: white;
+      }
+    }
+  }
+  .sf-hidden{
+    color: $primary-color;
+  }
+  #menu-2-1{
+    li{
+      background: $primary-color;
+    }
+  }
+}
+.sf-menu.sf-style-simple li:last-child {
+  background: white;
+  color: white;
+  @media (min-width: 600px){
+    background: $primary-color;
+    color: white;
+  }
+}
+.sf-menu.sf-style-simple li:hover li:last-child,
+.sf-menu.sf-style-simple li.sfHover li:last-child {
+  background: white;
+  @media (min-width: 600px){
+    background: #cd1941;
+  }
+}
+.block-superfish-1 {
+  bottom: 71px;
+  @media (min-width: 600px){
+    bottom: 0px;
+  }
+}
+.sf-accordion-toggle.sf-style-simple {
+  margin-bottom: 30px;
+}
+.sf-expanded{
+  li{
+    background: white;
+  }
+}
+
+//Logo
+.block-blockify-blockify-logo{
+  float: right;
+  @media (min-width: 600px){
+    float: left;
+  }
+}

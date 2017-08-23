@@ -1,0 +1,28 @@
+
+.not-logged-in{
+  .row.l-main{
+    display: none;
+  }
+  .footer-container{
+    margin-top: 0px;}
+  .bk-puntos-2{
+    display: none;
+  }
+}
+.node-page {
+  margin-bottom: 20px;
+}
+
+//Pagina de tags
+
+.field-name-field-tags{
+  .field-label {
+    display: none;
+  }
+}
+
+.node-article .image, .node-page .image {
+  margin-bottom: 20px;
+  float: left;
+  margin: 20px 20px 20px 0px;
+}
