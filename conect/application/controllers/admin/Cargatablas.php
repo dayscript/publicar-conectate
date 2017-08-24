@@ -672,8 +672,10 @@ class Cargatablas extends MY_Controller {
                         $columnString = PHPExcel_Cell::stringFromColumnIndex($i);
                         $columnaTitulo[$i]['valor'] = $sheet->getCell($columnString.$m)->getFormattedValue().'';
                     endfor;  
-                    //var_dump(json_encode($columnaTitulo));  
+                    //var_dump(json_encode($columnaTitulo));echo "<br>";  
+
                     $lista = $this->crearArray($columnaTitulo,strtolower($tabla));
+                    //var_dump(json_encode($lista));
                     if (count($lista) == 0) {
 
                     }
@@ -683,7 +685,7 @@ class Cargatablas extends MY_Controller {
                         $this->Crud_model->agregarRegistro('produccion_'.strtolower($tabla),$lista);
                     }
                 endfor;
-                $this->Crud_log->Insertar('Carga '.$tabla,1,json_encode(date('Y-m-d')));
+                $this->Crud_log->Insertar('Carga '.$tabla,1,json_encode(date('Y-m-d H:i:s',$this->ajusteFecha)));
                 $mensaje =-1;
                 $this->controlador($tabla,$mensaje);
             }else
@@ -724,8 +726,16 @@ class Cargatablas extends MY_Controller {
                             }
                             else
                             {
-                                $lista = array();
-                                return $lista;
+                                //temporal verificar actualizacion de datos pendiente por carga 
+                                if ($datosBuscar[0]->cargo_id == '') {
+                                    $lista = array();
+                                    return $lista;
+                                }
+                                else
+                                {
+                                    $lista = array();
+                                    return $lista;
+                                }
                             }
                         break;
                         case 'busqueda':

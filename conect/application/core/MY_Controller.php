@@ -21,11 +21,14 @@ class MY_Controller extends CI_Controller
     public $usuarioServicesDrupal;
     public $claveServicesDrupal;
 
+
 	function __construct()
     {
         parent::__construct();
         $this->cargarVariablesGlobales();
         $this->load->model('crud/Crud_rol');
+        $this->load->model('crud/Crud_usuario');
+        $this->load->model('crud/Crud_grupo');
         $this->load->library('agileRes/Curlwrap');
         $this->load->library('basic_RestClient/My_restclient','My_restclient');
     }
@@ -100,25 +103,36 @@ class MY_Controller extends CI_Controller
         $DatoRol = $this->Crud_rol->GetDatos($rol_id);
         redirect($DatoRol->rol_index);
     }
-    public function consultaRest($urlConsulta = '/api/test',$metodo = 'GET',$datos = null)
+    public function consultaRest($urlConsulta = '/api/test',$metodo = 'GET',$datos = null,$url = NULL)
     {
-        $datosRetorno = $this->curlwrap->curl_wrapIncentive($this->incentive.$urlConsulta,$datos,$metodo);
+        if (is_null($url)) {
+            $url = $this->incentive;
+        }
+        $datosRetorno = $this->curlwrap->curl_wrapIncentive($url.$urlConsulta,$datos,$metodo);
         $retornoValidar = json_decode($datosRetorno,true);
 
         if (is_null($retornoValidar)) 
         {
             echo "<br>";
-            echo "datos de respuesta";
+            echo "datos de envio";
+            echo "<br>";
             var_dump($datos);
             echo "<br>";
             echo "datos de url";
+            echo "<br>";
+            var_dump($url);
+            echo "<br>";
+            echo "datos de url concatenado";
+            echo "<br>";
             var_dump($urlConsulta);
             echo "<br>";
             echo "datos de metodo";
+            echo "<br>";
             var_dump($metodo);
             echo "<br>";
-            echo "datos de datos";
-            var_dump($datos);
+            echo "datos retorno sin editar ";
+            echo "<br>";
+            var_dump($datosRetorno);
             echo "<br>";
             return $retornoValidar;
         }else
@@ -550,6 +564,369 @@ class MY_Controller extends CI_Controller
                 return 'Diciembre';
             break;
         }
+    }
+    public function cargarDatosHome()
+    {
+        $where = array('p.rol_id' => 7);
+        $datos = $this->Crud_usuario->GetDatos($where);
+        
+        $Masculino = 0;
+        $Femenino =0;
+        foreach ($datos as $key) {
+            switch ($key->genero_nombre) 
+            {
+                case 'Masculino':
+                    $Masculino=$Masculino+1;
+                break;
+                case 'Femenino':
+                    $Femenino=$Femenino+1;
+                break;
+            }
+        }
+        $datosEnvio = array(
+            'totalusuarios' => count($datos),
+            'masculino' => $Masculino,
+            'femenino' => $Femenino
+        );
+        return $datosEnvio;
+    }
+    public function rankingxgrupoxMes($mes = null,$limite = 5,$grupo_id = null)
+    {
+        if (!is_null($mes)) 
+        {
+            $dia = '01';
+            $mes = $mes;
+            $ano = '2017';
+            $fecha = $ano.'-'.$mes.'-'.$dia;
+            $datosIncentive =  $this->consultaRest('/api/clients/3/dategoalvalues/'.$fecha,'GET');
+            $datosGenerales = array();
+            if (count($datosIncentive) > 0) {
+                foreach ($datosIncentive['goal_values'] as $key) {
+                    if ($key['date'] == $fecha) {
+                        $estructura = array();
+                        $estructura[$key['goal_id']] = array(
+                            'identification' => $key['identification'],
+                            'goal_id' => $key['goal_id'],
+                            'value' => $key['value'],
+                            'real' => $key['real'],
+                            'percentage' => $key['percentage'],
+                            'percentage_modified' => $key['percentage_modified'],
+                            'percentage_weighed' => $key['percentage_weighed'],
+                            'date' => $key['date'],
+                            'created_at' => $key['created_at']);
+                        //var_dump($estructura);
+                        if (isset($datosGenerales[$key['identification']])) {
+                            $datosGenerales[$key['identification']] = array_merge($datosGenerales[$key['identification']],$estructura);
+                        }
+                        else
+                        {
+                            $datosGenerales[$key['identification']] = $estructura;
+                        }
+                    }
+                }
+            }
+            foreach ($datosGenerales as $key1) {
+                $suma =0;
+                $identificacion = $this->returnIdentificacion($key1);
+                foreach ($key1 as $valoressuma) {
+                    $suma = $suma + $valoressuma['percentage_weighed'];
+                    $goal_id = $valoressuma['goal_id'];
+                }
+                $datos = array('suma' => $suma,'identification' =>$identificacion,'cargo_id' => $this->idCategoria($goal_id));
+                $datosGenerales[$identificacion] = array_merge($datosGenerales[$identificacion],$datos);             
+            }
+            $cargo1 = array();
+            $cargo1Final = array();
+            $conteo1 =0;
+            $cargo2 = array();
+            $cargo2Final = array();
+            $conteo2 =0;
+            $cargo3 = array();
+            $cargo3Final = array();
+            $conteo3 =0;
+            $cargo4 = array();
+            $cargo4Final = array();
+            $conteo4 =0;
+            $cargo5 = array();
+            $cargo5Final = array();
+            $conteo5 =0;
+            $cargo6 = array();
+            $cargo6Final = array();
+            $conteo6 =0;
+            $cargo7 = array();
+            $cargo7Final = array();
+            $conteo7 =0;
+            foreach ($datosGenerales as $key2) {
+                switch ($key2['cargo_id']) {
+                    case '1':
+                        $cargo1[$conteo1] = $key2; 
+                        $conteo1 = $conteo1+1;
+                    break;
+                    case '2':
+                        $cargo2[$conteo2] = $key2; 
+                        $conteo2 = $conteo2+1;
+                    break;
+                    case '3':
+                        $cargo3[$conteo3] = $key2; 
+                        $conteo3 = $conteo3+1;
+                    break;
+                    case '4':
+                        $cargo4[$conteo4] = $key2; 
+                        $conteo4 = $conteo4+1;
+                    break;
+                    case '5':
+                        $cargo5[$conteo5] = $key2; 
+                        $conteo5 = $conteo5+1;
+                    break;
+                    case '6':
+                        $cargo6[$conteo6] = $key2; 
+                        $conteo6 = $conteo6+1;
+                    break;
+                    case '7':
+                        $cargo7[$conteo7] = $key2;
+                        $conteo7 = $conteo7+1;
+                    break;
+                }
+            }
+            $cargo1 = $this->ordenarPosision($cargo1);
+            $cargo2 = $this->ordenarPosision($cargo2);
+            $cargo3 = $this->ordenarPosision($cargo3);
+            $cargo4 = $this->ordenarPosision($cargo4);
+            $cargo5 = $this->ordenarPosision($cargo5);
+            $cargo6 = $this->ordenarPosision($cargo6);
+            $cargo7 = $this->ordenarPosision($cargo7);
+            $cargo1Final =$this->cargarDatosUsuario($cargo1,$limite,$grupo_id);
+            $cargo2Final =$this->cargarDatosUsuario($cargo2,$limite,$grupo_id);
+            $cargo3Final =$this->cargarDatosUsuario($cargo3,$limite,$grupo_id);
+            $cargo4Final =$this->cargarDatosUsuario($cargo4,$limite,$grupo_id);
+            $cargo5Final =$this->cargarDatosUsuario($cargo5,$limite,$grupo_id);
+            $cargo6Final =$this->cargarDatosUsuario($cargo6,$limite,$grupo_id);
+            $cargo7Final =$this->cargarDatosUsuario($cargo7,$limite,$grupo_id);
+            $datosCraga = array(
+                'cargo1Final' => $cargo1Final, 
+                'cargo2Final' => $cargo2Final, 
+                'cargo3Final' => $cargo3Final, 
+                'cargo4Final' => $cargo4Final, 
+                'cargo5Final' => $cargo5Final, 
+            );
+            return $datosCraga;
+        }
+        else
+        {
+            return NULL;
+        }
+    }
+    public function totaltest()
+    {
+        $datosIncentive =  $this->consultaRest('resultados-quiz','GET',null,'http://conectatepublicar.com/');
+        return $datosIncentive;
+    }
+    public function cargarDatosUsuario($cargo1,$limite,$grupo_id)
+    {
+        $cargo1Final = array();
+        for ($i=0; $i < count($cargo1); $i++) {
+            if (!is_null($limite)) 
+            {
+                if ($i <= $limite) {
+                    $where = array('p.usuario_documento' => $cargo1[$i]["identification"]);
+                    $datosUsuario = $this->Crud_usuario->GetDatos($where);
+                    if (is_null($grupo_id)) {
+                        if (is_null($datosUsuario)) {
+                            $insertar = array('datosUsuario' =>  null);
+                        }else
+                        {
+                            $insertar = array('datosUsuario' => $datosUsuario[0]);
+                        }
+                        $cargo1[$i] = array_merge($insertar,$cargo1[$i]);
+                        $cargo1Final[$i] = $cargo1[$i];
+                    }
+                    else
+                    {
+                        if (!is_null($datosUsuario)) {
+                            if ($grupo_id == (int) $datosUsuario[0]->grupo_id) {
+                                $cargo1Final[$i] = $cargo1[$i];
+                            }
+                        }
+                    }
+                } 
+            }
+            else
+            {
+                $where = array('p.usuario_documento' => $cargo1[$i]["identification"]);
+                $datosUsuario = $this->Crud_usuario->GetDatos($where);
+                $insertar = array('datosUsuario' => $datosUsuario[0]);
+                $cargo1[$i] = array_merge($insertar,$cargo1[$i]);
+                if (is_null($grupo_id)) {
+                    if (is_null($datosUsuario)) {
+                        $insertar = array('datosUsuario' =>  null);
+                    }else
+                    {
+                        $insertar = array('datosUsuario' => $datosUsuario[0]);
+                    }
+                    $cargo1[$i] = array_merge($insertar,$cargo1[$i]);
+                    $cargo1Final[$i] = $cargo1[$i];
+                }
+                else
+                {
+                    if (!is_null($datosUsuario)) {
+                        if ($grupo_id == (int) $datosUsuario[0]->grupo_id) {
+                            $cargo1Final[$i] = $cargo1[$i];
+                        }
+                    }
+                }
+            }
+        }
+        return $cargo1Final;
+    }
+    public function getdatosxgrupo()
+    {
+        $datosReturn = array();
+        $con =0;
+        $datos = $this->Crud_model->obtenerRegistros('basica_grupo');
+        foreach ($datos as $key) {
+           $where = array('p.grupo_id' => $key->grupo_id);
+           $datosUsuarios = $this->Crud_grupo->GetDatosGrupo($where,'count(*) total');
+           
+           if ((int) $datosUsuarios[0]->total > 1) 
+           {
+               $carga = array('datos' => $key, 'total' => (int) $datosUsuarios[0]->total);
+               $datosReturn[$con] = $carga;
+               $con =$con+1;
+           }
+        }
+        return $datosReturn;
+    }
+    public function ordenarPosision($people)
+    {
+        $sortArray = array(); 
+        foreach($people as $person){
+            foreach($person as $key=>$value){
+                if(!isset($sortArray[$key])){
+                    $sortArray[$key] = array();
+                }
+                $sortArray[$key][] = $value;
+            }
+        } 
+        $orderby = "suma";
+        array_multisort($sortArray[$orderby],SORT_DESC,$people);
+        return $people; 
+    }
+    public function listTablaCargo($cargo1,$mes = '07')
+    {
+        $valorRetorno = '
+            <table cellspacing = "0" cellpadding = "0" border = "1" >
+                <tr >
+                    <td> Nombre</td>
+                    <td> Apellido</td>
+                    <td> Cedula</td>
+                    <td> Nomina </td>
+                    <td> Venas Renovacion %</td>
+                    <td> Venas Nuevas %</td>
+                    <td> Visitas %</td>
+                    <td> Test %</td>
+                    <td> Grupal %</td>
+                    <td> Venas Renovacion puntos</td>
+                    <td> Venas Nuevas puntos</td>
+                    <td> Visitas puntos</td>
+                    <td> Test puntos</td>
+                    <td> Grupal puntos</td>
+                    <td> Total</td>
+                </tr >  ';
+        foreach ($cargo1 as $item):
+            $renovacion = null;
+            $nuevo = null;
+            $llamadas = null;
+            $test = null;
+            $grupal = null;
+            if (!is_null($item["datosUsuario"])) 
+            {
+                for ($i=0; $i < count($item); $i++) { 
+                    if (isset($item[$i])) 
+                    {                        
+                        $r=(($item[$i]["goal_id"]/5)-intval(($item[$i]["goal_id"]/5)));  
+                        switch ((string) ($r*10)) {
+                            case '2':             
+                                $renovacion = $item[$i];
+                            break;
+                            case '4':
+                                $nuevo = $item[$i];
+                            break;
+                            case '6':
+                                $llamadas = $item[$i];
+                            break;
+                            case '8':
+                                $test = $item[$i];
+                            break;
+                            case '0':
+                                $grupal = $item[$i];
+                            break;
+                        }
+                    }
+                }
+                $bodytag = str_replace("%body%", "black", "<body text='%body%'>");
+                $valorRetorno .= '<tr>
+                        <td> '.$item["datosUsuario"]->usuario_nombre.'</td>
+                        <td> '.$item["datosUsuario"]->usuario_apellido.'</td>
+                        <td> '.$item['identification'].'</td>
+                        <td> '.$item["datosUsuario"]->usuario_codigonomina.' </td>
+                        <td> '.str_replace('.',',',(double) $renovacion["percentage"]).'</td>
+                        <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
+                        <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
+                        <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
+                        <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
+
+                        <td> '.str_replace('.',',',(double) $renovacion["percentage_weighed"]).'</td>
+                        <td> '.str_replace('.',',',(double) $nuevo["percentage_weighed"]).'</td>
+                        <td> '.str_replace('.',',',(double) $llamadas["percentage_weighed"]).'</td>
+                        <td> '.str_replace('.',',',(double) $test["percentage_weighed"]).'</td>
+                        <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
+                        <td> '.str_replace('.',',',(double) $item['suma']).'</td>
+                    </tr>';
+            }
+        endforeach;
+        $valorRetorno .= '</table>';
+        return $valorRetorno;
+    }
+    public function retornoMesxString($fecha)
+    {
+        $returnMes = null;
+        if (strpos($fecha, 'Enero') >0) {
+            $returnMes = '01';
+        }
+        if (strpos($fecha, 'Febrero') >0) {
+            $returnMes = '02';
+        }
+        if (strpos($fecha, 'Marzo') >0) {
+            $returnMes = '03';
+        }
+        if (strpos($fecha, 'Abril') >0) {
+            $returnMes = '04';
+        }
+        if (strpos($fecha, 'Mayo') >0) {
+            $returnMes = '05';
+        }
+        if (strpos($fecha, 'junio') >0) {
+            $returnMes = '06';
+        }
+        if (strpos($fecha, 'Julio') >0) {
+            $returnMes = '07';
+        }
+        if (strpos($fecha, 'Agosto') >0) {
+            $returnMes = '08';
+        }
+        if (strpos($fecha, 'Septiembre') >0) {
+            $returnMes = '09';
+        }
+        if (strpos($fecha, 'octubre') >0) {
+            $returnMes = '10';
+        }
+        if (strpos($fecha, 'Noviembre') >0) {
+            $returnMes = '11';
+        }
+        if (strpos($fecha, 'Diciembre') >0) {
+            $returnMes = '12';
+        }
+        return $returnMes;
     }
 }
 ?>

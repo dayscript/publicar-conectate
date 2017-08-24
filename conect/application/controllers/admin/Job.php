@@ -12,11 +12,13 @@ class Job extends MY_Controller {
         $this->load->model('crud/Crud_usuario');
         $this->load->model('crud/Crud_cumplimiento');
         $this->load->model('crud/Crud_grupo');
-        
+        $this->load->model('crud/Crud_test');
     }
     public function index()
     {
         $jobGeneral = $this->Crud_parametria->obtenerParametria('jobGeneral');
+        echo date('Y-m-d H:i:s',$this->ajusteFecha);
+        echo "<br>";
         if ($jobGeneral == '0') {
             echo "job inactivo";
         }else
@@ -27,7 +29,8 @@ class Job extends MY_Controller {
                     'ventas' => $this->cargarCumplimientosVentas(),
                     'visitas' => $this->cargarCumplimientosVisitas(),
                     'grupos' => $this->cargarCumplimientoGrupo(),
-                    'test' => $this->cargarCumplimientoTest()
+                    'test' => $this->cargarCumplimientoTest(),
+                    'fecha'=> date('Y-m-d',$this->ajusteFecha)
                 );
                 $this->Crud_log->Insertar('Ejecucion Job',0,json_encode($enviar));
             }
@@ -38,7 +41,8 @@ class Job extends MY_Controller {
                     'ventas' => $this->cargarCumplimientosVentas($jobGeneral),
                     'visitas' => $this->cargarCumplimientosVisitas($jobGeneral),
                     'grupos' => $this->cargarCumplimientoGrupo($jobGeneral),
-                    'test' => $this->cargarCumplimientoTest($jobGeneral)
+                    'test' => $this->cargarCumplimientoTest($jobGeneral),
+                    'fecha'=> date('Y-m-d',$this->ajusteFecha)
                 );
                 $this->Crud_log->Insertar('Ejecucion Job',0,json_encode($enviar));
             }
@@ -47,186 +51,11 @@ class Job extends MY_Controller {
     public function rankingxgrupo()
     {
         if ($this->input->is_ajax_request()) {
-            $dia = '01';
-            $mes = '07';
-            $ano = '2017';
-            $fecha = $ano.'-'.$mes.'-'.$dia;
-            $datosIncentive =  $this->consultaRest('/api/clients/3/dategoalvalues/'.$fecha,'GET');
-            $datosGenerales = array();
-            if (count($datosIncentive) > 0) {
-                foreach ($datosIncentive['goal_values'] as $key) {
-                    if ($key['date'] == $fecha) {
-                        $estructura = array();
-                        $estructura[$key['goal_id']] = array(
-                            'identification' => $key['identification'],
-                            'goal_id' => $key['goal_id'],
-                            'value' => $key['value'],
-                            'real' => $key['real'],
-                            'percentage' => $key['percentage'],
-                            'percentage_modified' => $key['percentage_modified'],
-                            'percentage_weighed' => $key['percentage_weighed'],
-                            'date' => $key['date'],
-                            'created_at' => $key['created_at']);
-                        //var_dump($estructura);
-                        if (isset($datosGenerales[$key['identification']])) {
-                            $datosGenerales[$key['identification']] = array_merge($datosGenerales[$key['identification']],$estructura);
-                        }
-                        else
-                        {
-                            $datosGenerales[$key['identification']] = $estructura;
-                        }
-                    }
-                }
+            $datos = $this->rankingxgrupoxMes('07');
+            $html = '';
+            for ($i=1; $i < 6; $i++) { 
+                $html =$html .'<br>'. $this->cargarHtmlRanking($datos["cargo".$i."Final"]);
             }
-            foreach ($datosGenerales as $key1) {
-                $suma =0;
-                $identificacion = $this->returnIdentificacion($key1);
-                foreach ($key1 as $valoressuma) {
-                    $suma = $suma + $valoressuma['percentage_weighed'];
-                    $goal_id = $valoressuma['goal_id'];
-                }
-                $datos = array('suma' => $suma,'identification' =>$identificacion,'cargo_id' => $this->idCategoria($goal_id));
-                $datosGenerales[$identificacion] = array_merge($datosGenerales[$identificacion],$datos);             
-            }
-            $cargo1 = array();
-            $cargo1Final = array();
-            $conteo1 =0;
-            $cargo2 = array();
-            $cargo2Final = array();
-            $conteo2 =0;
-            $cargo3 = array();
-            $cargo3Final = array();
-            $conteo3 =0;
-            $cargo4 = array();
-            $cargo4Final = array();
-            $conteo4 =0;
-            $cargo5 = array();
-            $cargo5Final = array();
-            $conteo5 =0;
-            $cargo6 = array();
-            $cargo6Final = array();
-            $conteo6 =0;
-            $cargo7 = array();
-            $cargo7Final = array();
-            $conteo7 =0;
-            foreach ($datosGenerales as $key2) {
-                switch ($key2['cargo_id']) {
-                    case '1':
-                        $cargo1[$conteo1] = $key2; 
-                        $conteo1 = $conteo1+1;
-                    break;
-                    case '2':
-                        $cargo2[$conteo2] = $key2; 
-                        $conteo2 = $conteo2+1;
-                    break;
-                    case '3':
-                        $cargo3[$conteo3] = $key2; 
-                        $conteo3 = $conteo3+1;
-                    break;
-                    case '4':
-                        $cargo4[$conteo4] = $key2; 
-                        $conteo4 = $conteo4+1;
-                    break;
-                    case '5':
-                        $cargo5[$conteo5] = $key2; 
-                        $conteo5 = $conteo5+1;
-                    break;
-                    case '6':
-                        $cargo6[$conteo6] = $key2; 
-                        $conteo6 = $conteo6+1;
-                    break;
-                    case '7':
-                        $cargo7[$conteo7] = $key2;
-                        $conteo7 = $conteo7+1;
-                    break;
-                }
-            }
-            $cargo1 = $this->ordenarPosision($cargo1);
-            $cargo2 = $this->ordenarPosision($cargo2);
-            $cargo3 = $this->ordenarPosision($cargo3);
-            $cargo4 = $this->ordenarPosision($cargo4);
-            $cargo5 = $this->ordenarPosision($cargo5);
-            $cargo6 = $this->ordenarPosision($cargo6);
-            $cargo7 = $this->ordenarPosision($cargo7);
-            for ($i=0; $i < count($cargo1); $i++) {
-                if ($i <= 5) {
-                    $where = array('p.usuario_documento' => $cargo1[$i]["identification"]);
-                    $datosUsuario = $this->Crud_usuario->GetDatos($where);
-                    $insertar = array('datosUsuario' => $datosUsuario[0]);
-                    $cargo1[$i] = array_merge($insertar,$cargo1[$i]);
-                    $cargo1Final[$i] = $cargo1[$i];
-                } 
-            }
-            for ($i=0; $i < count($cargo2); $i++) {
-                if ($i <= 5) {
-                    $where = array('p.usuario_documento' => $cargo2[$i]["identification"]);
-                    $datosUsuario = $this->Crud_usuario->GetDatos($where);
-                    $insertar = array('datosUsuario' => $datosUsuario[0]);
-                    $cargo2[$i] = array_merge($insertar,$cargo2[$i]);
-                    $cargo2Final[$i] = $cargo2[$i];
-                } 
-            }
-            for ($i=0; $i < count($cargo3); $i++) {
-                if ($i <= 5) {
-                    $where = array('p.usuario_documento' => $cargo3[$i]["identification"]);
-                    $datosUsuario = $this->Crud_usuario->GetDatos($where);
-                    $insertar = array('datosUsuario' => $datosUsuario[0]);
-                    $cargo3[$i] = array_merge($insertar,$cargo3[$i]);
-                    $cargo3Final[$i] = $cargo3[$i];
-                } 
-            }
-            for ($i=0; $i < count($cargo4); $i++) {
-                if ($i <= 5) {
-                    $where = array('p.usuario_documento' => $cargo4[$i]["identification"]);
-                    $datosUsuario = $this->Crud_usuario->GetDatos($where);
-                    $insertar = array('datosUsuario' => $datosUsuario[0]);
-                    $cargo4[$i] = array_merge($insertar,$cargo4[$i]);
-                    $cargo4Final[$i] = $cargo4[$i];
-                } 
-            }
-            for ($i=0; $i < count($cargo5); $i++) {
-                if ($i <= 5) {
-                    $where = array('p.usuario_documento' => $cargo5[$i]["identification"]);
-                    $datosUsuario = $this->Crud_usuario->GetDatos($where);
-                    $insertar = array('datosUsuario' => $datosUsuario[0]);
-                    $cargo5[$i] = array_merge($insertar,$cargo5[$i]);
-                    $cargo5Final[$i] = $cargo5[$i];
-                } 
-            }
-            for ($i=0; $i < count($cargo6); $i++) {
-                if ($i <= 5) {
-                    $where = array('p.usuario_documento' => $cargo6[$i]["identification"]);
-                    $datosUsuario = $this->Crud_usuario->GetDatos($where);
-                    $insertar = array('datosUsuario' => $datosUsuario[0]);
-                    $cargo6[$i] = array_merge($insertar,$cargo6[$i]);
-                    $cargo6Final[$i] = $cargo6[$i];
-                } 
-            }
-            for ($i=0; $i < count($cargo6); $i++) {
-                if ($i <= 5) {
-                    $where = array('p.usuario_documento' => $cargo6[$i]["identification"]);
-                    $datosUsuario = $this->Crud_usuario->GetDatos($where);
-                    $insertar = array('datosUsuario' => $datosUsuario[0]);
-                    $cargo6[$i] = array_merge($insertar,$cargo6[$i]);
-                    $cargo6Final[$i] = $cargo6[$i];
-                } 
-            }
-            for ($i=0; $i < count($cargo7); $i++) {
-                if ($i <= 5) {
-                    $where = array('p.usuario_documento' => $cargo7[$i]["identification"]);
-                    $datosUsuario = $this->Crud_usuario->GetDatos($where);
-                    $insertar = array('datosUsuario' => $datosUsuario[0]);
-                    $cargo7[$i] = array_merge($insertar,$cargo7[$i]);
-                    $cargo7Final[$i] = $cargo7[$i];
-                } 
-            }
-            $html = $this->cargarHtmlRanking($cargo1Final);
-            $html =$html .'<br>'. $this->cargarHtmlRanking($cargo2Final);
-            $html =$html .'<br>'. $this->cargarHtmlRanking($cargo3Final);
-            $html =$html .'<br>'. $this->cargarHtmlRanking($cargo4Final);
-            $html =$html .'<br>'. $this->cargarHtmlRanking($cargo5Final);
-            //$html =$html .'<br>'. $this->cargarHtmlRanking($cargo6Final);
-            //$html =$html .'<br>'. $this->cargarHtmlRanking($cargo7Final);
             $return = array('estado' => true,'carga'=>$html);
             echo json_encode($return, JSON_FORCE_OBJECT);
         }
@@ -249,21 +78,7 @@ class Job extends MY_Controller {
         $html =$html.'</select> ';
         return $html;
     }
-    public function ordenarPosision($people)
-    {
-        $sortArray = array(); 
-        foreach($people as $person){
-            foreach($person as $key=>$value){
-                if(!isset($sortArray[$key])){
-                    $sortArray[$key] = array();
-                }
-                $sortArray[$key][] = $value;
-            }
-        } 
-        $orderby = "suma";
-        array_multisort($sortArray[$orderby],SORT_DESC,$people);
-        return $people; 
-    }
+    
     public function cargarHtmlRanking($arrayDatos)
     {
         setlocale(LC_MONETARY, 'en_US.UTF-8');
@@ -883,7 +698,7 @@ class Job extends MY_Controller {
     public function cargarCumplimientosVentas($fecha = null)
     {
         if (is_null($fecha)) {
-            $fecha=date('Y-m-d');
+            $fecha=date('Y-m-d',$this->ajusteFecha);
         }
         $where = array('v.estado_id' => 1 ,'v.venta_fechacarga' => $fecha);
         $datosUsuario = $this->Crud_cumplimiento->datosPendientecarga($where,'max(`p`.`metaventa_id`) metaventa_id, p.metaventa_mes, p.metaventa_fecha, max(p.metaventa_recompra) metaventa_recompra, max(p.metaventa_nuevas) metaventa_nuevas, p.usuario_id, p.estado_id, p.metaventa_fechacarga, p.metaventa_nomina,v.*,u.*,pi.*','v.usuario_id');
@@ -970,7 +785,7 @@ class Job extends MY_Controller {
     public function cargarCumplimientosVisitas($fecha = null)
     {
         if (is_null($fecha)) {
-            $fecha=date('Y-m-d');
+            $fecha=date('Y-m-d',$this->ajusteFecha);
         }
         $where = array('v.estado_id' => 1 ,'v.visita_fechacarga' => $fecha);
         $datosUsuario = $this->Crud_cumplimiento->datosPendientecargaVisitas($where,'p.metavisita_id, 
@@ -1035,26 +850,51 @@ class Job extends MY_Controller {
     {
         $jobGrupo = $this->Crud_parametria->obtenerParametria('jobTest');
         if ($jobGrupo == '1') {
-            $where = array('p.estado_id' => 1,'p.rol_id' => 7);
-            $datosUsurio = $this->Crud_usuario->GetDatos($where);
-            foreach ($datosUsurio as $key) {
-                if ($key->cargo_id != 8 and $key->cargo_id != 9) {
+            $datosTest = $this->totaltest();
+            foreach ($datosTest["nodes"] as $key) {
+                if ($key["node"]["Evaluado"] == 'Sí') {
+                    $where = array('p.usuario_documento' => $key["node"]["Nombre"]);
+                    $datosusuario = $this->Crud_usuario->GetDatos($where);
+                    if (!is_null($datosusuario)) {
+                        $fecha = explode(',', $key["node"]["Date finished"]); 
+                        $mes = $this->retornoMesxString($fecha[1]);
+                        $where = array('p.usuario_id' => $datosusuario[0]->usuario_id,'p.test_fecha'=>date('Y').'-'.$mes.'-'.'01');
+                        $registroExiste = $this->Crud_model->obtenerRegistros('produccion_test',$where);
+                        if (is_null($registroExiste)) {
+                            $insert = array(
+                                'usuario_id' => $datosusuario[0]->usuario_id, 
+                                'test_fecha'=> (date('Y').'-'.$mes.'-'.'01'), 
+                                'estado_id'=> 1, 
+                                'test_valores'=> $key["node"]["Puntuación"], 
+                                'test_rest'=> json_encode($key["node"])
+                            );
+                            $this->Crud_model->agregarRegistro('produccion_test',$insert);
+                        }
+                    }
+                }
+            }
+            $where = array('p.estadoexportacion' => 0);
+            $datosTest = $this->Crud_test->GetDatos($where);
+            if (!is_null($datosTest)) {
+                foreach ($datosTest as $key) {
+                    $where = array('p.usuario_id' => $key->usuario_id);
+                    $datosUsurio = $this->Crud_usuario->GetDatos($where);
                     $envioDatos = array(
                         'value' => 10,
-                        'real' => 10,
-                        'goal' => $key->incentive_id_conocimiento,
-                        'date' => '2017-07-01'
+                        'real' => $key->test_valores/10,
+                        'goal' => $datosUsurio[0]->incentive_id_conocimiento,
+                        'date' => $key->test_fecha
                     );
-                    $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                    $datodCarga =  $this->consultaRest('/api/entities/'.$datosUsurio[0]->usuario_documento.'/addgoalvalue','POST',$envioDatos);
                     $this->Crud_log->Insertar('visitas incentive',$key->usuario_id,json_encode($datodCarga));
-                    $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_conocimiento, 'cumplimiento_fecha' => '2017-07-01',);
+                    $wherebuscar = array('usuario_id' => $datosUsurio[0]->usuario_id, 'tipocumplimiento_id' => $datosUsurio[0]->incentive_id_conocimiento, 'cumplimiento_fecha' => $key->test_fecha);
                     $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
                     if (is_null($datosCumplimiento)) {
                         $insertar = array(
-                            'usuario_id' => $key->usuario_id, 
-                            'tipocumplimiento_id' => $key->incentive_id_conocimiento,
+                            'usuario_id' => $datosUsurio[0]->usuario_id, 
+                            'tipocumplimiento_id' => $datosUsurio[0]->incentive_id_conocimiento,
                             'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                            'cumplimiento_fecha' => '2017-07-01',
+                            'cumplimiento_fecha' => $key->test_fecha,
                             'incentive_id' => $datodCarga["value"]["id"],
                             'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
                             'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
@@ -1071,6 +911,9 @@ class Job extends MY_Controller {
                         );
                         $this->Crud_cumplimiento->editar($edit,$where);
                     }
+                    $id = array('test_id' => $datosTest[0]->test_id);
+                    $update = array('estadoexportacion' => 1);
+                    $this->Crud_test->editar($update,$id);
                 }
             }
         }

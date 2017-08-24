@@ -25,6 +25,10 @@ class Crud_grupo extends CI_Model {
     {
         return $this->Crud_model->obtenerRegistros('produccion_metagrupo',$where,'*', NULL,NULL, NULL,NULL);
     }
+    public function GetDatosGrupo($where,$selct = '*')
+    {
+        return $this->Crud_model->obtenerRegistros('produccion_usuario',$where,$selct, NULL,NULL, NULL,NULL);
+    }
     public function GetDatosVentaGrupo($where)
     {
         $group = 'u.grupo_id';
