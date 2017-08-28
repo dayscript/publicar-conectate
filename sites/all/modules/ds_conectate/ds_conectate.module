@@ -154,6 +154,16 @@ function ds_conectate_preprocess_node(&$vars) {
     }
 }
 
+
+function ds_conectate_user_login(&$edit, $account) {
+  module_load_include('pages.inc', 'user');
+  $domain = domain_get_domain();
+  if( !isset($account->domain_user[$domain['domain_id']]) ){
+    user_logout();
+    drupal_goto('/');
+  }
+}
+
 /**
  * Implements hook_form_alter().
  */
