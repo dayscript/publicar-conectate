@@ -565,8 +565,11 @@ class MY_Controller extends CI_Controller
             break;
         }
     }
-    public function cargarDatosHome()
+    public function cargarDatosHome($mes = NULL)
     {
+        if (is_null($mes)) {
+            $mes = date('m',$this->ajusteFecha);
+        }
         $where = array('p.rol_id' => 7);
         $datos = $this->Crud_usuario->GetDatos($where);
         
@@ -778,14 +781,26 @@ class MY_Controller extends CI_Controller
         }
         return $cargo1Final;
     }
-    public function getdatosxgrupo()
+    public function getdatosxgrupo($mes = NULL)
     {
+        if (is_null($mes)) 
+        {
+            $mes = date('m',$this->ajusteFecha);
+        }
         $datosReturn = array();
         $con =0;
         $datos = $this->Crud_model->obtenerRegistros('basica_grupo');
         foreach ($datos as $key) {
-           $where = array('p.grupo_id' => $key->grupo_id);
-           $datosUsuarios = $this->Crud_grupo->GetDatosGrupo($where,'count(*) total');
+            $where = array('p.grupo_id' => $key->grupo_id);
+            $datosUsuarios = $this->Crud_grupo->GetDatosGrupo($where,'count(*) total');
+            $where = array(
+                'p.grupo_id' => $key->grupo_id,
+                'p.metagrupo_mes' => (int) $mes
+            );
+            $datosMetas = $this->Crud_model->obtenerRegistros('produccion_metagrupo',$where,'max(p.metagrupo_meta) metagrupo_meta');
+            if (is_null($datosMetas[0]->metagrupo_meta)) {
+                $datosMetas[0]->metagrupo_meta = 0;
+            }
            
            if ((int) $datosUsuarios[0]->total > 1) 
            {
@@ -798,17 +813,20 @@ class MY_Controller extends CI_Controller
     }
     public function ordenarPosision($people)
     {
+        var_dump();
         $sortArray = array(); 
-        foreach($people as $person){
-            foreach($person as $key=>$value){
-                if(!isset($sortArray[$key])){
-                    $sortArray[$key] = array();
+        if (count($people) > 0) {
+            foreach($people as $person){
+                foreach($person as $key=>$value){
+                    if(!isset($sortArray[$key])){
+                        $sortArray[$key] = array();
+                    }
+                    $sortArray[$key][] = $value;
                 }
-                $sortArray[$key][] = $value;
-            }
-        } 
-        $orderby = "suma";
-        array_multisort($sortArray[$orderby],SORT_DESC,$people);
+            } 
+            $orderby = "suma";
+            array_multisort($sortArray[$orderby],SORT_DESC,$people);
+        }   
         return $people; 
     }
     public function listTablaCargo($cargo1,$mes = '07')
@@ -820,8 +838,8 @@ class MY_Controller extends CI_Controller
                     <td> Apellido</td>
                     <td> Cedula</td>
                     <td> Nomina </td>
-                    <td> Venas Renovacion %</td>
-                    <td> Venas Nuevas %</td>
+                    <td> Ventas Renovacion %</td>
+                    <td> Ventas Nuevas %</td>
                     <td> Visitas %</td>
                     <td> Test %</td>
                     <td> Grupal %</td>

@@ -853,6 +853,8 @@ class Job extends MY_Controller {
             $datosTest = $this->totaltest();
             foreach ($datosTest["nodes"] as $key) {
                 if ($key["node"]["Evaluado"] == 'Sí') {
+                    //var_dump(json_encode($key["node"]));
+                    //echo('<br>');
                     $where = array('p.usuario_documento' => $key["node"]["Nombre"]);
                     $datosusuario = $this->Crud_usuario->GetDatos($where);
                     if (!is_null($datosusuario)) {
