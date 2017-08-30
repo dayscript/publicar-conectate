@@ -54,7 +54,9 @@ class Crud_usuario extends CI_Model {
     {
         return $this->Crud_model->actualizarRegistro('produccion_usuario',$pArrayActualizar,$id);
     }
-   
+    public function noTest($where = NULL){
+        return $this->Crud_model->obtenerRegistros('produccion_usuario', $where,'*');
+    }
 }
 
 ?>

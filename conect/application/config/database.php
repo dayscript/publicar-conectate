@@ -75,10 +75,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => '1234',
-	'database' => 'publicar_conect',
+	'hostname' => '190.147.154.86',
+	'username' => 'tecnologia',
+	'password' => '12345',
+	'database' => 'publicar-conect',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

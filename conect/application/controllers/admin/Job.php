@@ -1130,5 +1130,23 @@ class Job extends MY_Controller {
         $datosUsuario = $this->Crud_usuario->GetDatos($where);
         var_dump($datosUsuario);
     }
+
+    public function testNoRealizado($fecha, $bandera = NULL)
+    {
+        $where = 'usuario_id not in(select usuario_id from produccion_test where test_fecha = '.$fecha.')';
+        $notest = $this->Crud_usuario->noTest($where);
+        foreach ($notest as $key) {
+            $agileUser = $this->buscarUsuarioAgile($key->agile_id, 'id');
+            $tag = array('tipo' => 'codigoagile','datos' => $key->agile_id,'tag'=>'No ha realizado test');
+            if (is_null($bandera)) {
+                var_dump($agileUser);
+            }
+            else
+            {
+                $this->agregarTag($tag);
+            }
+            echo 'ok';
+        }
+    }
 }
 

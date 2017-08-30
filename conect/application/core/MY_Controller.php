@@ -335,6 +335,32 @@ class MY_Controller extends CI_Controller
             return 'error';
         }
     }
+    public function agregarTag($tag)
+    {
+        switch ($tag["tipo"]) {
+            case 'codigoagile':
+                $contact_json_tags = array(
+                    "id" => $tag["datos"], //It is mandatory field. Id of contact
+                   "tags" => array($tag["tag"])
+                );
+                $contact_json_tags_input = json_encode($contact_json_tags);
+                $tags1 = $this->curlwrap->curl_wrap("contacts/edit/tags", $contact_json_tags_input, "PUT", "application/json",$this->AGILE_DOMAIN,$this->AGILE_USER_EMAIL,$this->AGILE_REST_API_KEY);
+            break;
+            default:
+                $form_fields1 = array(
+                    'email' => urlencode($correo),
+                    'tags' => urlencode('["'.$tag["tag"].'"]')
+                );
+                $fields_string1 = '';
+                foreach ($form_fields1 as $key => $value) {
+                    $fields_string1 .= $key . '=' . $value . '&';
+                }
+
+                $tags1 = $this->curlwrap->curl_wrap("contacts/email/tags/add", rtrim($fields_string1, '&'), "POST", "application/x-www-form-urlencoded",$this->AGILE_DOMAIN,$this->AGILE_USER_EMAIL,$this->AGILE_REST_API_KEY);
+            break;
+        }
+        return $tags1;
+    }
     public function crearUsuarioAgile($datos,$cargamodulo = 'Archivo Carga',$idAgile = NULL,$etiquetaAdicional =  NULL){
         if (!isset($datos->urlCorreoReferidos)) {
             $referido = '';
