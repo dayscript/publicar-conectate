@@ -42,7 +42,7 @@
   cursor: default;
 }
 //Menu
-#superfish-1{
+#superfish-2{
   margin-top:40px;
   font-size: 1em;
   float: left;
@@ -53,7 +53,7 @@
       &:hover{
         color: $primary-color;
       }
-    }
+    } 
     .sf-depth-1.active {
       color: $primary-color;
     }
