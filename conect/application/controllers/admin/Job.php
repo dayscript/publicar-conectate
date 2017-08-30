@@ -1133,6 +1133,9 @@ class Job extends MY_Controller {
 
     public function testNoRealizado($fecha, $bandera = NULL)
     {
+        echo "badera";
+        var_dump($bandera);
+        echo "<br>";
         $where = 'usuario_id not in(select usuario_id from produccion_test where test_fecha = '.$fecha.')';
         $notest = $this->Crud_usuario->noTest($where);
         foreach ($notest as $key) {
@@ -1143,7 +1146,9 @@ class Job extends MY_Controller {
             }
             else
             {
-                $this->agregarTag($tag);
+                if ($bandera == 1) {
+                    $this->agregarTag($tag);
+                }
             }
             echo 'ok';
         }
