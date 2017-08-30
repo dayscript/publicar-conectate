@@ -1,11 +1,12 @@
 # Ignore configuration files that may contain sensitive information.
 sites/*/settings*.php
-conect/appication/config/database.php
 
 # Ignore paths that contain user-generated content.
 sites/*/files
 sites/*/private
 sites/all/themes/conectate/node_modules
 conect/file/uploads
-conect/appication/config/database.php
+conect/application/config/database.php
+
+
 
