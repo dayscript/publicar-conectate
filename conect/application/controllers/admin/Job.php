@@ -1131,26 +1131,32 @@ class Job extends MY_Controller {
         var_dump($datosUsuario);
     }
 
-    public function testNoRealizado($fecha, $bandera = NULL)
+    public function testNoRealizado($fecha = NULL, $bandera = NULL)
     {
         echo "badera";
         var_dump($bandera);
         echo "<br>";
-        $where = 'usuario_id not in(select usuario_id from produccion_test where test_fecha = '.$fecha.')';
-        $notest = $this->Crud_usuario->noTest($where);
-        foreach ($notest as $key) {
-            $agileUser = $this->buscarUsuarioAgile($key->agile_id, 'id');
-            $tag = array('tipo' => 'codigoagile','datos' => $key->agile_id,'tag'=>'No ha realizado test');
-            if (is_null($bandera)) {
-                var_dump($agileUser);
-            }
-            else
-            {
-                if ($bandera == 1) {
-                    $this->agregarTag($tag);
+        if (!is_null($fecha)) {
+            $where = 'usuario_id not in(select usuario_id from produccion_test where test_fecha = '.$fecha.')';
+            $notest = $this->Crud_usuario->noTest($where);
+            foreach ($notest as $key) {
+                $agileUser = $this->buscarUsuarioAgile($key->agile_id, 'id');
+                $tag = array('tipo' => 'codigoagile','datos' => $key->agile_id,'tag'=>'No ha realizado test');
+                if (is_null($bandera)) {
+                    var_dump($agileUser);
                 }
+                else
+                {
+                    if ($bandera == 1) {
+                        $this->agregarTag($tag);
+                    }
+                }
+                echo 'ok';
             }
-            echo 'ok';
+        }
+        else
+        {
+            echo "fecha no cargada";
         }
     }
 }
