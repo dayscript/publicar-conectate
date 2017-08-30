@@ -1141,7 +1141,7 @@ class Job extends MY_Controller {
             $notest = $this->Crud_usuario->noTest($where);
             foreach ($notest as $key) {
                 if (is_null($bandera)) {
-                    var_dump($key);
+                    var_dump(json_encode($notest));
                 }
                 else
                 {
