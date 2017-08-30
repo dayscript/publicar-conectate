@@ -7,4 +7,5 @@ sites/*/files
 sites/*/private
 sites/all/themes/conectate/node_modules
 conect/file/uploads
+conect/appication/config/database.php
 
