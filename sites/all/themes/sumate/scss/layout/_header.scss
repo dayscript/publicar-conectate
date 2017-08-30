@@ -72,6 +72,8 @@
       background: $primary-color;
     }
   }
+  li#menu-883-2{  background: $primary-color;}
+  li#menu-884-2{  background: $primary-color;}
 }
 .sf-menu.sf-style-simple li:last-child {
   background: white;
@@ -84,7 +86,7 @@
 .sf-menu.sf-style-simple li:hover li:last-child,
 .sf-menu.sf-style-simple li.sfHover li:last-child {
   background: white;
-  @media (min-width: 600px){
+  @media (min-width: 600px){ 
     background: #cd1941;
   }
 }
