@@ -1138,7 +1138,7 @@ class Job extends MY_Controller {
         echo "<br>";
         if (!is_null($fecha)) {
             $where = 'usuario_id not in(select usuario_id from produccion_test where test_fecha = '.$fecha.')';
-            $notest = $this->Crud_usuario->noTest($where);
+            $notest = $this->Crud_usuario->noTest($where,'p.agile_id,p.usuario_documento,p.usuario_nombre,p.usuario_correo,p.usuario_codigounico,p.usuario_codigonomina');
             foreach ($notest as $key) {
                 if (is_null($bandera)) {
                     var_dump(json_encode($notest));
