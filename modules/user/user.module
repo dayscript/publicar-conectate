@@ -1352,8 +1352,17 @@ function user_login_block($form) {
     '#size' => 15,
     '#required' => TRUE,
   );
+  global $base_url;
+  if (strstr($base_url, 'conectate')) {
+    $url = 'conectate';
+    $texto = 'Conéctate';
+  }
+  if (strstr($base_url, 'sumate')) {
+    $url = 'sumate';
+    $texto = 'Súmate';
+  }
   $form['cbox1'] = array('#type' => 'checkbox',
-    '#title' => t('Al ingresar a esta plataforma; usted acepta los <a href="http://conectatepublicar.linkpruebas.com/sites/default/files/conectate-terminos.pdf" title="" target="_blank">Términos y Condiciones</a> y la <a href="http://conectatepublicar.web/sites/default/files/politicadeprivacidad.pdf" target="_blank" title="">Política de Privacidad</a> del Programa "Conéctate Publicar"'),
+    '#title' => t('Al ingresar a esta plataforma; usted acepta los <a href="'.$base_url.'/sites/default/files/'.$url.'-terminos2017.pdf" title="" target="_blank">Términos y Condiciones</a> y la <a href="'.$base_url.'/sites/default/files/'.$url.'politicadeprivacidad.pdf" target="_blank" title="">Política de Privacidad</a> del Programa "'.$texto.' Publicar" '),
     '#size' => 15,
     '#required' => TRUE,
   );
