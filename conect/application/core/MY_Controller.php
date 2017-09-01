@@ -839,7 +839,6 @@ class MY_Controller extends CI_Controller
     }
     public function ordenarPosision($people)
     {
-        var_dump();
         $sortArray = array(); 
         if (count($people) > 0) {
             foreach($people as $person){
