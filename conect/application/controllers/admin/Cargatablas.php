@@ -727,6 +727,7 @@ class Cargatablas extends MY_Controller {
                             }
                             else
                             {
+                                $lista =array_merge($lista, array($columnaTitulo1[$i]['columnatabla'] => $columnaTitulo1[$i]['valor']));
                                 //temporal verificar actualizacion de datos pendiente por carga 
                                 if ($datosBuscar[0]->cargo_id == '') {
                                     $cargaExterna = true;
