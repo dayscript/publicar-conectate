@@ -730,12 +730,10 @@ class Cargatablas extends MY_Controller {
                                 //temporal verificar actualizacion de datos pendiente por carga 
                                 if ($datosBuscar[0]->cargo_id == '') {
                                     $cargaExterna = true;
-                                    $i= 100;
                                 }
                                 else
                                 {
                                     $cargaExterna = true;
-                                    $i= 100;
                                 }
                             }
                         break;
@@ -769,7 +767,6 @@ class Cargatablas extends MY_Controller {
         }
         if ($cargaExterna) 
         {
-            var_dump('produccion_update'.$tabla);
             var_dump($lista);
             //$this->Crud_model->agregarRegistro('produccion_update'.$tabla,$lista);
             $lista = array();
