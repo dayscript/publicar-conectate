@@ -768,7 +768,7 @@ class Cargatablas extends MY_Controller {
             }
         }
         if ($cargaExterna) {
-            $this->Crud_model->agregarRegistro('produccion_update'.$tabla,$lista);
+            //$this->Crud_model->agregarRegistro('produccion_update'.$tabla,$lista);
             $lista = array();
             return $lista;
         }
