@@ -405,7 +405,7 @@ class MY_Controller extends CI_Controller
                 )*/,
                 array(
                     "name" => "company",
-                    "value" => 'PUBLICAR',
+                    "value" => $datos->empresalegal_nombre,
                     "type" => "SYSTEM"
                 ),
                 array(

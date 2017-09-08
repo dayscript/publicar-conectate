@@ -704,6 +704,7 @@ class Cargatablas extends MY_Controller {
     public function crearArray($columnaTitulo1,$tabla)
     {
         $lista = array();
+        $cargaExterna = false;
         for ($i=0; $i < count($columnaTitulo1); $i++) { 
             if ($columnaTitulo1[$i]["tabla"] == $tabla) {
                 if ($columnaTitulo1[$i]['columnatabla'] != '') {
@@ -728,13 +729,13 @@ class Cargatablas extends MY_Controller {
                             {
                                 //temporal verificar actualizacion de datos pendiente por carga 
                                 if ($datosBuscar[0]->cargo_id == '') {
-                                    $lista = array();
-                                    return $lista;
+                                    $cargaExterna = true;
+                                    $i= 100;
                                 }
                                 else
                                 {
-                                    $lista = array();
-                                    return $lista;
+                                    $cargaExterna = true;
+                                    $i= 100;
                                 }
                             }
                         break;
@@ -766,7 +767,15 @@ class Cargatablas extends MY_Controller {
                 }
             }
         }
-        return $lista;
+        if ($cargaExterna) {
+            $this->Crud_model->agregarRegistro('produccion_update'.strtolower($tabla),$lista);
+            $lista = array();
+            return $lista;
+        }
+        else
+        {
+            return $lista;
+        }
     }
     public function limpiarArray($columnaTitulo1)
     {
