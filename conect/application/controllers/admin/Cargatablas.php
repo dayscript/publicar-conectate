@@ -682,7 +682,7 @@ class Cargatablas extends MY_Controller {
                     else
                     {
                         //var_dump($lista);
-                        //$this->Crud_model->agregarRegistro('produccion_'.strtolower($tabla),$lista);
+                        $this->Crud_model->agregarRegistro('produccion_'.strtolower($tabla),$lista);
                     }
                 endfor;
                 $this->Crud_log->Insertar('Carga '.$tabla,1,json_encode(date('Y-m-d H:i:s',$this->ajusteFecha)));
@@ -767,8 +767,7 @@ class Cargatablas extends MY_Controller {
         }
         if ($cargaExterna) 
         {
-            var_dump($lista);
-            //$this->Crud_model->agregarRegistro('produccion_update'.$tabla,$lista);
+            $this->Crud_model->agregarRegistro('produccion_update'.$tabla,$lista);
             $lista = array();
             return $lista;
         }
