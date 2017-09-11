@@ -1055,7 +1055,7 @@ class Job extends MY_Controller {
             }
             $actualiza = array('estado_id' => 5);
             $where = array('usuario_id' => $key->usuario_idUpdate);
-            //$this->Crud_update->editar($actualiza,$where);
+            $this->Crud_update->editar($actualiza,$where);
         }
     }
     public function datosCedula()
