@@ -13,6 +13,7 @@ class Job extends MY_Controller {
         $this->load->model('crud/Crud_cumplimiento');
         $this->load->model('crud/Crud_grupo');
         $this->load->model('crud/Crud_test');
+        $this->load->model('crud/Crud_update');
     }
     public function index()
     {
@@ -1013,6 +1014,12 @@ class Job extends MY_Controller {
     public function archivos()
     {
         echo $this->listar_archivos(getcwd(),"/File/uploader/courier");
+    }
+    public function cargarActualizaciones()
+    {
+        $datosUpdate = $this->Crud_update->datosConsulta();
+        var_dump($datosUpdate);
+        echo "string";
     }
     public function datosCedula()
     {

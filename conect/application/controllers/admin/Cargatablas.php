@@ -641,7 +641,8 @@ class Cargatablas extends MY_Controller {
                         'tabla' => $valorCampo->tabla_nombre,
                         'columna_tipo' => $valorCampo->columna_tipo,
                         'columna_remplasa' => $valorCampo->columna_remplasa,
-                        'valor'=> '' 
+                        'valor'=> '',
+                        'columna_insert' => $valorCampo->columna_insert
                     );
                 }
             endfor;
@@ -657,12 +658,13 @@ class Cargatablas extends MY_Controller {
                         'tabla' => $key->tabla_nombre,
                         'columna_tipo' => $key->columna_tipo,
                         'columna_remplasa' => $key->columna_remplasa,
-                        'valor'=> '' 
+                        'valor'=> '',
+                        'columna_insert' => $key->columna_insert
                     );
                     $in= $in+1;
                 }
                 
-                for ($m = 2; $m <= $highestRow; $m++): // RECORRE EL NUMERO DE FILAS QUE TIENE EL ARCHIVO EXCEL
+                for ($m = 2; $m <= $highestRow; $m++): // RECORRE EL NUMERO DE filter_input_array(type)S QUE TIENE EL ARCHIVO EXCEL
                     //var_dump($columnaTitulo);
                     //echo "<br>";
                     $columnaTitulo = $this->limpiarArray($columnaTitulo);
@@ -703,6 +705,7 @@ class Cargatablas extends MY_Controller {
 
     public function crearArray($columnaTitulo1,$tabla)
     {
+        //columna_insert
         $lista = array();
         $cargaExterna = false;
         for ($i=0; $i < count($columnaTitulo1); $i++) { 
@@ -745,6 +748,21 @@ class Cargatablas extends MY_Controller {
                                 $array = json_decode(json_encode($valores[0]), true);
                                 //var_dump($array[$columnaTitulo1[$i]["columnatabla"].'_id']);
                                 $lista =array_merge($lista, array($columnaTitulo1[$i]["columnatabla"].'_id' => $array[$columnaTitulo1[$i]["columnatabla"].'_id']));
+                            }
+                            else
+                            {
+                                if ((int) $columnaTitulo1[$i]["columna_insert"] == 1) 
+                                {
+                                    $insertBusqueda = array($columnaTitulo1[$i]["columnatabla"].'_nombre' => $columnaTitulo1[$i]["valor"]);
+                                    $this->Crud_model->agregarRegistro('basica_'.$columnaTitulo1[$i]["columnatabla"],$insertBusqueda);
+                                    $wheredinamico = array($columnaTitulo1[$i]["columna_remplasa"] => $columnaTitulo1[$i]["valor"]);
+                                    $valores = $this->Crud_model->obtenerRegistros('basica_'.$columnaTitulo1[$i]["columnatabla"],$wheredinamico);
+                                    if (!is_null($valores)) {
+                                        $array = json_decode(json_encode($valores[0]), true);
+                                        //var_dump($array[$columnaTitulo1[$i]["columnatabla"].'_id']);
+                                        $lista =array_merge($lista, array($columnaTitulo1[$i]["columnatabla"].'_id' => $array[$columnaTitulo1[$i]["columnatabla"].'_id']));
+                                    }
+                                }
                             }
                         break;
                         case 'fijo':
