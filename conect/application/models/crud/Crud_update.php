@@ -20,7 +20,7 @@ class Crud_update extends CI_Model {
         {
             $where=$whereArray;
         }
-        return $this->Crud_model->obtenerRegistros('produccion_updateusuario',$where,$select, NULL,'p.metaventa_id desc', $joins,$group);
+        return $this->Crud_model->obtenerRegistros('produccion_updateusuario',$where,$select, NULL,null, $joins,$group);
     }
     public function GetDatosTotal(){
         return $this->Crud_model->obtenerRegistros('produccion_updateusuario',null,'*');
