@@ -10,11 +10,14 @@ class Crud_cumplimiento extends CI_Model {
         
     }
 
-    public function datosPendientecarga($whereArray = null,$select = '*',$group = null)
+    public function datosPendientecarga($whereArray = null,$select = '*',$group = null,$fecha = null)
     {
+        if (is_null($fecha)) {
+            $fecha=date('Y-m-d',$this->ajusteFecha);
+        }
         $joins[0]  = array('tabla' => 'produccion_venta v ','tipo_join' =>'inner', 'conect'=>'v.usuario_id = p.usuario_id AND p.metaventa_mes = v.venta_mes');
         $joins[1]  = array('tabla' => 'produccion_usuario u ','tipo_join' =>'inner', 'conect'=>'u.usuario_id =  p.usuario_id');
-        $joins[2]  = array('tabla' => 'parametria_incentive pi ','tipo_join' =>'left', 'conect'=>'u.cargo_id =  pi.cargo_id');
+        $joins[2]  = array('tabla' => 'parametria_incentive pi ','tipo_join' =>'left', 'conect'=>"u.cargo_id =  pi.cargo_id and pi.incentive_fechainicio <=  '".$fecha."' and pi.incentive_fechafin >= '".$fecha."'");
 
         if (is_null($whereArray)) {
             $where = array('u.estado_id' => 1);
@@ -25,11 +28,14 @@ class Crud_cumplimiento extends CI_Model {
         }
         return $this->Crud_model->obtenerRegistros('produccion_metaventa',$where,$select, NULL,'p.metaventa_id desc', $joins,$group);
     }
-    public function datosPendientecargaVisitas($whereArray = null,$select = '*',$group = null)
+    public function datosPendientecargaVisitas($whereArray = null,$select = '*',$group = null,$fecha = null)
     {
+        if (is_null($fecha)) {
+            $fecha=date('Y-m-d',$this->ajusteFecha);
+        }
         $joins[0]  = array('tabla' => 'produccion_visita v ','tipo_join' =>'inner', 'conect'=>'v.usuario_id = p.usuario_id AND p.metavisita_mes = v.visita_mes');
         $joins[1]  = array('tabla' => 'produccion_usuario u ','tipo_join' =>'inner', 'conect'=>'u.usuario_id =  p.usuario_id');
-        $joins[2]  = array('tabla' => 'parametria_incentive pi ','tipo_join' =>'left', 'conect'=>'u.cargo_id =  pi.cargo_id');
+        $joins[2]  = array('tabla' => 'parametria_incentive pi ','tipo_join' =>'left', 'conect'=>"u.cargo_id =  pi.cargo_id and pi.incentive_fechainicio <=  '".$fecha."' and pi.incentive_fechafin >= '".$fecha."'");
 
         if (is_null($whereArray)) {
             $where = array('u.estado_id' => 1);

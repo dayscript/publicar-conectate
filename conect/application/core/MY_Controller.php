@@ -287,7 +287,7 @@ class MY_Controller extends CI_Controller
          return $key;
     }
     
-    public function restDrupal($datos = NULL,$metodo = 'get')
+    public function restDrupal($datos = NULL,$metodo = 'get',$url = null)
     {
         $this->load->library('basic_RestClient/my_restclient');
         $datosConect = array(
@@ -295,7 +295,7 @@ class MY_Controller extends CI_Controller
             'usuarioServicesDrupal' =>$this->usuarioServicesDrupal , 
             'claveServicesDrupal'=>$this->claveServicesDrupal
         );
-        return $this->my_restclient->crearUsuarioDrupal($datosConect,$metodo,$datos);
+        return $this->my_restclient->crearUsuarioDrupal($datosConect,$metodo,$datos,$url);
     }
     public function crearUsuario($contact_json = null,$metodoCarga = "POST"){
         

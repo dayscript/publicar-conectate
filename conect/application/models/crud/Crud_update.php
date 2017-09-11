@@ -11,6 +11,7 @@ class Crud_update extends CI_Model {
     }
     public function GetDatos($whereArray = null)
     {
+        $fecha=date('Y-m-d',$this->ajusteFecha);
         $joins[0]  = array('tabla' => 'basica_estado e ','tipo_join' =>'left', 'conect'=>'e.estado_id = p.estado_id');
         $joins[1]  = array('tabla' => 'basica_genero g ','tipo_join' =>'left', 'conect'=>'p.genero_id = g.genero_id');
         $joins[2]  = array('tabla' => 'basica_ciudad c','tipo_join' =>'left', 'conect'=>'c.ciudad_id = p.ciudad_id');
@@ -21,7 +22,7 @@ class Crud_update extends CI_Model {
         $joins[7]  = array('tabla' => 'basica_posicion bp  ','tipo_join' =>'left', 'conect'=>'bp.posicion_id =  p.posicion_id');
         $joins[8]  = array('tabla' => 'basica_regional br ','tipo_join' =>'left', 'conect'=>'br.regional_id =  c.regional_id');
         $joins[9]  = array('tabla' => 'basica_tipocontrato bt ','tipo_join' =>'left', 'conect'=>'bt.tipocontrato_id =  p.tipocontrato_id');
-        $joins[10]  = array('tabla' => 'parametria_incentive pri ','tipo_join' =>'left', 'conect'=>'pri.cargo_id =  p.cargo_id');
+        $joins[10]  = array('tabla' => 'parametria_incentive pri ','tipo_join' =>'left', 'conect'=>"p.cargo_id =  pri.cargo_id and pri.incentive_fechainicio <=  '".$fecha."' and pri.incentive_fechafin >= '".$fecha."'");
         $joins[11]  = array('tabla' => 'basica_grupo bg ','tipo_join' =>'left', 'conect'=>'bg.grupo_id =  p.grupo_id');
         $joins[12]  = array('tabla' => 'basica_cargo bca ','tipo_join' =>'left', 'conect'=>'bca.cargo_id =  p.cargo_id');
 
