@@ -335,6 +335,37 @@ class MY_Controller extends CI_Controller
             return 'error';
         }
     }
+    public function editarContactoAgile($id,$kilometros,$variablecostum)
+    {
+        $numero = $this->buscarCampoAgile($id->properties,$variablecostum,true);
+        if (!$numero['datos']) {
+            $insert =(object) array('type' => "CUSTOM",'name'=> $variablecostum,'value'=> $kilometros);
+            $id->properties[$numero['conteo']] =  $insert;
+        }
+        else
+        {
+            $id->properties[$numero['datos']]->value = $kilometros;
+        }
+        $contact_json_update_input = json_encode($id);
+        $contact5 = $this->curlwrap->curl_wrap("contacts", $contact_json_update_input, "PUT", "application/json",$this->AGILE_DOMAIN,$this->AGILE_USER_EMAIL,$this->AGILE_REST_API_KEY);
+        return $contact5;
+    }
+    public function buscarCampoAgile($properties,$campo,$posi = FALSE)
+    {
+        $conteo = 0;
+        foreach ($properties as $key) {
+            if ($key->name == $campo) {
+                if ($posi) {
+                    return array('datos' => $conteo,'conteo'=> NULL);
+                }else
+                {
+                    return array('datos' => $key,'conteo'=> NULL);
+                }
+            }
+            $conteo= $conteo+1;
+        }
+        return array('datos' => false,'conteo'=> $conteo);
+    }
     public function agregarTag($tag)
     {
         switch ($tag["tipo"]) {

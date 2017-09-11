@@ -1017,9 +1017,46 @@ class Job extends MY_Controller {
     }
     public function cargarActualizaciones()
     {
-        $datosUpdate = $this->Crud_update->datosConsulta();
-        var_dump($datosUpdate);
-        echo "string";
+        $select = 'p.usuario_id as usuario_idUpdate,u.usuario_id,p.usuario_documento, p.grupo_id as grupo_idUpdate, 
+    u.grupo_id as grupo_id,p.cargo_id as cargo_idUpdate,u.cargo_id as cargo_id,p.empresalegal_id as empresalegal_idUpdate,u.empresalegal_id,u.agile_id';
+        $datosUpdate = $this->Crud_update->datosConsulta(null,$select);
+        foreach ($datosUpdate as $key) {
+            $where = array('usuario_id' => $key->usuario_idUpdate);
+            $datosusuario = $this->Crud_update->GetDatos($where);
+            $contact1 = $this->buscarUsuarioAgile($key->agile_id, 'id');
+            if ($key->grupo_idUpdate != $key->grupo_id) {
+                $where = array('usuario_id' => $key->usuario_id);
+                $actualiza = array('grupo_id' => $key->grupo_idUpdate);
+                $this->Crud_usuario->editar($actualiza,$where);
+                if ($contact1 != '') {
+                    $result = json_decode($contact1, false, 512, JSON_BIGINT_AS_STRING);
+                    $result1 =$this->editarContactoAgile($result,$datosusuario[0]->grupo_nombre,'Grupo');
+                }
+            }
+            if ($key->cargo_idUpdate != $key->cargo_id) {
+                $where = array('usuario_id' => $key->usuario_id);
+                $actualiza = array('cargo_id' => $key->cargo_idUpdate);
+                $this->Crud_usuario->editar($actualiza,$where);
+                if ($contact1 != '') {
+                    $result = json_decode($contact1, false, 512, JSON_BIGINT_AS_STRING);
+                    $result1 =$this->editarContactoAgile($result,$datosusuario[0]->cargo_nombre,'Cargo');
+                    $result1 =$this->editarContactoAgile($result,$datosusuario[0]->cargo_nombre,'Posicion');
+                }
+            }
+            if ($key->empresalegal_idUpdate != $key->empresalegal_id) {
+                $where = array('usuario_id' => $key->usuario_id);
+                $actualiza = array('empresalegal_id' => $key->empresalegal_idUpdate);
+                $this->Crud_usuario->editar($actualiza,$where);
+                if ($contact1 != '') {
+                    $result = json_decode($contact1, false, 512, JSON_BIGINT_AS_STRING);
+                    $result1 =$this->editarContactoAgile($result,$datosusuario[0]->empresalegal_nombre,'Empresa legal');
+                    $result1 =$this->editarContactoAgile($result,$datosusuario[0]->empresalegal_nombre,'company');
+                }
+            }
+            $actualiza = array('estado_id' => 5);
+            $where = array('usuario_id' => $key->usuario_idUpdate);
+            //$this->Crud_update->editar($actualiza,$where);
+        }
     }
     public function datosCedula()
     {
