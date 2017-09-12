@@ -139,7 +139,7 @@ class Job extends MY_Controller {
     {
         if ($this->input->is_ajax_request()) {
             $docuemnto = $this->input->post("documento", TRUE);
-            $docuemnto = 1022976301;
+            //$docuemnto = 1022976301;
             $where = array('p.usuario_documento' => $docuemnto);
             $datosUsuario = $this->Crud_usuario->GetDatos($where);
             $dia = $this->input->post("dia", TRUE);
@@ -147,14 +147,15 @@ class Job extends MY_Controller {
             $ano = $this->input->post("ano", TRUE);
             $mes = (strlen($mes) == 1) ? '0'.$mes : $mes;
             $dia = (strlen($dia) == 1) ? '0'.$dia : $dia;
-            $dia =  01;
-            $mes =  '08';
-            $ano =  2017;
+            //$dia =  01;
+            //$mes =  '08';
+            //$ano =  2017;
             $fecha = $ano.'-'.$mes.'-'.$dia;
             $datodCarga =  $this->consultaRest('/api/entities/'.$docuemnto);
             $enviodatos = array();
             $contador = 0;
             $suma =  0;
+            //var_dump(strpos($_SERVER['HTTP_HOST'], 'conectate'));
             if (strpos($_SERVER['HTTP_HOST'], 'conectate')) {
                 $dominio_id =  1;
                 if ((int) $mes <= 7) {
@@ -190,7 +191,8 @@ class Job extends MY_Controller {
                             'meta' => $key["value"], 
                             'cumplimiento' => $key["real"], 
                             'puntos' => $key["percentage_weighed"],
-                            'date'=> $key["date"]
+                            'date'=> $key["date"],
+                            'cargosubmenu_tipo' => $datoIcentive[0]->cargosubmenu_tipo
                         );
                         $enviodatos[$contador] = $arrayName;
                         $contador = $contador + 1;
@@ -199,17 +201,26 @@ class Job extends MY_Controller {
                     }
                 }
             }
+            //var_dump(json_encode($enviodatos));
+            //echo "<br>";
             $datosIncentive = $this->Crud_parametria->datosMenuIncentive($datosMenuIncentive);
+            //var_dump(json_encode($datosIncentive));
+            //echo "<br>";
             foreach ($datosIncentive as $key1) {
-                switch ($key1->cargomenu_id) {
-                    case '1':
+                //var_dump($key1->cargosubmenu_tipo);
+                //echo "<br>";
+                switch ($key1->cargosubmenu_tipo) {
+                    case '1' :
                         $bandera = true;
                         $conta = 0;
                         while ($bandera and count($enviodatos) > $conta ) {
-                            if ($enviodatos[$conta]["menuid"] == $key1->cargomenu_id) {
+                            if ($enviodatos[$conta]["cargosubmenu_tipo"] == $key1->cargosubmenu_tipo) {
                                 $bandera = false;
                             }
-                            $conta = $conta+1;
+                            else
+                            {
+                                $conta = $conta+1;
+                            }
                         }
                         if ($bandera) {
                             $whereTempo = array('metaventa_mes' => $mes,'usuario_id'=> $datosUsuario[0]->usuario_id);
@@ -232,7 +243,8 @@ class Job extends MY_Controller {
                                 'meta' => $merta, 
                                 'cumplimiento' => 0, 
                                 'puntos' => 0,
-                                'date'=> ''
+                                'date'=> '',
+                                'cargosubmenu_tipo' => $key1->cargosubmenu_tipo
                             );
                             $enviodatos[$contador] = $arrayName;
                             $contador = $contador + 1;
@@ -245,7 +257,8 @@ class Job extends MY_Controller {
                                 'meta' => $merta1, 
                                 'cumplimiento' => 0, 
                                 'puntos' => 0,
-                                'date'=> ''
+                                'date'=> '',
+                                'cargosubmenu_tipo' => $key1->cargosubmenu_tipo
                             );
                             $enviodatos[$contador] = $arrayName;
                             $contador = $contador + 1;
@@ -255,10 +268,13 @@ class Job extends MY_Controller {
                             $bandera = true;
                             $conta = 0;
                             while ($bandera and count($enviodatos) > $conta ) {
-                                if ($enviodatos[$conta]["menuid"] == $key1->cargomenu_id) {
-                                    $bandera = false;
+                                if ($enviodatos[$conta]["cargosubmenu_tipo"] == $key1->cargosubmenu_tipo) {
+                                $bandera = false;
                                 }
-                                $conta = $conta+1;
+                                else
+                                {
+                                    $conta = $conta+1;
+                                }
                             }
                             if ($bandera) {
                                 $arrayName = array(
@@ -268,7 +284,8 @@ class Job extends MY_Controller {
                                     'meta' => '', 
                                     'cumplimiento' => 0, 
                                     'puntos' => 0,
-                                    'date'=> ''
+                                    'date'=> '',
+                                    'cargosubmenu_tipo' => $key1->cargosubmenu_tipo
                                 );
                                 $enviodatos[$contador] = $arrayName;
                                 $contador = $contador + 1;
@@ -278,10 +295,13 @@ class Job extends MY_Controller {
                         $bandera = true;
                         $conta = 0;
                         while ($bandera and count($enviodatos) > $conta ) {
-                            if ($enviodatos[$conta]["menuid"] == $key1->cargomenu_id) {
+                            if ($enviodatos[$conta]["cargosubmenu_tipo"] == $key1->cargosubmenu_tipo) {
                                 $bandera = false;
                             }
-                            $conta = $conta+1;
+                            else
+                            {
+                                $conta = $conta+1;
+                            }
                         }
                         if ($bandera) {
                             $arrayName = array(
@@ -291,7 +311,8 @@ class Job extends MY_Controller {
                                 'meta' => '', 
                                 'cumplimiento' => 0, 
                                 'puntos' => 0,
-                                'date'=> ''
+                                'date'=> '',
+                                'cargosubmenu_tipo' => $key1->cargosubmenu_tipo
                             );
                             $enviodatos[$contador] = $arrayName;
                             $contador = $contador + 1;
@@ -301,10 +322,13 @@ class Job extends MY_Controller {
                         $bandera = true;
                         $conta = 0;
                         while ($bandera and count($enviodatos) > $conta ) {
-                            if ($enviodatos[$conta]["menuid"] == $key1->cargomenu_id) {
+                            if ($enviodatos[$conta]["cargosubmenu_tipo"] == $key1->cargosubmenu_tipo) {
                                 $bandera = false;
                             }
-                            $conta = $conta+1;
+                            else
+                            {
+                                $conta = $conta+1;
+                            }
                         }
                         if ($bandera) {
                             $arrayName = array(
@@ -314,7 +338,8 @@ class Job extends MY_Controller {
                                 'meta' => '', 
                                 'cumplimiento' => 0, 
                                 'puntos' => 0,
-                                'date'=> ''
+                                'date'=> '',
+                                'cargosubmenu_tipo' => $key1->cargosubmenu_tipo
                             );
                             $enviodatos[$contador] = $arrayName;
                             $contador = $contador + 1;
@@ -324,10 +349,13 @@ class Job extends MY_Controller {
                         $bandera = true;
                         $conta = 0;
                         while ($bandera and count($enviodatos) > $conta ) {
-                            if ($enviodatos[$conta]["menuid"] == $key1->cargomenu_id) {
+                            if ($enviodatos[$conta]["cargosubmenu_tipo"] == $key1->cargosubmenu_tipo) {
                                 $bandera = false;
                             }
-                            $conta = $conta+1;
+                            else
+                            {
+                                $conta = $conta+1;
+                            }
                         }
                         if ($bandera) {
                             $arrayName = array(
@@ -337,7 +365,8 @@ class Job extends MY_Controller {
                                 'meta' => '', 
                                 'cumplimiento' => 0, 
                                 'puntos' => 0,
-                                'date'=> ''
+                                'date'=> '',
+                                'cargosubmenu_tipo' => $key1->cargosubmenu_tipo
                             );
                             $enviodatos[$contador] = $arrayName;
                             $contador = $contador + 1;
@@ -354,6 +383,7 @@ class Job extends MY_Controller {
                 $enviodatos = $this->ordenar($enviodatos);
                 $htmlText = $this->cargarHtmlComprimido($enviodatos,$suma);   
             }
+            //echo $htmlText;
             $return = array('estado' => true,'carga'=>$htmlText);
             echo json_encode($return, JSON_FORCE_OBJECT);
         }
@@ -369,9 +399,9 @@ class Job extends MY_Controller {
         while ($contador <= 5) 
         { 
             for ($i=0; $i < count($ordenar); $i++) { 
-                if ($ordenar[$i]['menuid'] == $contador) 
+                if ($ordenar[$i]['cargosubmenu_tipo'] == $contador) 
                 {
-                    if ($ordenar[$i]['menuid']  != 1) 
+                    if ($ordenar[$i]['cargosubmenu_tipo']  != 1) 
                     {
                         $datos[$contadorArray] = $ordenar[$i];
                         $ordenar[$i] = null;
