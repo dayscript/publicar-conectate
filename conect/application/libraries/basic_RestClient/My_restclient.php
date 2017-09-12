@@ -77,7 +77,7 @@ class My_restclient {
         //Retornar la respuesta del servidor
         return $response_json;
     }
-    public function crearUsuarioDrupal($conect,$metodo,$datos,$url)
+    public function crearUsuarioDrupal($conect,$metodo,$datos,$url = null)
     {
         $api = new RestClient([
             'base_url' => $conect['urlServicesDrupal'],
@@ -98,13 +98,13 @@ class My_restclient {
         {
             switch ($metodo) {
                 case 'post':
-                    $result = $api->post("/user/".$url,$datos);
+                    $result = $api->post($url,$datos);
                 break;
                 case 'get':
-                    $result = $api->get("/user/".$url,$datos);
+                    $result = $api->get($url,$datos);
                 break;
                 case 'put':
-                    $result = $api->get("/user/".$url,$datos);
+                    $result = $api->get($url,$datos);
                 break;
             }
         }

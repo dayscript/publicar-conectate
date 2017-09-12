@@ -64,7 +64,7 @@ class Curlwrap {
         curl_close($ch);
         return $output;
     }
-    function curl_wrapIncentive($entity, $data, $method, $content_type = NULL) {
+    function curl_wrapIncentive($entity, $data, $method, $content_type = NULL,$header = true) {
         if ($content_type == NULL) {
             $content_type = "application/json";
         }
@@ -99,9 +99,15 @@ class Curlwrap {
             default:
                 break;
         }
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            "Content-type : $content_type;", 'Accept : application/json'
-        ));
+        if ($header) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                "Content-type : $content_type;", 'Accept : application/json'
+            ));
+        }
+        else
+        { 
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept : application/json'));
+        }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         //curl_setopt($ch, CURLOPT_USERPWD, $AGILE_USER_EMAIL . ':' . $AGILE_REST_API_KEY);
         curl_setopt($ch, CURLOPT_TIMEOUT, 120);

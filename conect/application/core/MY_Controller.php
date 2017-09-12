@@ -20,6 +20,7 @@ class MY_Controller extends CI_Controller
     public $urlServicesDrupal;
     public $usuarioServicesDrupal;
     public $claveServicesDrupal;
+    public $urlambiente;
 
 
 	function __construct()
@@ -67,6 +68,7 @@ class MY_Controller extends CI_Controller
         if (is_null($this->recaptcha)) {
             $this->recaptcha =$this->Crud_parametria->obtenerParametria('recaptcha');
         }
+        $this->urlambiente = $this->Crud_parametria->obtenerParametria('urlambiente');
         $this->urlServicesDrupal =  $this->Crud_parametria->obtenerParametria('urlServicesDrupal');
         $this->usuarioServicesDrupal =  $this->Crud_parametria->obtenerParametria('usuarioServicesDrupal');
         $this->claveServicesDrupal =  $this->Crud_parametria->obtenerParametria('claveServicesDrupal');
@@ -103,12 +105,12 @@ class MY_Controller extends CI_Controller
         $DatoRol = $this->Crud_rol->GetDatos($rol_id);
         redirect($DatoRol->rol_index);
     }
-    public function consultaRest($urlConsulta = '/api/test',$metodo = 'GET',$datos = null,$url = NULL)
+    public function consultaRest($urlConsulta = '/api/test',$metodo = 'GET',$datos = null,$url = NULL,$content_type=null,$header=true)
     {
         if (is_null($url)) {
             $url = $this->incentive;
         }
-        $datosRetorno = $this->curlwrap->curl_wrapIncentive($url.$urlConsulta,$datos,$metodo);
+        $datosRetorno = $this->curlwrap->curl_wrapIncentive($url.$urlConsulta,$datos,$metodo,$content_type,$header);
         $retornoValidar = json_decode($datosRetorno,true);
 
         if (is_null($retornoValidar)) 
@@ -778,8 +780,16 @@ class MY_Controller extends CI_Controller
     }
     public function totaltest()
     {
+        $insertar = array(
+            'username' => 'admin',
+            'password' => 'p0p01234'
+        );
+        $datosIncentive =  $this->consultaRest('/usuarios/user/login','POST',$insertar,'http://conectatepublicar.com/','',false);
+        var_dump($datosIncentive);
         $datosIncentive =  $this->consultaRest('resultados-quiz','GET',null,'http://conectatepublicar.com/');
+        var_dump($datosIncentive);
         return $datosIncentive;
+        
     }
     public function cargarDatosUsuario($cargo1,$limite,$grupo_id)
     {

@@ -904,27 +904,28 @@ class Job extends MY_Controller {
         $jobGrupo = $this->Crud_parametria->obtenerParametria('jobTest');
         if ($jobGrupo == '1') {
             $datosTest = $this->totaltest();
-            var_dump(json_encode($datosTest));
-            foreach ($datosTest["nodes"] as $key) {
-                if ($key["node"]["Evaluado"] == 'Sí') {
-                    //var_dump(json_encode($key["node"]));
-                    //echo('<br>');
-                    $where = array('p.usuario_documento' => $key["node"]["Nombre"]);
-                    $datosusuario = $this->Crud_usuario->GetDatos($where);
-                    if (!is_null($datosusuario)) {
-                        $fecha = explode(',', $key["node"]["Date finished"]); 
-                        $mes = $this->retornoMesxString($fecha[1]);
-                        $where = array('p.usuario_id' => $datosusuario[0]->usuario_id,'p.test_fecha'=>date('Y').'-'.$mes.'-'.'01');
-                        $registroExiste = $this->Crud_model->obtenerRegistros('produccion_test',$where);
-                        if (is_null($registroExiste)) {
-                            $insert = array(
-                                'usuario_id' => $datosusuario[0]->usuario_id, 
-                                'test_fecha'=> (date('Y').'-'.$mes.'-'.'01'), 
-                                'estado_id'=> 1, 
-                                'test_valores'=> $key["node"]["Puntuación"], 
-                                'test_rest'=> json_encode($key["node"])
-                            );
-                            $this->Crud_model->agregarRegistro('produccion_test',$insert);
+            if (!is_null($datosTest)) {
+                foreach ($datosTest["nodes"] as $key) {
+                    if ($key["node"]["Evaluado"] == 'Sí') {
+                        //var_dump(json_encode($key["node"]));
+                        //echo('<br>');
+                        $where = array('p.usuario_documento' => $key["node"]["Nombre"]);
+                        $datosusuario = $this->Crud_usuario->GetDatos($where);
+                        if (!is_null($datosusuario)) {
+                            $fecha = explode(',', $key["node"]["Date finished"]); 
+                            $mes = $this->retornoMesxString($fecha[1]);
+                            $where = array('p.usuario_id' => $datosusuario[0]->usuario_id,'p.test_fecha'=>date('Y').'-'.$mes.'-'.'01');
+                            $registroExiste = $this->Crud_model->obtenerRegistros('produccion_test',$where);
+                            if (is_null($registroExiste)) {
+                                $insert = array(
+                                    'usuario_id' => $datosusuario[0]->usuario_id, 
+                                    'test_fecha'=> (date('Y').'-'.$mes.'-'.'01'), 
+                                    'estado_id'=> 1, 
+                                    'test_valores'=> $key["node"]["Puntuación"], 
+                                    'test_rest'=> json_encode($key["node"])
+                                );
+                                $this->Crud_model->agregarRegistro('produccion_test',$insert);
+                            }
                         }
                     }
                 }
@@ -967,7 +968,7 @@ class Job extends MY_Controller {
                         );
                         $this->Crud_cumplimiento->editar($edit,$where);
                     }
-                    $id = array('test_id' => $datosTest[0]->test_id);
+                    $id = array('test_id' => $key->test_id);
                     $update = array('estadoexportacion' => 1);
                     $this->Crud_test->editar($update,$id);
                 }
