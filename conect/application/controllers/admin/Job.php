@@ -137,7 +137,7 @@ class Job extends MY_Controller {
     }
     public function metasPorUsuario($carga = null)
     {
-        //if ($this->input->is_ajax_request()) {
+        if ($this->input->is_ajax_request()) {
             $docuemnto = $this->input->post("documento", TRUE);
             $docuemnto = 1022976301;
             $where = array('p.usuario_documento' => $docuemnto);
@@ -356,7 +356,7 @@ class Job extends MY_Controller {
             }
             $return = array('estado' => true,'carga'=>$htmlText);
             echo json_encode($return, JSON_FORCE_OBJECT);
-        //}
+        }
     }
     public function ordenar($ordenar)
     {
