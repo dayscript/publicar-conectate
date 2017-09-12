@@ -493,7 +493,7 @@ class MY_Controller extends CI_Controller
                 ),
                 array(
                     'name' => "URLSISTEMA",
-                    "value" => $this->Crud_parametria->obtenerParametria('urlambiente'),
+                    "value" => $datos->dominio_url,
                     "type" => "CUSTOM"
                 ),
                 array(
