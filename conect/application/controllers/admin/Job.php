@@ -137,9 +137,9 @@ class Job extends MY_Controller {
     }
     public function metasPorUsuario($carga = null)
     {
-        if ($this->input->is_ajax_request()) {
+        //if ($this->input->is_ajax_request()) {
             $docuemnto = $this->input->post("documento", TRUE);
-            //$docuemnto = 1024839411;
+            $docuemnto = 1022976301;
             $where = array('p.usuario_documento' => $docuemnto);
             $datosUsuario = $this->Crud_usuario->GetDatos($where);
             $dia = $this->input->post("dia", TRUE);
@@ -147,20 +147,42 @@ class Job extends MY_Controller {
             $ano = $this->input->post("ano", TRUE);
             $mes = (strlen($mes) == 1) ? '0'.$mes : $mes;
             $dia = (strlen($dia) == 1) ? '0'.$dia : $dia;
-            //$dia =  01;
-            //$mes =  '07';
-            //$ano =  2017;
+            $dia =  01;
+            $mes =  '08';
+            $ano =  2017;
             $fecha = $ano.'-'.$mes.'-'.$dia;
             $datodCarga =  $this->consultaRest('/api/entities/'.$docuemnto);
             $enviodatos = array();
             $contador = 0;
             $suma =  0;
+            if (strpos($_SERVER['HTTP_HOST'], 'conectate')) {
+                $dominio_id =  1;
+                if ((int) $mes <= 7) {
+                    $menupordominio = array('dominio_id' => 1);
+                }
+                else
+                {
+                    $datosMenuIncentive = array('dominio_id' => 1,'cargosubmenu_id <>'=>2);
+                }
+            }
+            else
+            {
+                $dominio_id =  2;
+                if ((int) $mes <= 7) {
+                    $datosMenuIncentive = array('dominio_id' => 2);
+                }
+                else
+                {
+                    $datosMenuIncentive = array('dominio_id' => 2,'cargosubmenu_id <>'=>7);
+                }
+            }
             if (!isset($datodCarga["status"])) 
             {
                 foreach ($datodCarga['entity']["goalvalues"] as $key) 
                 {
+
                     if (date("m", strtotime($key["date"])) == date("m", strtotime($fecha))) {
-                        $datoIcentive = $this->buscarTipoDeCarga($key["goal_id"],$datosUsuario[0]->cargo_id);
+                        $datoIcentive = $this->buscarTipoDeCarga($key["goal_id"],$datosUsuario[0]->cargo_id,$dominio_id,$fecha);
                         $arrayName = array(
                             'menu' => $datoIcentive[0]->cargomenu_nombre, 
                             'menuid' => $datoIcentive[0]->cargomenu_id, 
@@ -177,27 +199,7 @@ class Job extends MY_Controller {
                     }
                 }
             }
-
-            if (strpos($_SERVER['HTTP_HOST'], 'conectate') >= 0) {
-                if ((int) $mes <= 7) {
-                    $arrayName = array('dominio_id' => 1);
-                }
-                else
-                {
-                    $arrayName = array('dominio_id' => 1,'cargosubmenu_id <>'=>2);
-                }
-            }
-            else
-            {
-                if ((int) $mes <= 7) {
-                    $arrayName = array('dominio_id' => 2);
-                }
-                else
-                {
-                    $arrayName = array('dominio_id' => 2,'cargosubmenu_id <>'=>7);
-                }
-            }
-            $datosIncentive = $this->Crud_parametria->datosMenuIncentive($arrayName);
+            $datosIncentive = $this->Crud_parametria->datosMenuIncentive($datosMenuIncentive);
             foreach ($datosIncentive as $key1) {
                 switch ($key1->cargomenu_id) {
                     case '1':
@@ -354,7 +356,7 @@ class Job extends MY_Controller {
             }
             $return = array('estado' => true,'carga'=>$htmlText);
             echo json_encode($return, JSON_FORCE_OBJECT);
-        }
+        //}
     }
     public function ordenar($ordenar)
     {
@@ -404,34 +406,122 @@ class Job extends MY_Controller {
         }
         return $datos;
     }
-    public function buscarTipoDeCarga($goal_id,$cargo_id)
+    public function buscarTipoDeCarga($goal_id,$cargo_id,$dominio_id,$fecha)
     {
-        $datoAjustedo = (($goal_id/5)-intval(($goal_id/5)))*100;
-        switch (strval($datoAjustedo)) 
+        if ($fecha <= '2017-07-31') {
+            $divisor = 5;
+        }
+        else
         {
-            case 20:
-                $where = array('c.cargosubmenu_id' => 1);
-                $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
-            break;
-            case 40:
+            $divisor = 4;
+        }
+        if ($divisor == 5) {
+            $datoAjustedo = (($goal_id/$divisor)-intval(($goal_id/$divisor)))*100;
+            switch (strval($datoAjustedo)) 
+            {
+                case 20:
+                    if ($dominio_id == 1) {
+                        $where = array('c.cargosubmenu_id' => 1,'p.dominio_id' => $dominio_id);
+                    }
+                    else
+                    {
+                        $where = array('c.cargosubmenu_id' => 6,'p.dominio_id' => $dominio_id);
+                    }
+                    
+                    $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+                break;
+                case 40:
 
-                $where = array('c.cargosubmenu_id' => 2);
-                $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
-            break;
-            case 60:
+                    if ($dominio_id == 1) {
+                        $where = array('c.cargosubmenu_id' => 2,'p.dominio_id' => $dominio_id);
+                    }
+                    else
+                    {
+                        $where = array('c.cargosubmenu_id' => 7,'p.dominio_id' => $dominio_id);
+                    }
+                    $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+                break;
+                case 60:
 
-                $where = array('c.cargosubmenu_id' => 3);
-                $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
-            break;
-            case 80:
+                    if ($dominio_id == 1) {
+                        $where = array('c.cargosubmenu_id' => 3,'p.dominio_id' => $dominio_id);
+                    }
+                    else
+                    {
+                        $where = array('c.cargosubmenu_id' => 8,'p.dominio_id' => $dominio_id);
+                    }
+                    $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+                break;
+                case 80:
 
-                $where = array('c.cargosubmenu_id' => 4);
-                $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
-            break;
-            case 0:
-                $where = array('c.cargosubmenu_id' => 5);
-                $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
-            break;
+                    if ($dominio_id == 1) {
+                        $where = array('c.cargosubmenu_id' => 4,'p.dominio_id' => $dominio_id);
+                    }
+                    else
+                    {
+                        $where = array('c.cargosubmenu_id' => 9,'p.dominio_id' => $dominio_id);
+                    }
+                    $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+                break;
+                case 0:
+                    if ($dominio_id == 1) {
+                        $where = array('c.cargosubmenu_id' => 5,'p.dominio_id' => $dominio_id);
+                    }
+                    else
+                    {
+                        $where = array('c.cargosubmenu_id' => 10,'p.dominio_id' => $dominio_id);
+                    }
+                    $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+                break;
+            }
+        }
+        else
+        {
+            $goal_id=$goal_id-35;
+            $datoAjustedo = (($goal_id/$divisor)-intval(($goal_id/$divisor)))*100;
+            switch (strval($datoAjustedo)) 
+            {
+                case 25:
+                    if ($dominio_id == 1) {
+                        $where = array('c.cargosubmenu_id' => 1,'p.dominio_id' => $dominio_id);
+                    }
+                    else
+                    {
+                        $where = array('c.cargosubmenu_id' => 6,'p.dominio_id' => $dominio_id);
+                    }
+                    $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+                break;
+                case 50:
+                    if ($dominio_id == 1) {
+                        $where = array('c.cargosubmenu_id' => 3,'p.dominio_id' => $dominio_id);
+                    }
+                    else
+                    {
+                        $where = array('c.cargosubmenu_id' => 8,'p.dominio_id' => $dominio_id);
+                    }
+                    $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+                break;
+                case 75:
+                    if ($dominio_id == 1) {
+                        $where = array('c.cargosubmenu_id' => 4,'p.dominio_id' => $dominio_id);
+                    }
+                    else
+                    {
+                        $where = array('c.cargosubmenu_id' => 9,'p.dominio_id' => $dominio_id);
+                    }
+                    $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+                break;
+                case 0:
+                    if ($dominio_id == 1) {
+                        $where = array('c.cargosubmenu_id' => 5,'p.dominio_id' => $dominio_id);
+                    }
+                    else
+                    {
+                        $where = array('c.cargosubmenu_id' => 10,'p.dominio_id' => $dominio_id);
+                    }
+                    $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
+                break;
+            }
         }
         return $datosIncentive;
     }
@@ -1209,7 +1299,7 @@ class Job extends MY_Controller {
         }
         */
         $where = array('r.rol_id' => 7 ,'p.empresalegal_id' => 2);
-        $this->cargaregaloTest($where,'2017-08-01','Regalo de conociemnto');
+        $this->cargaregaloTest($where,'2017-08-01','Regalo de conocimiento');
     }
     public function  eliminarDatosIncentivexCedula($docuemnto = 80216675,$fecha = '2017-08-01')
     {
