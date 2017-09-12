@@ -1209,7 +1209,7 @@ class Job extends MY_Controller {
         }
         */
         $where = array('r.rol_id' => 7 ,'p.empresalegal_id' => 2);
-        //$this->cargaregaloTest($where,'2017-08-01','Regalo de conociemnto');
+        $this->cargaregaloTest($where,'2017-08-01','Regalo de conociemnto');
     }
     public function  eliminarDatosIncentivexCedula($docuemnto = 80216675,$fecha = '2017-08-01')
     {
