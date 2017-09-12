@@ -1013,7 +1013,7 @@ class Job extends MY_Controller {
                     $conteo = 2;
                     $result =  $this->restDrupal(json_encode($insertar),'post');
                     if (!isset($result->uid)) {
-                        $editar = array('drupal_estado_id' => 3,'drupal_id' => null);
+                        $editar = array('drupal_estado_id' => 3);
                         $busqueda = array('usuario_id' => $key->usuario_id);
                         $this->Crud_usuario->editar($editar,$busqueda);
                         $this->Crud_log->Insertar('usuario drupal',$key->usuario_id,json_encode($result));
