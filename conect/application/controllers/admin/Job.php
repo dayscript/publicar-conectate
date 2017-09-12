@@ -177,7 +177,27 @@ class Job extends MY_Controller {
                     }
                 }
             }
-            $datosIncentive = $this->Crud_parametria->datosMenuIncentive();
+
+            if (strpos($_SERVER['HTTP_HOST'], 'conectate') >= 0) {
+                if ((int) $mes <= 7) {
+                    $arrayName = array('dominio_id' => 1);
+                }
+                else
+                {
+                    $arrayName = array('dominio_id' => 1,'cargosubmenu_id <>'=>2);
+                }
+            }
+            else
+            {
+                if ((int) $mes <= 7) {
+                    $arrayName = array('dominio_id' => 2);
+                }
+                else
+                {
+                    $arrayName = array('dominio_id' => 2,'cargosubmenu_id <>'=>7);
+                }
+            }
+            $datosIncentive = $this->Crud_parametria->datosMenuIncentive($arrayName);
             foreach ($datosIncentive as $key1) {
                 switch ($key1->cargomenu_id) {
                     case '1':
@@ -230,27 +250,27 @@ class Job extends MY_Controller {
                         }
                     break;
                     case '2':
-                        $bandera = true;
-                        $conta = 0;
-                        while ($bandera and count($enviodatos) > $conta ) {
-                            if ($enviodatos[$conta]["menuid"] == $key1->cargomenu_id) {
-                                $bandera = false;
+                            $bandera = true;
+                            $conta = 0;
+                            while ($bandera and count($enviodatos) > $conta ) {
+                                if ($enviodatos[$conta]["menuid"] == $key1->cargomenu_id) {
+                                    $bandera = false;
+                                }
+                                $conta = $conta+1;
                             }
-                            $conta = $conta+1;
-                        }
-                        if ($bandera) {
-                            $arrayName = array(
-                                'menu' => $key1->cargomenu_nombre, 
-                                'menuid' => $key1->cargomenu_id, 
-                                'indicarod' => $key1->cargosubmenu_nombre, 
-                                'meta' => '', 
-                                'cumplimiento' => 0, 
-                                'puntos' => 0,
-                                'date'=> ''
-                            );
-                            $enviodatos[$contador] = $arrayName;
-                            $contador = $contador + 1;
-                        }
+                            if ($bandera) {
+                                $arrayName = array(
+                                    'menu' => $key1->cargomenu_nombre, 
+                                    'menuid' => $key1->cargomenu_id, 
+                                    'indicarod' => $key1->cargosubmenu_nombre, 
+                                    'meta' => '', 
+                                    'cumplimiento' => 0, 
+                                    'puntos' => 0,
+                                    'date'=> ''
+                                );
+                                $enviodatos[$contador] = $arrayName;
+                                $contador = $contador + 1;
+                            }
                     break;
                     case '3':
                         $bandera = true;
@@ -390,10 +410,6 @@ class Job extends MY_Controller {
         switch (strval($datoAjustedo)) 
         {
             case 20:
-                /*
-                $where = array('c.cargo_id' => $cargo_id);
-                $datosIncentive = $this->Crud_parametria->datosIncentive($where,'incentive_id_renovacion');
-                */
                 $where = array('c.cargosubmenu_id' => 1);
                 $datosIncentive = $this->Crud_parametria->datosMenuIncentive($where,'*');
             break;

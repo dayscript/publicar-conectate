@@ -105,7 +105,7 @@ class MY_Controller extends CI_Controller
         $DatoRol = $this->Crud_rol->GetDatos($rol_id);
         redirect($DatoRol->rol_index);
     }
-    public function consultaRest($urlConsulta = '/api/test',$metodo = 'GET',$datos = null,$url = NULL,$content_type=null,$header=true)
+    public function consultaRest($urlConsulta = '/api/test',$metodo = 'GET',$datos = null,$url = NULL,$content_type=null,$header=false)
     {
         if (is_null($url)) {
             $url = $this->incentive;
@@ -784,12 +784,10 @@ class MY_Controller extends CI_Controller
             'username' => 'admin',
             'password' => 'p0p01234'
         );
-        $datosIncentive =  $this->consultaRest('/usuarios/user/login','POST',$insertar,'http://conectatepublicar.com/','',false);
-        var_dump($datosIncentive);
-        $datosIncentive =  $this->consultaRest('resultados-quiz','GET',null,'http://conectatepublicar.com/');
-        var_dump($datosIncentive);
-        return $datosIncentive;
-        
+        $datosIncentive =  $this->consultaRest('/usuarios/user/login','POST',$insertar,'http://conectatepublicar.com/','',array('Accept : application/json'));
+        $datosRst =  $this->consultaRest('/resultados-quiz','GET',null,'http://conectatepublicar.com/','',array('Accept : application/json','Cookie'=>$datosIncentive['session_name'] . '=' . $datosIncentive['sessid']));
+        var_dump($datosRst);
+        return $datosRst;
     }
     public function cargarDatosUsuario($cargo1,$limite,$grupo_id)
     {
