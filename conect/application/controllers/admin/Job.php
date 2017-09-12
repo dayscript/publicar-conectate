@@ -1112,6 +1112,7 @@ class Job extends MY_Controller {
                         $result = json_decode($contact1, false, 512, JSON_BIGINT_AS_STRING);
                         $result1 =$this->editarContactoAgile($result,$datosusuario[0]->empresalegal_nombre,'Empresa legal');
                         $result1 =$this->editarContactoAgile($result,$datosusuario[0]->empresalegal_nombre,'company');
+                        $result1 =$this->editarContactoAgile($result,$datosusuario[0]->dominio_url,'URLSISTEMA');
                     }
                 }
                 $actualiza = array('estado_id' => 5);

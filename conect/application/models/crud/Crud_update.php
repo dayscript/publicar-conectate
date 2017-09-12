@@ -25,6 +25,7 @@ class Crud_update extends CI_Model {
         $joins[10]  = array('tabla' => 'parametria_incentive pri ','tipo_join' =>'left', 'conect'=>"p.cargo_id =  pri.cargo_id and pri.incentive_fechainicio <=  '".$fecha."' and pri.incentive_fechafin >= '".$fecha."'");
         $joins[11]  = array('tabla' => 'basica_grupo bg ','tipo_join' =>'left', 'conect'=>'bg.grupo_id =  p.grupo_id');
         $joins[12]  = array('tabla' => 'basica_cargo bca ','tipo_join' =>'left', 'conect'=>'bca.cargo_id =  p.cargo_id');
+        $joins[13]  = array('tabla' => 'produccion_dominio pd ','tipo_join' =>'left', 'conect'=>'pd.empresalegal_id =  be.empresalegal_id');
 
         if (is_null($whereArray)) {
             $where = array('estado_id' => 1);
