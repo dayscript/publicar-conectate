@@ -568,12 +568,12 @@ class Job extends MY_Controller {
         </thead>
         <tbody>';
         foreach ($arrayDatos as $key) {
-            switch ($key['menuid']) {
+            switch ($key['cargosubmenu_tipo']) {
                 case '1':
                     if ($bandera) {
                         $html = $html.'
                     <tr>
-                        <td colspan="2" class="group">'.$key['menuid'].'. '.$key['menu'].'</td>
+                        <td colspan="2" class="group">'.$key['cargosubmenu_tipo'].'. '.$key['menu'].'</td>
                     </tr>
                     <tr>
                         <td height="36">'.$key['indicarod'].'</td>
@@ -590,10 +590,10 @@ class Job extends MY_Controller {
                     </tr>';
                     }
                 break;
-                case '4':
+                case '5':
                     $html = $html.'
                         <tr>
-                            <td colspan="2" class="group">'.$key['menuid'].'. '.$key['menu'].'</td>
+                            <td colspan="2" class="group">'.$key['cargosubmenu_tipo'].'. '.$key['menu'].'</td>
                         </tr>
                         <tr>
                             <td height="36">'.$key['indicarod'].'</td>
@@ -604,7 +604,7 @@ class Job extends MY_Controller {
                 default:
                         $html = $html.'
                         <tr>
-                            <td colspan="2" class="group">'.$key['menuid'].'. '.$key['menu'].'</td>
+                            <td colspan="2" class="group">'.$key['cargosubmenu_tipo'].'. '.$key['menu'].'</td>
                         </tr>
                         <tr>
                             <td height="36">'.$key['indicarod'].'</td>
@@ -662,7 +662,7 @@ class Job extends MY_Controller {
                     </tr>';
                     }
                 break;
-                case '4':
+                case '5':
                     $html = $html.'
                         <tr>
                             <td colspan="4" class="group">'.$key['cargosubmenu_tipo'].'. '.$key['menu'].'</td>
