@@ -567,21 +567,9 @@ class MY_Controller extends CI_Controller
     }
     public function idCategoria($meta_id)
     {
-        if ($meta_id <= 5) {
-            return 1;
-        } elseif ($meta_id <= 10) {
-            return 2;
-        } elseif ($meta_id <= 15) {
-            return 3;
-        } elseif ($meta_id <= 20) {
-            return 4;
-        } elseif ($meta_id <= 25) {
-            return 5;
-        } elseif ($meta_id <= 30) {
-            return 6;
-        } elseif ($meta_id <= 35) {
-            return 7;
-        }
+        $query = 'select * from parametria_incentive where incentive_id_renovacion = '.$meta_id.' or incentive_id_nueva = '.$meta_id.' or incentive_id_ventas = '.$meta_id.' or incentive_id_citas = '.$meta_id.' or incentive_id_conocimiento = '.$meta_id.' or incentive_id_grupo = '.$meta_id;
+        $datos =  $this->Crud_model->queryConsulta($query);
+        return $datos[0]["cargo_id"];
     }
     public function traerNombremes($mes)
     {

@@ -712,7 +712,6 @@ class Job extends MY_Controller {
                 {
                     $where = array('p.metagrupo_mes' => $mes,'p.grupo_id' => $key->grupo_id); 
                     $metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
-                    $where = array('p.venta_mess' => $mes,'g.grupo_id' => $key->grupo_id); 
                     $venta = $this->Crud_grupo->GetdatosQuery($mes,$key->grupo_id);
                     if (!is_null($metas) and !is_null($venta)) {
                         $metasTotal = (int) $metas[0]->metagrupo_meta;
@@ -750,73 +749,112 @@ class Job extends MY_Controller {
                             );
                             $this->Crud_cumplimiento->editar($edit,$where);
                         }
-                        if ($key->cargo_id == 6 || $key->cargo_id == 7) {
-                            $ventatotal = (int) $venta[0]['ventasumaRecompra'];
-                            $envioDatos = array(
-                                'value' => $metasTotal,
-                                'real' => $ventatotal,
-                                'goal' => $key->incentive_id_renovacion,
-                                'date' => '2017-'.$mes.'-01'
-                            );
-                            $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
-                            $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
-                            $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_renovacion, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
-                            if (is_null($datosCumplimiento)) 
-                            {
-                                $insertar = array(
-                                    'usuario_id' => $key->usuario_id, 
-                                    'tipocumplimiento_id' => $key->incentive_id_renovacion,
-                                    'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                                    'cumplimiento_fecha' => '2017-'.$mes.'-01',
-                                    'incentive_id' => $datodCarga["value"]["id"],
-                                    'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
-                                    'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                        if ($key->cargo_grupo == 1) {
+                            if (is_null($key->incentive_id_ventas)) {
+                                $ventatotal = (int) $venta[0]['ventasumaRecompra'];
+                                $envioDatos = array(
+                                    'value' => $metasTotal,
+                                    'real' => $ventatotal,
+                                    'goal' => $key->incentive_id_renovacion,
+                                    'date' => '2017-'.$mes.'-01'
                                 );
-                                //var_dump($insertar);
-                                $this->Crud_cumplimiento->Insertar($insertar);
+                                $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                                $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
+                                $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_renovacion, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
+                                if (is_null($datosCumplimiento)) 
+                                {
+                                    $insertar = array(
+                                        'usuario_id' => $key->usuario_id, 
+                                        'tipocumplimiento_id' => $key->incentive_id_renovacion,
+                                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                        'cumplimiento_fecha' => '2017-'.$mes.'-01',
+                                        'incentive_id' => $datodCarga["value"]["id"],
+                                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                                    );
+                                    //var_dump($insertar);
+                                    $this->Crud_cumplimiento->Insertar($insertar);
+                                }
+                                else
+                                {
+                                    $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
+                                    $edit = array(
+                                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                                    );
+                                    $this->Crud_cumplimiento->editar($edit,$where);
+                                }
+                                $ventatotal = (int) $venta[0]['ventasumaNuevo'];
+                                $envioDatos = array(
+                                    'value' => $metasTotal,
+                                    'real' => $ventatotal,
+                                    'goal' => $key->incentive_id_nueva,
+                                    'date' => '2017-'.$mes.'-01'
+                                );
+                                $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                                $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
+                                $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_nueva, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
+                                if (is_null($datosCumplimiento)) {
+                                    $insertar = array(
+                                        'usuario_id' => $key->usuario_id, 
+                                        'tipocumplimiento_id' => $key->incentive_id_nueva,
+                                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                        'cumplimiento_fecha' => '2017-'.$mes.'-01',
+                                        'incentive_id' => $datodCarga["value"]["id"],
+                                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                                    );
+                                    //var_dump($insertar);
+                                    $this->Crud_cumplimiento->Insertar($insertar);
+                                }
+                                else
+                                {
+                                    $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
+                                    $edit = array(
+                                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                                    );
+                                    $this->Crud_cumplimiento->editar($edit,$where);
+                                }
                             }
                             else
                             {
-                                $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
-                                $edit = array(
-                                    'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                                    'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
-                                    'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                                $ventatotal = (int) $venta[0]['ventasumaRecompra'] + (int) $venta[0]['ventasumaNuevo'];
+                                $envioDatos = array(
+                                    'value' => $metasTotal,
+                                    'real' => $ventatotal,
+                                    'goal' => $key->incentive_id_ventas,
+                                    'date' => '2017-'.$mes.'-01'
                                 );
-                                $this->Crud_cumplimiento->editar($edit,$where);
-                            }
-                            $ventatotal = (int) $venta[0]['ventasumaNuevo'];
-                            $envioDatos = array(
-                                'value' => $metasTotal,
-                                'real' => $ventatotal,
-                                'goal' => $key->incentive_id_nueva,
-                                'date' => '2017-'.$mes.'-01'
-                            );
-                            $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
-                            $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
-                            $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_nueva, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
-                            if (is_null($datosCumplimiento)) {
-                                $insertar = array(
-                                    'usuario_id' => $key->usuario_id, 
-                                    'tipocumplimiento_id' => $key->incentive_id_nueva,
-                                    'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                                    'cumplimiento_fecha' => '2017-'.$mes.'-01',
-                                    'incentive_id' => $datodCarga["value"]["id"],
-                                    'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
-                                    'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
-                                );
-                                //var_dump($insertar);
-                                $this->Crud_cumplimiento->Insertar($insertar);
-                            }
-                            else
-                            {
-                                $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
-                                $edit = array(
-                                    'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                                    'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
-                                    'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
-                                );
-                                $this->Crud_cumplimiento->editar($edit,$where);
+                                $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                                $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
+                                $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_ventas, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
+                                if (is_null($datosCumplimiento)) 
+                                {
+                                    $insertar = array(
+                                        'usuario_id' => $key->usuario_id, 
+                                        'tipocumplimiento_id' => $key->incentive_id_ventas,
+                                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                        'cumplimiento_fecha' => '2017-'.$mes.'-01',
+                                        'incentive_id' => $datodCarga["value"]["id"],
+                                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                                    );
+                                    //var_dump($insertar);
+                                    $this->Crud_cumplimiento->Insertar($insertar);
+                                }
+                                else
+                                {
+                                    $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
+                                    $edit = array(
+                                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                                    );
+                                    $this->Crud_cumplimiento->editar($edit,$where);
+                                }
                             }
                         }
                     }
@@ -1422,5 +1460,6 @@ class Job extends MY_Controller {
             echo "fecha no cargada";
         }
     }
+
 }
 

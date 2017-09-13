@@ -83,15 +83,30 @@ class Cargatablas extends MY_Controller {
             $this->redirecionar($this->session->userdata('rol_id'));
         }
     }
-    public function exportar($tabla= null,$datosPantalla = null)
+    public function exportar($tabla= null,$fecha = null,$dominio_id,$datosPantalla = null)
     {
-        if ($tabla == 'exportgeneral') {
-            $dia = '01';
-            $mes = '07';
-            $ano = '2017';
-            $fecha = $ano.'-'.$mes.'-'.$dia;
-            $datosUsuario = $this->Crud_usuario->GetDatos(array('p.estado_id' => 1,'p.rol_id' => 7));
-            $datosIncentive =  $this->consultaRest('/api/clients/3/dategoalvalues/'.$fecha,'GET');
+        if (is_null($fecha) or (int) $fecha == 1) {
+            $fecha=date('Y-m-d',$this->ajusteFecha);
+            $ano =  date('Y',$this->ajusteFecha);
+            $mes =  date('m',$this->ajusteFecha);
+            $dia =  date('d',$this->ajusteFecha);
+            $fecha = $ano.'-'.$mes.'-01';
+        }
+        else
+        { 
+            $ano =  date('Y',strtotime($fecha));
+            $mes =  date('m',strtotime($fecha));
+            $dia =  date('d',strtotime($fecha));
+            $fecha = $ano.'-'.$mes.'-01';
+        }
+        if (!is_null($dominio_id)) {
+            $where = array('dominio_id' => $dominio_id);
+            $dominio = $this->Crud_model->obtenerRegistros('produccion_dominio',$where);
+        }
+        if ($tabla == 'exportgeneral' and !is_null($dominio)) {
+            
+            $datosUsuario = $this->Crud_usuario->GetDatos(array('p.estado_id' => 1,'p.rol_id' => 7,'p.empresalegal_id'=>$dominio[0]->empresalegal_id));
+            $datosIncentive =  $this->consultaRest('/api/clients/'.$dominio[0]->codigo_incentive.'/dategoalvalues/'.$fecha,'GET');
             $datosGenerales = array();
             if (count($datosIncentive) > 0) {
                 foreach ($datosIncentive['goal_values'] as $key) {
@@ -117,7 +132,7 @@ class Cargatablas extends MY_Controller {
                         }
                     }
                 }
-                //var_dump(json_encode($datosGenerales));
+                
             }
             //var_dump($datosGenerales);
             foreach ($datosGenerales as $key1) {
@@ -130,94 +145,33 @@ class Cargatablas extends MY_Controller {
                 $datos = array('suma' => $suma,'identification' =>$identificacion,'cargo_id' => $this->idCategoria($goal_id),'datos'=>null);
                 $datosGenerales[$identificacion] = array_merge($datosGenerales[$identificacion],$datos);             
             }
-            //var_dump(json_encode($datosGenerales));
-            $cargo1 = array();
-            $conteo1 =0;
-            $cargo2 = array();
-            $conteo2 =0;
-            $cargo3 = array();
-            $conteo3 =0;
-            $cargo4 = array();
-            $conteo4 =0;
-            $cargo5 = array();
-            $conteo5 =0;
-            $cargo6 = array();
-            $conteo6 =0;
-            $cargo7 = array();
-            $conteo7 =0;
+            $datos = array(
+                'cargo_1' => array('datos'=>array(),'conteo'=>0),
+                'cargo_2' => array('datos'=>array(),'conteo'=>0),
+                'cargo_3' => array('datos'=>array(),'conteo'=>0),
+                'cargo_4' => array('datos'=>array(),'conteo'=>0),
+                'cargo_5' => array('datos'=>array(),'conteo'=>0),
+                'cargo_6' => array('datos'=>array(),'conteo'=>0),
+                'cargo_7' => array('datos'=>array(),'conteo'=>0),
+                'cargo_8' => array('datos'=>array(),'conteo'=>0)
+            );
             foreach ($datosGenerales as $key2) {
-                switch ($key2['cargo_id']) {
-                    case '1':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo1[$conteo1] = $key2; 
-                        $conteo1 = $conteo1+1;
-                    break;
-                    case '2':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo2[$conteo2] = $key2; 
-                        $conteo2 = $conteo2+1;
-                    break;
-                    case '3':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo3[$conteo3] = $key2; 
-                        $conteo3 = $conteo3+1;
-                    break;
-                    case '4':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo4[$conteo4] = $key2; 
-                        $conteo4 = $conteo4+1;
-                    break;
-                    case '5':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo5[$conteo5] = $key2; 
-                        $conteo5 = $conteo5+1;
-                    break;
-                    case '6':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo6[$conteo6] = $key2; 
-                        $conteo6 = $conteo6+1;
-                    break;
-                    case '7':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo7[$conteo7] = $key2; 
-                        $conteo7 = $conteo7+1;
-                    break;
+                foreach ($datosUsuario as $usuarioUnidad) {
+                    if ($usuarioUnidad->usuario_documento == $key2['identification']) {
+                        $key2['datos'] = $usuarioUnidad;
+                    }
                 }
+                $datos['cargo_'.$key2['cargo_id']]['datos'][$datos['cargo_'.$key2['cargo_id']]['conteo']] = $key2; 
+                $datos['cargo_'.$key2['cargo_id']]['conteo'] = $datos['cargo_'.$key2['cargo_id']]['conteo']+1;
             }
-            //var_dump(json_encode($cargo1));
-            $this->listaConcesionariosToExcel('07',$cargo1,$cargo2,$cargo3,$cargo4,$cargo5,$cargo6,$cargo7,$datosPantalla);
+            //echo "<br>";
+            //var_dump(json_encode($datos));
+            $this->listaConcesionariosToExcel($mes,$datos,$datosPantalla);
+            
         }
     }
     /*Excel concesionarios*/
-    public function listaConcesionariosToExcel($mes = '07',$cargo1,$cargo2,$cargo3,$cargo4,$cargo5,$cargo6,$cargo7,$datosPantalla)
+    public function listaConcesionariosToExcel($mes = '07',$datos,$datosPantalla)
     {
         $contador=0;
 
@@ -232,11 +186,13 @@ class Cargatablas extends MY_Controller {
                     <td> Mes</td>
                     <td> Venas Renovacion %</td>
                     <td> Venas Nuevas %</td>
+                    <td> Venas %</td>
                     <td> Visitas %</td>
                     <td> Test %</td>
                     <td> Grupal %</td>
-                    <td> Venas Renovacion puntos</td>
-                    <td> Venas Nuevas puntos</td>
+                    <td> Ventas Renovacion puntos</td>
+                    <td> Ventas Nuevas puntos</td>
+                    <td> Ventas puntos</td>
                     <td> Visitas puntos</td>
                     <td> Test puntos</td>
                     <td> Grupal puntos</td>
@@ -244,7 +200,95 @@ class Cargatablas extends MY_Controller {
                     <td> Total</td>
                 </tr >  ';
 
-        
+        foreach ($datos as $key) 
+        {
+            if ($key["conteo"] > 0) {
+                foreach ($key["datos"] as $item) {
+                    //var_dump(json_encode($key2));
+                    $renovacion = null;
+                    $nuevo = null;
+                    $ventas= null;
+                    $llamadas = null;
+                    $test = null;
+                    $grupal = null;
+                    if (!is_null($item["datos"])) 
+                    {
+                        for ($i=0; $i < count($item); $i++) { 
+                            if (isset($item[$i])) {
+                                
+                                if ($item[$i]["goal_id"]-35 > 0) {
+                                    $divisor =4;
+                                    $goal_id=$item[$i]["goal_id"]-35;
+                                    $datoAjustedo = (($goal_id/$divisor)-intval(($goal_id/$divisor)))*100;
+                                    switch (strval($datoAjustedo)) {
+                                        case 25:
+                                            $ventas = $item[$i];
+                                        break;
+                                        case 50:
+                                            $llamadas = $item[$i];
+                                        break;
+                                        case 75:
+                                            $test = $item[$i];
+                                        break;
+                                        case 0:
+                                            $grupal = $item[$i];
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    $divisor =5;
+                                    $goal_id=$item[$i]["goal_id"];
+                                    $datoAjustedo = (($goal_id/$divisor)-intval(($goal_id/$divisor)))*100;
+                                    switch (strval($datoAjustedo)) {
+                                        case 20:
+                                            $renovacion = $item[$i];
+                                        break;
+                                        case 40:
+                                            $nuevo = $item[$i];
+                                        break;
+                                        case 60:
+                                            $llamadas = $item[$i];
+                                        break;
+                                        case 80:
+                                            $test = $item[$i];
+                                        break;
+                                        case 0:
+                                            $grupal = $item[$i];
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    $valorRetorno .= '<tr>
+                        <td> '.$item["datos"]->usuario_nombre.'</td>
+                        <td> '.$item["datos"]->usuario_apellido.'</td>
+                        <td> '.$item["datos"]->usuario_correo.'</td>
+                        <td> '.$item['identification'].'</td>
+                        <td> '.$item["datos"]->usuario_codigonomina.' </td>
+                        <td> '.$mes.'</td>
+                        <td> '.str_replace('.',',',(double) $renovacion["percentage"]).'</td>
+                        <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
+                        <td> '.str_replace('.',',',(double) $ventas["percentage"]).'</td>
+                        <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
+                        <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
+                        <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
+
+                        <td> '.str_replace('.',',',(double) $renovacion["percentage_weighed"]).'</td>
+                        <td> '.str_replace('.',',',(double) $nuevo["percentage_weighed"]).'</td>
+                        <td> '.str_replace('.',',',(double) $ventas["percentage_weighed"]).'</td>
+                        <td> '.str_replace('.',',',(double) $llamadas["percentage_weighed"]).'</td>
+                        <td> '.str_replace('.',',',(double) $test["percentage_weighed"]).'</td>
+                        <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
+                        <td> '.$item["datos"]->cargo_nombre.'</td>
+                        <td> '.str_replace('.',',',(double) $item['suma']).'</td>
+                    </tr>';
+                }
+            }
+            break;
+        }
+        /*
         foreach ($cargo1 as $item):
             $renovacion = null;
             $nuevo = null;
@@ -297,6 +341,8 @@ class Cargatablas extends MY_Controller {
                     </tr>';
             }
         endforeach;
+        */
+        /*
         foreach ($cargo2 as $item):
             $renovacion = null;
             $nuevo = null;
@@ -597,6 +643,7 @@ class Cargatablas extends MY_Controller {
                     </tr>';
             }
         endforeach;
+        */
 
         $valorRetorno .= '</table>';
         if (is_null($datosPantalla)) {
