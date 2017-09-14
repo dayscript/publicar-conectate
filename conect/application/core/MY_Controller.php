@@ -1017,14 +1017,15 @@ class MY_Controller extends CI_Controller
     }
     public function getDominio()
     {
-        if (strpos($_SERVER['HTTP_HOST'], 'conectate') >= 0) 
+        if (strpos($_SERVER['HTTP_HOST'], 'conectate') == 0) 
         {
-            return 1;
+            $variable = 1;
         }
-        else
+        if (strpos($_SERVER['HTTP_HOST'], 'sumate') == 0) 
         {
-            return 2;
+            $variable = 2;
         }
+        return $variable;
     }
 }
 ?>
