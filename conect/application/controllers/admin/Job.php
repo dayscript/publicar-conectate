@@ -62,23 +62,7 @@ class Job extends MY_Controller {
         }
     }
     
-    public function cargarHtmlSelect($mes)
-    {
-        $html ='<select name="mes" id="mes" class="mes" >
-                  <option value="">Selecione un mes</option>';
-        for ($i=7; $i <= 12; $i++) { 
-            if ($mes == $i) {
-                $carga= 'selected';
-            }
-            else
-            {
-                $carga= '';
-            }
-            $html = $html.'<option value="'.$i.'" '.$carga.'>'.$this->traerNombremes($i).'</option>';
-        }
-        $html =$html.'</select> ';
-        return $html;
-    }
+    
     
     public function cargarHtmlRanking($arrayDatos)
     {
