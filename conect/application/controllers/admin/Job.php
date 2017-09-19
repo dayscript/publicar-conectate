@@ -1235,6 +1235,8 @@ class Job extends MY_Controller {
                         $result = json_decode($contact1, false, 512, JSON_BIGINT_AS_STRING);
                         $result1 =$this->editarContactoAgile($result,$datosusuario[0]->grupo_nombre,'Grupo');
                     }
+                    $carga = array('grupo_Viejo' => $key->grupo_id, 'grupo_nuevo'=>$key->grupo_idUpdate);
+                    $this->Crud_log->Insertar('Actualizaciones Grupo',$datosusuario[0]->usuario_id,json_encode($carga));
                 }
                 if ($key->cargo_idUpdate != $key->cargo_id) {
                     $where = array('usuario_id' => $key->usuario_id);
@@ -1245,6 +1247,8 @@ class Job extends MY_Controller {
                         $result1 =$this->editarContactoAgile($result,$datosusuario[0]->cargo_nombre,'Cargo');
                         $result1 =$this->editarContactoAgile($result,$datosusuario[0]->cargo_nombre,'Posicion');
                     }
+                    $carga = array('cargo_Viejo' => $key->cargo_id, 'cargo_nuevo'=>$key->cargo_idUpdate);
+                    $this->Crud_log->Insertar('Actualizaciones Cargo',$datosusuario[0]->usuario_id,json_encode($carga));
                 }
                 if ($key->empresalegal_idUpdate != $key->empresalegal_id) {
                     $where = array('usuario_id' => $key->usuario_id);
@@ -1256,6 +1260,8 @@ class Job extends MY_Controller {
                         $result1 =$this->editarContactoAgile($result,$datosusuario[0]->empresalegal_nombre,'company');
                         $result1 =$this->editarContactoAgile($result,$datosusuario[0]->dominio_url,'URLSISTEMA');
                     }
+                    $carga = array('empresalegal_Viejo' => $key->empresalegal_id, 'empresalegal_nuevo'=>$key->empresalegal_idUpdate);
+                    $this->Crud_log->Insertar('Actualizaciones Empresa Legal',$datosusuario[0]->usuario_id,json_encode($carga));
                 }
                 $actualiza = array('estado_id' => 5);
                 $where = array('usuario_id' => $key->usuario_idUpdate);
