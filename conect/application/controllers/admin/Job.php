@@ -680,7 +680,7 @@ class Job extends MY_Controller {
     public function cargarCumplimientoGrupo($fecha = null)
     {
         if (is_null($fecha)) {
-            $fecha=date('m');
+            $fecha=date('m',$this->ajusteFecha);
         }
         else
         {
@@ -707,7 +707,7 @@ class Job extends MY_Controller {
                             'date' => '2017-'.$mes.'-01'
                         );
                         $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
-                        $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
+                        $this->Crud_log->Insertar('Meta Grupo incentive',$key->usuario_id,json_encode($datodCarga));
                         $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_grupo, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
                         $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
                         if (is_null($datosCumplimiento)) {
@@ -743,7 +743,7 @@ class Job extends MY_Controller {
                                     'date' => '2017-'.$mes.'-01'
                                 );
                                 $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
-                                $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
+                                $this->Crud_log->Insertar('Venta incentive',$key->usuario_id,json_encode($datodCarga));
                                 $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_renovacion, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
                                 if (is_null($datosCumplimiento)) 
                                 {
@@ -842,7 +842,6 @@ class Job extends MY_Controller {
                             }
                         }
                     }
-                    
                 }
             }
             return true;
@@ -1271,93 +1270,245 @@ class Job extends MY_Controller {
     }
     public function datosCedula()
     {
-        /*
+    /*
         $arrayName = array();
-        $arrayName[0] = 79731874;
-        $arrayName[1] = 1013595186;
-        $arrayName[2] = 1013625445;
-        $arrayName[3] = 80094751;
-        $arrayName[4] = 80745886;
-        $arrayName[5] = 1013654514;
-        $arrayName[6] = 80216675;
-        $arrayName[7] = 1022389702;
-        $arrayName[8] = 1073232957;
-        $arrayName[9] = 1019138507;
-        $arrayName[10] = 1110526308;
-        $arrayName[11] = 1015421201;
-        $arrayName[12] = 1032456259;
-        $arrayName[13] = 1015436810;
-        $arrayName[14] = 1024556043;
-        $arrayName[15] = 1072962403;
-        $arrayName[16] = 1020763416;
-        $arrayName[17] = 1032381046;
-        $arrayName[18] = 1022388176;
-        $arrayName[19] = 1030544063;
-        $arrayName[20] = 1020751434;
-        $arrayName[21] = 1073675708;
-        $arrayName[22] = 53932071;
-        $arrayName[23] = 52977543;
-        $arrayName[24] = 1015448282;
-        $arrayName[25] = 80739979;
-        $arrayName[26] = 1031122179;
-        $arrayName[27] = 1032440919;
-        $arrayName[28] = 1019006108;
-        $arrayName[29] = 34325529;
-        $arrayName[30] = 1032400215;
-        $arrayName[31] = 52792171;
-        $arrayName[32] = 37707838;
-        $arrayName[33] = 79879677;
-        $arrayName[34] = 1030571314;
-        $arrayName[35] = 1093772736;
-        $arrayName[36] = 1012352755;
-        $arrayName[37] = 1015424170;
-        $arrayName[38] = 1110534326;
-        $arrayName[39] = 1033738395;
-        $arrayName[40] = 1098769920;
-        $arrayName[41] = 52533081;
-        $arrayName[42] = 52778847;
-        $arrayName[43] = 1016032085;
-        $arrayName[44] = 1012409353;
-        $arrayName[45] = 1019057276;
-        $arrayName[46] = 52362139;
-        $arrayName[47] = 80824907;
-        $arrayName[48] = 53891989;
-        $arrayName[49] = 80810256;
-        $arrayName[50] = 1016002693;
-        $arrayName[51] = 52730173;
-        $arrayName[52] = 1015455083;
-        $arrayName[53] = 1030615228;
-        $arrayName[54] = 52200330;
-        $arrayName[55] = 1033733509;
-        $arrayName[56] = 1012407673;
-        $arrayName[57] = 1014196916;
-        $arrayName[58] = 1010225996;
-        $arrayName[59] = 52439231;
-        $arrayName[60] = 1022976301;
-        $arrayName[61] = 1053775428;
-        $arrayName[62] = 1019066602;
-        $arrayName[63] = 1104707991;
-        $arrayName[64] = 1010205610;
-        $arrayName[65] = 1101754639;
-        $arrayName[66] = 1018467144;
-        $arrayName[67] = 1020794054;
-        $arrayName[68] = 1019006825;
-        $arrayName[69] = 1014241338;
-        $arrayName[70] = 1010170641;
-        $arrayName[71] = 1026275842;
-        $arrayName[72] = 80115455;
-        $arrayName[73] = 1015397689;
-        $arrayName[74] = 79223701;
-        $arrayName[75] = 1014213503;
-        $arrayName[76] = 1012380151;
-        $arrayName[77] = 79835477;
-        $arrayName[78] = 80739986;
+    $arrayName[0] = 22460753;
+    $arrayName[1] = 38657130;
+    $arrayName[2] = 63369066;
+    $arrayName[3] = 45476010;
+    $arrayName[4] = 16767418;
+    $arrayName[5] = 79168966;
+    $arrayName[6] = 42142517;
+    $arrayName[7] = 80049709;
+    $arrayName[8] = 1098628991;
+    $arrayName[9] = 79541464;
+    $arrayName[10] = 13498049;
+    $arrayName[11] = 88271492;
+    $arrayName[12] = 72188601;
+    $arrayName[13] = 42160488;
+    $arrayName[14] = 51844643;
+    $arrayName[15] = 70558181;
+    $arrayName[16] = 19386669;
+    $arrayName[17] = 71641159;
+    $arrayName[18] = 1090487881;
+    $arrayName[19] = 1010164524;
+    $arrayName[20] = 1010196118;
+    $arrayName[21] = 1033711742;
+    $arrayName[22] = 1128482496;
+    $arrayName[23] = 52783712;
+    $arrayName[24] = 1014197106;
+    $arrayName[25] = 55301209;
+    $arrayName[26] = 1037602211;
+    $arrayName[27] = 1128269099;
+    $arrayName[28] = 1015423162;
+    $arrayName[29] = 1032433451;
+    $arrayName[30] = 52525170;
+    $arrayName[31] = 1070704439;
+    $arrayName[32] = 1014195363;
+    $arrayName[33] = 1037581848;
+    $arrayName[34] = 1095801118;
+    $arrayName[35] = 77190441;
+    $arrayName[36] = 10778077;
+    $arrayName[37] = 1016027030;
+    $arrayName[38] = 1075250318;
+    $arrayName[39] = 53029565;
+    $arrayName[40] = 1144065018;
+    $arrayName[41] = 6625748;
+    $arrayName[42] = 94541310;
+    $arrayName[43] = 1151954713;
+    $arrayName[44] = 1023903960;
+    $arrayName[45] = 1121857011;
+    $arrayName[46] = 1047422268;
+    $arrayName[47] = 45539490;
+    $arrayName[48] = 1026262579;
+    $arrayName[49] = 52344015;
+    $arrayName[50] = 80793717;
+    $arrayName[51] = 45522972;
+    $arrayName[52] = 52342182;
+    $arrayName[53] = 55172927;
+    $arrayName[54] = 1044423276;
+    $arrayName[55] = 1044422577;
+    $arrayName[56] = 1093755209;
+    $arrayName[57] = 45517325;
+    $arrayName[58] = 51607361;
+    $arrayName[59] = 91535473;
+    $arrayName[60] = 77154251;
+    $arrayName[61] = 45706580;
+    $arrayName[62] = 1098706906;
+    $arrayName[63] = 1037585265;
+    $arrayName[64] = 38361779;
+    $arrayName[65] = 51942412;
+    $arrayName[66] = 52849165;
+    $arrayName[67] = 1030615668;
+    $arrayName[68] = 1075650251;
+    $arrayName[69] = 1015439275;
+    $arrayName[70] = 1019022494;
+    $arrayName[71] = 1110471176;
+    $arrayName[72] = 1017198935;
+    $arrayName[73] = 36562176;
+    $arrayName[74] = 1030605960;
+    $arrayName[75] = 1093742098;
+    $arrayName[76] = 1049634970;
+    $arrayName[77] = 72278331;
+    $arrayName[78] = 36694319;
+    $arrayName[79] = 53066103;
+    $arrayName[80] = 31429542;
+    $arrayName[81] = 25289696;
+    $arrayName[82] = 45760648;
+    $arrayName[83] = 19583558;
+    $arrayName[84] = 41948588;
+    $arrayName[85] = 25872363;
+    $arrayName[86] = 39647530;
+    $arrayName[87] = 63500705;
+    $arrayName[88] = 6776616;
+    $arrayName[89] = 63293169;
+    $arrayName[90] = 51584655;
+    $arrayName[91] = 25018384;
+    $arrayName[92] = 66848865;
+    $arrayName[93] = 31945784;
+    $arrayName[94] = 38869804;
+    $arrayName[95] = 31171831;
+    $arrayName[96] = 31956404;
+    $arrayName[97] = 31202920;
+    $arrayName[98] = 42087667;
+    $arrayName[99] = 25543856;
+    $arrayName[100] = 91258466;
+    $arrayName[101] = 63347514;
+    $arrayName[102] = 30274679;
+    $arrayName[103] = 31403118;
+    $arrayName[104] = 80766503;
+    $arrayName[105] = 1033681926;
+    $arrayName[106] = 1089846246;
+    $arrayName[107] = 50926514;
+    $arrayName[108] = 1082869403;
+    $arrayName[109] = 1152685739;
+    $arrayName[110] = 1129576825;
+    $arrayName[111] = 79246044;
+    $arrayName[112] = 1129498914;
+    $arrayName[113] = 60327613;
+    $arrayName[114] = 1053775529;
+    $arrayName[115] = 1082860622;
+    $arrayName[116] = 53122262;
+    $arrayName[117] = 1026567912;
+    $arrayName[118] = 1140837886;
+    $arrayName[119] = 1098652609;
+    $arrayName[120] = 1107043886;
+    $arrayName[121] = 1094912089;
+    $arrayName[122] = 16935925;
+    $arrayName[123] = 1088536327;
+    $arrayName[124] = 10305877;
+    $arrayName[125] = 45519854;
+    $arrayName[126] = 64580842;
+    $arrayName[127] = 1102815761;
+    $arrayName[128] = 40437543;
+    $arrayName[129] = 1018403599;
+    $arrayName[130] = 37748176;
+    $arrayName[131] = 40410885;
+    $arrayName[132] = 94041085;
+    $arrayName[133] = 22589702;
+    $arrayName[134] = 1033699125;
+    $arrayName[135] = 1047393431;
+    $arrayName[136] = 14899331;
+    $arrayName[137] = 45536910;
+    $arrayName[138] = 1014214447;
+    $arrayName[139] = 71264876;
+    $arrayName[140] = 75095368;
+    $arrayName[141] = 8432512;
+    $arrayName[142] = 91234793;
+    $arrayName[143] = 52912092;
+    $arrayName[144] = 37659444;
+    $arrayName[145] = 66951678;
+    $arrayName[146] = 94063239;
+    $arrayName[147] = 32762948;
+    $arrayName[148] = 24219789;
+    $arrayName[149] = 1033719828;
+    $arrayName[150] = 1128384677;
+    $arrayName[151] = 63356030;
+    $arrayName[152] = 39284148;
+    $arrayName[153] = 1010202890;
+    $arrayName[154] = 52040666;
+    $arrayName[155] = 80815895;
+    $arrayName[156] = 79750691;
+    $arrayName[157] = 1017161064;
+    $arrayName[158] = 34320811;
+    $arrayName[159] = 1033756003;
+    $arrayName[160] = 42102730;
+    $arrayName[161] = 8106155;
+    $arrayName[162] = 43816868;
+    $arrayName[163] = 42017368;
+    $arrayName[164] = 25232661;
+    $arrayName[165] = 30336095;
+    $arrayName[166] = 93088550;
+    $arrayName[167] = 37899798;
+    $arrayName[168] = 63557449;
+    $arrayName[169] = 94325879;
+    $arrayName[170] = 45760693;
+    $arrayName[171] = 42730323;
+    $arrayName[172] = 55154782;
+    $arrayName[173] = 43111006;
+    $arrayName[174] = 57416795;
+    $arrayName[175] = 10781921;
+    $arrayName[176] = 43163033;
+    $arrayName[177] = 1090390874;
+    $arrayName[178] = 88137179;
+    $arrayName[179] = 30578476;
+    $arrayName[180] = 10248150;
+    $arrayName[181] = 30304047;
+    $arrayName[182] = 10248394;
+    $arrayName[183] = 71263924;
+    $arrayName[184] = 52505356;
+    $arrayName[185] = 10135546;
+    $arrayName[186] = 52265305;
+    $arrayName[187] = 15373211;
+    $arrayName[188] = 36954088;
+    $arrayName[189] = 60302892;
+    $arrayName[190] = 27893663;
+    $arrayName[191] = 14136558;
+    $arrayName[192] = 36065236;
+    $arrayName[193] = 36564328;
+    $arrayName[194] = 98549155;
+    $arrayName[195] = 71229034;
+    $arrayName[196] = 10275051;
+    $arrayName[197] = 45465288;
+    $arrayName[198] = 23002704;
+    $arrayName[199] = 94377254;
+    $arrayName[200] = 22526944;
+    $arrayName[201] = 32646263;
+    $arrayName[202] = 8709417;
+    $arrayName[203] = 32724426;
+    $arrayName[204] = 51803954;
+    $arrayName[205] = 6104389;
+    $arrayName[206] = 52022536;
+    $arrayName[207] = 79685661;
+    $arrayName[208] = 41792802;
+    $arrayName[209] = 15919346;
+    $arrayName[210] = 52558764;
+    $arrayName[211] = 79117468;
+    $arrayName[212] = 31998744;
+    $arrayName[213] = 98525851;
+    $arrayName[214] = 43565207;
+    $arrayName[215] = 98576310;
+    $arrayName[216] = 98625286;
+    $arrayName[217] = 19403071;
+    $arrayName[218] = 71741357;
+    $arrayName[219] = 7174168;
+    $arrayName[220] = 43724547;
+    $arrayName[221] = 39406268;
+    $arrayName[222] = 51696883;
+    $arrayName[223] = 42897250;
+    $arrayName[224] = 51922835;
+    $arrayName[225] = 71603000;
+    $arrayName[226] = 43030006;
+    $arrayName[227] = 19375316;
+    $arrayName[228] = 43009269;
+    $arrayName[229] = 14272348;
+    $arrayName[230] = 1040740977;
         foreach ($arrayName as $key) {
-            $this->eliminarDatosIncentivexCedula($key);
+            $this->eliminarDatosIncentivexCedula($key,'2017-07-01');
         }
-        */
-        $where = array('r.rol_id' => 7 ,'p.empresalegal_id' => 2);
-        $this->cargaregaloTest($where,'2017-08-01','Regalo de conocimiento');
+*/
+        $where = array('r.rol_id' => 7 ,'p.empresalegal_id' => 1);
+        $this->cargaregaloTest($where,'2017-07-01','Regalo de conocimiento');
     }
     public function  eliminarDatosIncentivexCedula($docuemnto = 80216675,$fecha = '2017-08-01')
     {
@@ -1383,41 +1534,43 @@ class Job extends MY_Controller {
             }
         }
     }
-    public function cargaregaloTest($where,$fecha = '2017-08-01',$descripcion='')
+    public function cargaregaloTest($where,$fecha = '2017-07-01',$descripcion='')
     {
         $datosUsuario = $this->Crud_usuario->GetDatos($where);
-        foreach ($datosUsuario as $key) {
-            $envioDatos = array(
-                'value' => 10,
-                'real' => 10,
-                'goal' => $key->incentive_id_conocimiento,
-                'date' => $fecha
-            );
-            $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
-            $this->Crud_log->Insertar('visitas incentive'.$descripcion,$key->usuario_id,json_encode($datodCarga));
-            $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_conocimiento, 'cumplimiento_fecha' => $fecha);
-            $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
-            if (is_null($datosCumplimiento)) {
-                $insertar = array(
-                    'usuario_id' => $key->usuario_id, 
-                    'tipocumplimiento_id' => $key->incentive_id_conocimiento,
-                    'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                    'cumplimiento_fecha' => $fecha,
-                    'incentive_id' => $datodCarga["value"]["id"],
-                    'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
-                    'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+        if (!is_null($datosUsuario)) {
+            foreach ($datosUsuario as $key) {
+                $envioDatos = array(
+                    'value' => 10,
+                    'real' => 10,
+                    'goal' => $key->incentive_id_conocimiento,
+                    'date' => $fecha
                 );
-                $this->Crud_cumplimiento->Insertar($insertar);
-            }
-            else
-            {
-                $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
-                $edit = array(
-                    'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                    'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
-                    'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
-                );
-                $this->Crud_cumplimiento->editar($edit,$where);
+                $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                $this->Crud_log->Insertar('visitas incentive'.$descripcion,$key->usuario_id,json_encode($datodCarga));
+                $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_conocimiento, 'cumplimiento_fecha' => $fecha);
+                $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
+                if (is_null($datosCumplimiento)) {
+                    $insertar = array(
+                        'usuario_id' => $key->usuario_id, 
+                        'tipocumplimiento_id' => $key->incentive_id_conocimiento,
+                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                        'cumplimiento_fecha' => $fecha,
+                        'incentive_id' => $datodCarga["value"]["id"],
+                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                    );
+                    $this->Crud_cumplimiento->Insertar($insertar);
+                }
+                else
+                {
+                    $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
+                    $edit = array(
+                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                    );
+                    $this->Crud_cumplimiento->editar($edit,$where);
+                }
             }
         }
     }
