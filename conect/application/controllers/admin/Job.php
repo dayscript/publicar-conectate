@@ -27,6 +27,7 @@ class Job extends MY_Controller {
             if ($jobGeneral == '-1') {
                 $enviar  = array(
                     'usuarios' => $this->cargaUsuarios(),
+                    'Actiualizausuarios'=> $this->cargarActualizaciones(),
                     'ventas' => $this->cargarCumplimientosVentas(),
                     'visitas' => $this->cargarCumplimientosVisitas(),
                     'grupos' => $this->cargarCumplimientoGrupo(),
@@ -39,6 +40,7 @@ class Job extends MY_Controller {
             {
                 $enviar  = array(
                     'usuarios' => $this->cargaUsuarios($jobGeneral),
+                    'Actiualizausuarios'=> $this->cargarActualizaciones(),
                     'ventas' => $this->cargarCumplimientosVentas($jobGeneral),
                     'visitas' => $this->cargarCumplimientosVisitas($jobGeneral),
                     'grupos' => $this->cargarCumplimientoGrupo($jobGeneral),
@@ -61,7 +63,10 @@ class Job extends MY_Controller {
             echo json_encode($return, JSON_FORCE_OBJECT);
         }
     }
-    
+    public function fechaSistema()
+    {
+        echo date('Y-m-d H:i:s',$this->ajusteFecha);
+    }
     
     
     public function cargarHtmlRanking($arrayDatos)
