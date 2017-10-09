@@ -9,8 +9,9 @@ class Cargatablas extends MY_Controller {
         $this->load->model('crud/Crud_noticias');
         $this->load->model('crud/Crud_usuario');
         $this->load->model('crud/Crud_menu');
-        $this->load->library("Excel/Excel");
+        $this->load->model('crud/Crud_campo');
         $this->load->model('crud/Crud_tabla');
+        $this->load->library("Excel/Excel");
         if (is_null($this->session->userdata('id'))) {
         	redirect('Login');
         }
@@ -63,21 +64,29 @@ class Cargatablas extends MY_Controller {
                 break;
             }
             $mes = date('m',$this->ajusteFecha);
-            $dataSend = array(
-                "footer" => $dataFooter,
-                'nav' => $datoNav,
-                'error' => $mensaje,
-                'datosCarga' => $datosEditar,
-                'datos' =>$campos,
-                'select'=> $this->cargarHtmlSelect($mes),
-                'dominio' => $this->getDominio()
-            );
+            
             switch ((int)$campos['tipoaccion']) {
                 case 1:
-                    $this->load->view('admin/controler_view',$dataSend);
+                    $dataSend = array(
+                        "footer" => $dataFooter,
+                        'nav' => $datoNav,
+                        'error' => $mensaje,
+                        'datosCarga' => $datosEditar,
+                        'datos' =>$campos
+                    );
+                    $this->load->view('admin/carga_view',$dataSend);
                 break;
                 case 2:
-                    $this->load->view('admin/controlerexport_view',$dataSend);
+                    
+                    $dataSend = array(
+                        "footer" => $dataFooter,
+                        'nav' => $datoNav,
+                        'error' => $mensaje,
+                        'datosCarga' => $datosEditar,
+                        'datos' =>$campos,
+                        'form'=> $this->cargarComponentesform($this->Crud_campo->GetDatosMetaGrupo(array('p.tabla_nombre' => $dato)))
+                    );
+                    $this->load->view('admin/export_view',$dataSend);
                 break;
             }
         }
@@ -88,6 +97,10 @@ class Cargatablas extends MY_Controller {
     }
     public function exportar($tabla= null,$fecha = null,$dominio_id = 1,$datosPantalla = null)
     {
+        $arraywhere = array(
+            'p.tabla_nombre' => strtolower($tabla)
+        );
+        $valorCampo = $this->Crud_tabla->GetDatos($arraywhere,null,null,'*');
         $ano =  date('Y',$this->ajusteFecha);
         $mes = $this->input->post("mes", TRUE);
         $fecha = $ano.'-'.$mes.'-01';
@@ -111,7 +124,7 @@ class Cargatablas extends MY_Controller {
             $where = array('dominio_id' => $dominio_id);
             $dominio = $this->Crud_model->obtenerRegistros('produccion_dominio',$where);
         }
-        if ($tabla == 'exportgeneral' and !is_null($dominio)) {
+        if ($tabla == 'exportgeneral' and !is_null($dominio_id)) {
             
             $datosUsuario = $this->Crud_usuario->GetDatos(array('p.estado_id' => 1,'p.rol_id' => 7,'p.empresalegal_id'=>$dominio[0]->empresalegal_id));
             $datosIncentive =  $this->consultaRest('/api/clients/'.$dominio[0]->codigo_incentive.'/dategoalvalues/'.$fecha,'GET');
@@ -174,15 +187,15 @@ class Cargatablas extends MY_Controller {
             }
             //echo "<br>";
             //var_dump(json_encode($datos));
-            $this->listaConcesionariosToExcel($mes,$datos,$datosPantalla);
+            $this->listaConcesionariosToExcel($mes,$datos,null,$valorCampo);
         }
         //$this->controlador('exportgeneral');
     }
-    /*Excel concesionarios*/
-    public function listaConcesionariosToExcel($mes = '07',$datos,$datosPantalla)
+    public function listaConcesionariosToExcel($mes = '07',$datos,$datosPantalla,$valorCampo)
     {
         $contador=0;
-
+        
+        var_dump($valorCampo);
         $valorRetorno = '
             <table cellspacing = "0" cellpadding = "0" border = "1" >
                 <tr >
@@ -219,7 +232,8 @@ class Cargatablas extends MY_Controller {
                     <td> Perfil</td>
                     <td> Total</td>
                 </tr >  ';
-
+        //var_dump(json_encode($datos));
+        /*
         foreach ($datos as $key) 
         {
             if ($key["conteo"] > 0) {
@@ -329,6 +343,7 @@ class Cargatablas extends MY_Controller {
             header("Expires: 0");
         }
         echo $valorRetorno;
+        */
     }
     public function guardar($tabla= null)
     {
@@ -411,8 +426,24 @@ class Cargatablas extends MY_Controller {
                     }
                 endfor;
                 $this->Crud_log->Insertar('Carga '.$tabla,1,json_encode(date('Y-m-d H:i:s',$this->ajusteFecha)));
-                $mensaje =-1;
-                $this->controlador($tabla,$mensaje);
+                $campos = $this->buscarParametria($tabla);
+                if ($campos['tabla_jobfin'] != '' and !is_null($campos['tabla_jobfin'])) {
+                    $retorno = $this->consultaRest($campos['tabla_jobfin'],'GET',null,base_url());
+                    if (!$retorno["estado"]) {
+                        $this->mensajeExterno = 'error en ejecutar join ';
+                        $mensaje =-2;
+                        $this->controlador($tabla,$mensaje);
+                    }
+                    else
+                    {
+                        //var_dump($retorno["datos"]);
+                        $this->controlador($tabla,$mensaje);      
+                    }
+                }
+                else
+                {
+                    $this->controlador($tabla,$mensaje);
+                }
             }else
             {
                 $this->mensajeExterno = $mensaje;
@@ -425,7 +456,6 @@ class Cargatablas extends MY_Controller {
             $this->controlador($tabla,$mensaje);
         }
     }
-
     public function crearArray($columnaTitulo1,$tabla)
     {
         //columna_insert
@@ -525,6 +555,55 @@ class Cargatablas extends MY_Controller {
         }
         return $columnaTitulo1;
 
+    }
+    public function exportarParametros($tabla= null)
+    {
+        $arraywhere = array(
+            'p.tabla_nombre' => strtolower($tabla)
+        );
+        $valorCampo = $this->Crud_campo->GetDatosMetaGrupo(array_merge($arraywhere,array('c.campo_oblicatorio' =>1)));
+        $whereDinamico = array();
+        foreach ($valorCampo as $key) {
+            switch ($key->campo_value) {
+                case '[[NOT NULL]]':
+                    $tempoArray = array($key->campo_nombre.' !=' => null);
+                break;
+                default:
+                    $tempoArray = array($key->campo_nombre => $key->campo_value);
+                break;
+            }
+            
+            $whereDinamico = array_merge($tempoArray,$whereDinamico);
+        }
+        $valorjoin = $this->Crud_tabla->getJoin($arraywhere);
+        $datos = $this->Crud_model->obtenerRegistros('produccion_usuario',$whereDinamico,null,null,null,$valorjoin);
+        $this->listaToExcel($datos,null,$this->Crud_tabla->GetDatos($arraywhere));
+    }
+    public function listaToExcel($datos,$datosPantalla= null,$valorCampo)
+    {
+        $contador=0;
+        $valorRetorno = '<table cellspacing = "0" cellpadding = "0" border = "1" ><tr >';
+
+        foreach ($valorCampo as $key) {
+            $valorRetorno .= '<td>'.$key->columna_nombre.'</td>';
+        }
+        $valorRetorno .= '<tr>';
+        foreach ($datos as $key1) 
+        {
+            $valorRetorno .= '<tr>';
+            foreach ($valorCampo as $key2) {
+                $valorRetorno .= '<td>'.$key1->{$key2->columna_relacion}.'</td>';
+            }
+            $valorRetorno .= '</tr>';
+        }
+        $valorRetorno .= '</table>';
+        if (is_null($datosPantalla)) {
+            header('Content-type: application/vnd.ms-excel');
+            header("Content-Disposition: attachment; filename=lista_exportable-".date('Y-m-d H:i:s',$this->ajusteFecha) . ".xls");
+            header("Pragma: no-cache");
+            header("Expires: 0");
+        }
+        echo $valorRetorno;
     }
 
 }

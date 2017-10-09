@@ -31,14 +31,7 @@
                   </div>
                   <div class="x_content">
                     <span class="section"><?= $datos['mensaje']; ?></span>
-                    <form action="<?php echo base_url().index_page()?>/admin/Cargatablas/exportar/<?= ($datos["controlador"]); ?>" method="post">
-                    <?php 
-                      echo $select;
-                    ?>
-                    <input type="hidden" name="dominio_id" value="<?= $dominio; ?>">
-                    <input type="submit" value="Exportar">
-                    </form>
-                    
+                    <?= $form ?> 
                 </div>
               </div>
             </div>
