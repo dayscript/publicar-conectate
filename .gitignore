@@ -5,7 +5,6 @@ sites/*/settings*.php
 sites/*/files
 sites/*/private
 sites/all/themes/conectate/node_modules
-conect/file/uploads
 conect/application/config/database.php
 
 
