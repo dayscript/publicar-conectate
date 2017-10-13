@@ -20,6 +20,8 @@ class MY_Controller extends CI_Controller
     public $urlServicesDrupal;
     public $usuarioServicesDrupal;
     public $claveServicesDrupal;
+    public $urlambiente;
+    public $dominio;
 
 
 	function __construct()
@@ -67,6 +69,7 @@ class MY_Controller extends CI_Controller
         if (is_null($this->recaptcha)) {
             $this->recaptcha =$this->Crud_parametria->obtenerParametria('recaptcha');
         }
+        $this->urlambiente = $this->Crud_parametria->obtenerParametria('urlambiente');
         $this->urlServicesDrupal =  $this->Crud_parametria->obtenerParametria('urlServicesDrupal');
         $this->usuarioServicesDrupal =  $this->Crud_parametria->obtenerParametria('usuarioServicesDrupal');
         $this->claveServicesDrupal =  $this->Crud_parametria->obtenerParametria('claveServicesDrupal');
@@ -74,6 +77,7 @@ class MY_Controller extends CI_Controller
         $this->incentive =  $this->Crud_parametria->obtenerParametria('incentive');
         $this->PoweredBy =  $this->Crud_parametria->obtenerParametria('PoweredBy');
         $this->ajusteFecha = strtotime($this->Crud_parametria->obtenerParametria('ajusteFecha'),strtotime(date('Y-m-j H:i:s')));
+        $this->dominio = $this->getDominio();
     }
     public function crearSesion($pObjetoUsuario) {
         try {
@@ -103,12 +107,12 @@ class MY_Controller extends CI_Controller
         $DatoRol = $this->Crud_rol->GetDatos($rol_id);
         redirect($DatoRol->rol_index);
     }
-    public function consultaRest($urlConsulta = '/api/test',$metodo = 'GET',$datos = null,$url = NULL)
+    public function consultaRest($urlConsulta = '/api/test',$metodo = 'GET',$datos = null,$url = NULL,$content_type=null,$header=false)
     {
         if (is_null($url)) {
             $url = $this->incentive;
         }
-        $datosRetorno = $this->curlwrap->curl_wrapIncentive($url.$urlConsulta,$datos,$metodo);
+        $datosRetorno = $this->curlwrap->curl_wrapIncentive($url.$urlConsulta,$datos,$metodo,$content_type,$header);
         $retornoValidar = json_decode($datosRetorno,true);
 
         if (is_null($retornoValidar)) 
@@ -287,7 +291,7 @@ class MY_Controller extends CI_Controller
          return $key;
     }
     
-    public function restDrupal($datos = NULL,$metodo = 'get')
+    public function restDrupal($datos = NULL,$metodo = 'get',$url = null)
     {
         $this->load->library('basic_RestClient/my_restclient');
         $datosConect = array(
@@ -295,7 +299,7 @@ class MY_Controller extends CI_Controller
             'usuarioServicesDrupal' =>$this->usuarioServicesDrupal , 
             'claveServicesDrupal'=>$this->claveServicesDrupal
         );
-        return $this->my_restclient->crearUsuarioDrupal($datosConect,$metodo,$datos);
+        return $this->my_restclient->crearUsuarioDrupal($datosConect,$metodo,$datos,$url);
     }
     public function crearUsuario($contact_json = null,$metodoCarga = "POST"){
         
@@ -334,6 +338,37 @@ class MY_Controller extends CI_Controller
         {
             return 'error';
         }
+    }
+    public function editarContactoAgile($id,$kilometros,$variablecostum)
+    {
+        $numero = $this->buscarCampoAgile($id->properties,$variablecostum,true);
+        if (!$numero['datos']) {
+            $insert =(object) array('type' => "CUSTOM",'name'=> $variablecostum,'value'=> $kilometros);
+            $id->properties[$numero['conteo']] =  $insert;
+        }
+        else
+        {
+            $id->properties[$numero['datos']]->value = $kilometros;
+        }
+        $contact_json_update_input = json_encode($id);
+        $contact5 = $this->curlwrap->curl_wrap("contacts", $contact_json_update_input, "PUT", "application/json",$this->AGILE_DOMAIN,$this->AGILE_USER_EMAIL,$this->AGILE_REST_API_KEY);
+        return $contact5;
+    }
+    public function buscarCampoAgile($properties,$campo,$posi = FALSE)
+    {
+        $conteo = 0;
+        foreach ($properties as $key) {
+            if ($key->name == $campo) {
+                if ($posi) {
+                    return array('datos' => $conteo,'conteo'=> NULL);
+                }else
+                {
+                    return array('datos' => $key,'conteo'=> NULL);
+                }
+            }
+            $conteo= $conteo+1;
+        }
+        return array('datos' => false,'conteo'=> $conteo);
     }
     public function agregarTag($tag)
     {
@@ -460,7 +495,7 @@ class MY_Controller extends CI_Controller
                 ),
                 array(
                     'name' => "URLSISTEMA",
-                    "value" => $this->Crud_parametria->obtenerParametria('urlambiente'),
+                    "value" => $datos->dominio_url,
                     "type" => "CUSTOM"
                 ),
                 array(
@@ -520,7 +555,8 @@ class MY_Controller extends CI_Controller
                 'general'=> $datosLista,
                 'mensaje' =>  $datosTabla[0]->tabla_mesaje,
                 'datosEditar' => null,
-                'tipoaccion' => $datosTabla[0]->tipoaccion_id
+                'tipoaccion' => $datosTabla[0]->tipoaccion_id,
+                'tabla_jobfin' => $datosTabla[0]->tabla_jobfin
             );
         }
         return $info;
@@ -534,21 +570,9 @@ class MY_Controller extends CI_Controller
     }
     public function idCategoria($meta_id)
     {
-        if ($meta_id <= 5) {
-            return 1;
-        } elseif ($meta_id <= 10) {
-            return 2;
-        } elseif ($meta_id <= 15) {
-            return 3;
-        } elseif ($meta_id <= 20) {
-            return 4;
-        } elseif ($meta_id <= 25) {
-            return 5;
-        } elseif ($meta_id <= 30) {
-            return 6;
-        } elseif ($meta_id <= 35) {
-            return 7;
-        }
+        $query = 'select * from parametria_incentive where incentive_id_renovacion = '.$meta_id.' or incentive_id_nueva = '.$meta_id.' or incentive_id_ventas = '.$meta_id.' or incentive_id_citas = '.$meta_id.' or incentive_id_conocimiento = '.$meta_id.' or incentive_id_grupo = '.$meta_id;
+        $datos =  $this->Crud_model->queryConsulta($query);
+        return $datos[0]["cargo_id"];
     }
     public function traerNombremes($mes)
     {
@@ -747,8 +771,15 @@ class MY_Controller extends CI_Controller
     }
     public function totaltest()
     {
-        $datosIncentive =  $this->consultaRest('resultados-quiz','GET',null,'http://conectatepublicar.com/');
-        return $datosIncentive;
+        $insertar = array(
+            'username' => 'admin',
+            'password' => 'p0p01234'
+        );
+        $datosIncentive =  $this->consultaRest('/usuarios/user/login','POST',$insertar,'http://conectatepublicar.com/','',array('Accept : application/json'));
+        $datosRst =  $this->consultaRest('/resultados-quiz','GET',null,'http://conectatepublicar.com/','',array('Accept : application/json','Cookie'=>$datosIncentive['session_name'] . '=' . $datosIncentive['sessid']));
+        //$datosRst =  json_decode('',true);
+        //var_dump($datosRst);
+        return $datosRst;
     }
     public function cargarDatosUsuario($cargo1,$limite,$grupo_id)
     {
@@ -970,6 +1001,83 @@ class MY_Controller extends CI_Controller
             $returnMes = '12';
         }
         return $returnMes;
+    }
+    public function cargarHtmlSelect($mes)
+    {
+        $html ='<select name="mes" id="mes" class="mes" >
+                  <option value="">Selecione un mes</option>';
+        for ($i=7; $i <= 12; $i++) { 
+            if ($mes == $i) {
+                $carga= 'selected';
+            }
+            else
+            {
+                $carga= '';
+            }
+            $html = $html.'<option value="'.$i.'" '.$carga.'>'.$this->traerNombremes($i).'</option>';
+        }
+        $html =$html.'</select> ';
+        return $html;
+    }
+    public function getDominio()
+    {
+        $rest = substr($_SERVER['HTTP_HOST'], 0,6);
+        switch ($rest) {
+            case 'sumate':
+                $variable = 2;
+            break;
+            case 'conect':
+                $variable = 1;
+            break;
+        }
+        return $variable;
+    }
+    public function cargarComponentesform($datosForm)
+    {
+        $html = '<form action="'.base_url().index_page().'/admin/Cargatablas/exportar/'.$datosForm[0]->tabla_nombre.'" method="'.$datosForm[0]->tabla_method.'">';
+        if (!is_null($datosForm[0]->campo_id)) {
+            foreach ($datosForm as $key) {
+                switch ($key->tipocampo_nombre) 
+                {
+                    case 'input':
+                        $retVal = ($key->campo_hidden) ? 'hidden' : 'text' ;
+                        $rest = substr($key->campo_value, 0,2);
+                        switch ($rest) {
+                            case '{{':
+                                $retValValue = $this->{substr($key->campo_value, 2,-2)}();
+                            break;
+                            case '[[':
+                                switch ($key->campo_value) {
+                                    case '[[NOT NULL]]':
+                                        $retValValue = 'NOT NULL';
+                                    break;
+                                    case '[[NULL]]':
+                                        $retValValue = 'NULL';
+                                    break;
+                                    default:
+                                        $retValValue = '';
+                                    break;
+                                }
+                            break;
+                            default:
+                                $retValValue = $key->campo_value;
+                            break;
+                        }
+                        $html .='<input type="'.$retVal.'" name="'.$key->campo_nombre.'" value="'.$retValValue.'">';
+                    break;
+                    case 'submit':
+                        $html .='<input type="submit" value="'.$key->campo_value.'">';
+                    break;
+                    case 'select':
+                        $html .= $this->{$key->campo_funcion}(07);
+                    break;
+                }
+            }
+        }else{
+            $html .='<input type="submit" value="enviar">';
+        }
+        $html .= '</form>';
+        return $html;
     }
 }
 ?>

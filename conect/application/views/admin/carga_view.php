@@ -39,7 +39,6 @@
                       <?php 
                         if(!is_null($datosCarga)){
                           echo '<input type="text" id="id" name="id" value="'.$datosCarga[0]->slide_id .'" hidden="true">';
-                          
                         }
                       ?>
                       

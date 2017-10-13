@@ -31,7 +31,7 @@
                   </div>
                   <div class="x_content">
                     <span class="section"><?= $datos['mensaje']; ?></span>
-                    <a href="<?php echo base_url().index_page()?>/admin/Cargatablas/exportar/<?= ($datos["controlador"]); ?>">Exportar</a>
+                    <?= $form ?> 
                 </div>
               </div>
             </div>

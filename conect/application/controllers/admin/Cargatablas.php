@@ -9,8 +9,9 @@ class Cargatablas extends MY_Controller {
         $this->load->model('crud/Crud_noticias');
         $this->load->model('crud/Crud_usuario');
         $this->load->model('crud/Crud_menu');
-        $this->load->library("Excel/Excel");
+        $this->load->model('crud/Crud_campo');
         $this->load->model('crud/Crud_tabla');
+        $this->load->library("Excel/Excel");
         if (is_null($this->session->userdata('id'))) {
         	redirect('Login');
         }
@@ -62,19 +63,30 @@ class Cargatablas extends MY_Controller {
                     $datosEditar= $campos["datosEditar"];
                 break;
             }
-            $dataSend = array(
-                "footer" => $dataFooter,
-                'nav' => $datoNav,
-                'error' => $mensaje,
-                'datosCarga' => $datosEditar,
-                'datos' =>$campos
-            );
+            $mes = date('m',$this->ajusteFecha);
+            
             switch ((int)$campos['tipoaccion']) {
                 case 1:
-                    $this->load->view('admin/controler_view',$dataSend);
+                    $dataSend = array(
+                        "footer" => $dataFooter,
+                        'nav' => $datoNav,
+                        'error' => $mensaje,
+                        'datosCarga' => $datosEditar,
+                        'datos' =>$campos
+                    );
+                    $this->load->view('admin/carga_view',$dataSend);
                 break;
                 case 2:
-                    $this->load->view('admin/controlerexport_view',$dataSend);
+                    
+                    $dataSend = array(
+                        "footer" => $dataFooter,
+                        'nav' => $datoNav,
+                        'error' => $mensaje,
+                        'datosCarga' => $datosEditar,
+                        'datos' =>$campos,
+                        'form'=> $this->cargarComponentesform($this->Crud_campo->GetDatosMetaGrupo(array('p.tabla_nombre' => $dato)))
+                    );
+                    $this->load->view('admin/export_view',$dataSend);
                 break;
             }
         }
@@ -83,18 +95,41 @@ class Cargatablas extends MY_Controller {
             $this->redirecionar($this->session->userdata('rol_id'));
         }
     }
-    public function exportar($tabla= null,$datosPantalla = null)
+    public function exportar($tabla= null,$fecha = null,$dominio_id = 1,$datosPantalla = null)
     {
-        if ($tabla == 'exportgeneral') {
-            $dia = '01';
-            $mes = '07';
-            $ano = '2017';
-            $fecha = $ano.'-'.$mes.'-'.$dia;
-            $datosUsuario = $this->Crud_usuario->GetDatos(array('p.estado_id' => 1,'p.rol_id' => 7));
-            $datosIncentive =  $this->consultaRest('/api/clients/3/dategoalvalues/'.$fecha,'GET');
+        $arraywhere = array(
+            'p.tabla_nombre' => strtolower($tabla)
+        );
+        $valorCampo = $this->Crud_tabla->GetDatos($arraywhere,null,null,'*');
+        $ano =  date('Y',$this->ajusteFecha);
+        $mes = $this->input->post("mes", TRUE);
+        $fecha = $ano.'-'.$mes.'-01';
+        $dominio_id = $this->input->post("dominio_id", TRUE);
+        if (is_null($fecha) or (int) $fecha == 1) {
+            $fecha=date('Y-m-d',$this->ajusteFecha);
+            $ano =  date('Y',$this->ajusteFecha);
+            $mes =  date('m',$this->ajusteFecha);
+            $dia =  date('d',$this->ajusteFecha);
+            $fecha= $ano.'-'.$mes.'-01';
+        }
+        else
+        { 
+            $ano =  date('Y',strtotime($fecha));
+            $mes =  date('m',strtotime($fecha));
+            $dia =  date('d',strtotime($fecha));
+            $fecha = $ano.'-'.$mes.'-01';
+        }
+        if (!is_null($dominio_id)) {
+            $where = array('dominio_id' => $dominio_id);
+            $dominio = $this->Crud_model->obtenerRegistros('produccion_dominio',$where);
+        }
+        if ($tabla == 'exportgeneral' and !is_null($dominio_id)) {
+            $datosUsuario = $this->Crud_usuario->GetDatos(array('p.estado_id' => 1,'p.rol_id' => 7,'p.empresalegal_id'=>$dominio[0]->empresalegal_id));
+            $datosIncentive =  $this->consultaRest('/api/clients/'.$dominio[0]->codigo_incentive.'/dategoalvalues/'.$fecha,'GET');
             $datosGenerales = array();
             if (count($datosIncentive) > 0) {
                 foreach ($datosIncentive['goal_values'] as $key) {
+                    //if ($key['identification'] == 22589702) {
                     if ($key['date'] == $fecha) {
                         $estructura = array();
                         $estructura[$key['goal_id']] = array(
@@ -116,111 +151,175 @@ class Cargatablas extends MY_Controller {
                             $datosGenerales[$key['identification']] = $estructura;
                         }
                     }
+                    //}
                 }
-                //var_dump(json_encode($datosGenerales));
+                
             }
-            //var_dump($datosGenerales);
+            //var_dump(json_encode($datosGenerales));
             foreach ($datosGenerales as $key1) {
                 $suma =0;
+                $conteodos =  0;
                 $identificacion = $this->returnIdentificacion($key1);
                 foreach ($key1 as $valoressuma) {
                     $suma = $suma + $valoressuma['percentage_weighed'];
                     $goal_id = $valoressuma['goal_id'];
+                    $conteodos = $conteodos +1;
                 }
-                $datos = array('suma' => $suma,'identification' =>$identificacion,'cargo_id' => $this->idCategoria($goal_id),'datos'=>null);
-                $datosGenerales[$identificacion] = array_merge($datosGenerales[$identificacion],$datos);             
+                $datosCompletosUsuario = null;
+                $datosCompletosUsuario_id = null;
+                foreach ($datosUsuario as $usuarioUnidad) {
+                    if ($usuarioUnidad->usuario_documento == $identificacion) {
+                        $datosCompletosUsuario = $usuarioUnidad;
+                        $datosCompletosUsuario_id = $usuarioUnidad->usuario_id;
+                    }
+                }
+                $datos = array('suma' => $suma,'identification' =>$identificacion,'cargo_id' => $this->idCategoria($goal_id),'datos'=>$datosCompletosUsuario,'usuario_id'=>$datosCompletosUsuario_id);
+                $datosGenerales[$identificacion] = array_merge($datosGenerales[$identificacion],$datos);    
+                $whereIncentive = array('p.cargo_id' => $this->idCategoria($goal_id),'p.incentive_fechainicio <='=>$fecha,'p.incentive_fechafin >='=>$fecha);
+                $datosIncentiveCarga =$this->Crud_parametria->datosIncentive($whereIncentive);
+                if (is_null($datosIncentiveCarga[0]->incentive_id_ventas)) {
+                    $cargaboolrenovacion = false;
+                    $cargaboolnueva = false;
+                    foreach ($key1 as $valoressuma) {
+                        if ($datosIncentiveCarga[0]->incentive_id_renovacion == $valoressuma['goal_id']) {
+                            $cargaboolrenovacion = true;
+                        }
+                        if ($datosIncentiveCarga[0]->incentive_id_nueva == $valoressuma['goal_id']) {
+                            $cargaboolnueva = true;
+                        }
+                    }
+                    if (!$cargaboolrenovacion) {
+                        $datosMetaCarga = $this->Crud_model->obtenerRegistros('produccion_metaventa',array('usuario_id' => $datosGenerales[$identificacion]['usuario_id'],'metaventa_mes'=>$mes),'max(metaventa_nuevas) metaventa_nuevas');
+                        if (is_null($datosMetaCarga)) {
+                            $datosMetaCarga = 0;
+                        }
+                        else
+                        {
+                            $datosMetaCarga = $datosMetaCarga[0]->metaventa_nuevas;
+                        }
+                        $datosGenerales[$identificacion][$conteodos] = array(
+                            'identification' => $identificacion,
+                            'goal_id'=>$datosIncentiveCarga[0]->incentive_id_renovacion,
+                            'value'=>$datosMetaCarga,
+                            'real'=>0 ,
+                            'percentage'=>0,
+                            'percentage_modified'=>0,
+                            'percentage_weighed'=>0,
+                            'date'=>$fecha,
+                            'created_at'=> $fecha);
+                        $conteodos=$conteodos+1;
+                    }
+                    if (!$cargaboolnueva) {
+                        $datosMetaCarga = $this->Crud_model->obtenerRegistros('produccion_metaventa',array('usuario_id' => $datosGenerales[$identificacion]['usuario_id'],'metaventa_mes'=>$mes),'max(metaventa_recompra) metaventa_nuevas');
+                        if (is_null($datosMetaCarga)) {
+                            $datosMetaCarga = 0;
+                        }
+                        else
+                        {
+                            $datosMetaCarga = $datosMetaCarga[0]->metaventa_nuevas;
+                        }
+                        $datosGenerales[$identificacion][$conteodos] = array(
+                            'identification' => $identificacion,
+                            'goal_id'=>$datosIncentiveCarga[0]->incentive_id_nueva,
+                            'value'=>$datosMetaCarga,
+                            'real'=>0 ,
+                            'percentage'=>0,
+                            'percentage_modified'=>0,
+                            'percentage_weighed'=>0,
+                            'date'=>$fecha,
+                            'created_at'=> $fecha);
+                        $conteodos=$conteodos+1;
+                    }
+                }
+                else
+                {
+                    $cargaboolventa = false;
+                    foreach ($key1 as $valoressuma) {
+                        if ($datosIncentiveCarga[0]->incentive_id_ventas == $valoressuma['goal_id']) {
+                            $cargaboolventa = true;
+                        }
+                    }
+                    if (!$cargaboolventa) {
+                        $datosMetaCarga = $this->Crud_model->obtenerRegistros('produccion_metaventa',array('usuario_id' => $datosGenerales[$identificacion]['usuario_id'],'metaventa_mes'=>$mes),'max(metaventa_nuevas)+max(metaventa_recompra) metaventa_nuevas');
+                        if (is_null($datosMetaCarga)) {
+                            $datosMetaCarga = 0;
+                        }
+                        else
+                        {
+                            $datosMetaCarga = $datosMetaCarga[0]->metaventa_nuevas;
+                        }
+                        $datosGenerales[$identificacion][$conteodos] = array(
+                            'identification' => $identificacion,
+                            'goal_id'=>$datosIncentiveCarga[0]->incentive_id_ventas,
+                            'value'=>$datosMetaCarga,
+                            'real'=>0 ,
+                            'percentage'=>0,
+                            'percentage_modified'=>0,
+                            'percentage_weighed'=>0,
+                            'date'=>$fecha,
+                            'created_at'=> $fecha);
+                        $conteodos=$conteodos+1;
+                    }
+                }      
+                $cargaboolvisitas = false;
+                foreach ($key1 as $valoressuma) {
+                    if ($datosIncentiveCarga[0]->incentive_id_citas == $valoressuma['goal_id']) {
+                        $cargaboolvisitas = true;
+                    }
+                }
+                if (!$cargaboolvisitas) {
+                    $datosMetaCarga = $this->Crud_model->obtenerRegistros('produccion_metavisita',array('usuario_id' => $datosGenerales[$identificacion]['usuario_id'],'metavisita_mes'=>$mes),'max(metavisita_totales) metaventa_nuevas');
+                    if (is_null($datosMetaCarga)) {
+                        $datosMetaCarga = 0;
+                    }
+                    else
+                    {
+                        $datosMetaCarga = $datosMetaCarga[0]->metaventa_nuevas;
+                    }
+                    $datosGenerales[$identificacion][$conteodos] = array(
+                        'identification' => $identificacion,
+                        'goal_id'=>$datosIncentiveCarga[0]->incentive_id_citas,
+                        'value'=>$datosMetaCarga,
+                        'real'=>0 ,
+                        'percentage'=>0,
+                        'percentage_modified'=>0,
+                        'percentage_weighed'=>0,
+                        'date'=>$fecha,
+                        'created_at'=> $fecha);
+                    $conteodos=$conteodos+1;
+                }
             }
+            
             //var_dump(json_encode($datosGenerales));
-            $cargo1 = array();
-            $conteo1 =0;
-            $cargo2 = array();
-            $conteo2 =0;
-            $cargo3 = array();
-            $conteo3 =0;
-            $cargo4 = array();
-            $conteo4 =0;
-            $cargo5 = array();
-            $conteo5 =0;
-            $cargo6 = array();
-            $conteo6 =0;
-            $cargo7 = array();
-            $conteo7 =0;
+            $datos = array(
+                'cargo_1' => array('datos'=>array(),'conteo'=>0),
+                'cargo_2' => array('datos'=>array(),'conteo'=>0),
+                'cargo_3' => array('datos'=>array(),'conteo'=>0),
+                'cargo_4' => array('datos'=>array(),'conteo'=>0),
+                'cargo_5' => array('datos'=>array(),'conteo'=>0),
+                'cargo_6' => array('datos'=>array(),'conteo'=>0),
+                'cargo_7' => array('datos'=>array(),'conteo'=>0),
+                'cargo_8' => array('datos'=>array(),'conteo'=>0)
+            );
             foreach ($datosGenerales as $key2) {
-                switch ($key2['cargo_id']) {
-                    case '1':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo1[$conteo1] = $key2; 
-                        $conteo1 = $conteo1+1;
-                    break;
-                    case '2':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo2[$conteo2] = $key2; 
-                        $conteo2 = $conteo2+1;
-                    break;
-                    case '3':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo3[$conteo3] = $key2; 
-                        $conteo3 = $conteo3+1;
-                    break;
-                    case '4':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo4[$conteo4] = $key2; 
-                        $conteo4 = $conteo4+1;
-                    break;
-                    case '5':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo5[$conteo5] = $key2; 
-                        $conteo5 = $conteo5+1;
-                    break;
-                    case '6':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo6[$conteo6] = $key2; 
-                        $conteo6 = $conteo6+1;
-                    break;
-                    case '7':
-                        foreach ($datosUsuario as $usuarioUnidad) {
-                            if ($usuarioUnidad->usuario_documento == $key2['identification']) {
-                                $key2['datos'] = $usuarioUnidad;
-                            }
-                        }
-                        $cargo7[$conteo7] = $key2; 
-                        $conteo7 = $conteo7+1;
-                    break;
+                foreach ($datosUsuario as $usuarioUnidad) {
+                    if ($usuarioUnidad->usuario_documento == $key2['identification']) {
+                        $key2['datos'] = $usuarioUnidad;
+                    }
                 }
+                $datos['cargo_'.$key2['cargo_id']]['datos'][$datos['cargo_'.$key2['cargo_id']]['conteo']] = $key2; 
+                $datos['cargo_'.$key2['cargo_id']]['conteo'] = $datos['cargo_'.$key2['cargo_id']]['conteo']+1;
             }
-            //var_dump(json_encode($cargo1));
-            $this->listaConcesionariosToExcel('07',$cargo1,$cargo2,$cargo3,$cargo4,$cargo5,$cargo6,$cargo7,$datosPantalla);
+            //echo "<br>";
+            //var_dump(json_encode($datos));
+            $this->listaConcesionariosToExcel($mes,$datos,$datosPantalla,$valorCampo);
         }
+        //$this->controlador('exportgeneral');
     }
-    /*Excel concesionarios*/
-    public function listaConcesionariosToExcel($mes = '07',$cargo1,$cargo2,$cargo3,$cargo4,$cargo5,$cargo6,$cargo7,$datosPantalla)
+    public function listaConcesionariosToExcel($mes = '07',$datos,$datosPantalla,$valorCampo)
     {
         $contador=0;
-
+        
         $valorRetorno = '
             <table cellspacing = "0" cellpadding = "0" border = "1" >
                 <tr >
@@ -230,374 +329,135 @@ class Cargatablas extends MY_Controller {
                     <td> Cedula</td>
                     <td> Nomina </td>
                     <td> Mes</td>
-                    <td> Venas Renovacion %</td>
-                    <td> Venas Nuevas %</td>
+                    <td> Ventas Renovacion Meta</td>
+                    <td> Ventas Nuevas Meta</td>
+                    <td> Ventas Meta</td>
+                    <td> Visitas Meta</td>
+                    <td> Test Meta</td>
+                    <td> Grupal Meta</td>
+                    <td> Ventas Renovacion Real</td>
+                    <td> Ventas Nuevas Real</td>
+                    <td> Ventas Real</td>
+                    <td> Visitas Real</td>
+                    <td> Test Real</td>
+                    <td> Grupal Real</td>
+                    <td> Ventas Renovacion %</td>
+                    <td> Ventas Nuevas %</td>
+                    <td> Ventas %</td>
                     <td> Visitas %</td>
                     <td> Test %</td>
                     <td> Grupal %</td>
-                    <td> Venas Renovacion puntos</td>
-                    <td> Venas Nuevas puntos</td>
+                    <td> Ventas Renovacion puntos</td>
+                    <td> Ventas Nuevas puntos</td>
+                    <td> Ventas puntos</td>
                     <td> Visitas puntos</td>
                     <td> Test puntos</td>
                     <td> Grupal puntos</td>
                     <td> Perfil</td>
                     <td> Total</td>
                 </tr >  ';
-
-        
-        foreach ($cargo1 as $item):
-            $renovacion = null;
-            $nuevo = null;
-            $llamadas = null;
-            $test = null;
-            $grupal = null;
-            if (!is_null($item["datos"])) 
-            {
-                for ($i=0; $i < count($item); $i++) { 
-                    if (isset($item[$i])) {
-                        if ($item[$i]["goal_id"] == 1) {
-                            $renovacion = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 2) {
-                            $nuevo = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 3) {
-                            $llamadas = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 4) {
-                            $test = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 5) {
-                            $grupal = $item[$i];
-                        }
-                    }
-                }
-
-                $bodytag = str_replace("%body%", "black", "<body text='%body%'>");
-                $valorRetorno .= '<tr>
-                        <td> '.$item["datos"]->usuario_nombre.'</td>
-                        <td> '.$item["datos"]->usuario_apellido.'</td>
-                        <td> '.$item["datos"]->usuario_correo.'</td>
-                        <td> '.$item['identification'].'</td>
-                        <td> '.$item["datos"]->usuario_codigonomina.' </td>
-                        <td> '.$mes.'</td>
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
-
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
-                        <td> '.$item["datos"]->cargo_nombre.'</td>
-                        <td> '.str_replace('.',',',(double) $item['suma']).'</td>
-                    </tr>';
-            }
-        endforeach;
-        foreach ($cargo2 as $item):
-            $renovacion = null;
-            $nuevo = null;
-            $llamadas = null;
-            $test = null;
-            $grupal = null;
-            if (!is_null($item["datos"])) 
-            {
-                for ($i=0; $i < count($item); $i++) { 
-                    if (isset($item[$i])) {
-                        if ($item[$i]["goal_id"] == 6) {
-                            $renovacion = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 7) {
-                            $nuevo = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 8) {
-                            $llamadas = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 9) {
-                            $test = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 10) {
-                            $grupal = $item[$i];
+        //var_dump(json_encode($datos));
+        foreach ($datos as $key) 
+        {
+            if ($key["conteo"] > 0) {
+                foreach ($key["datos"] as $item) {
+                    //var_dump(json_encode($item));
+                    $renovacion = null;
+                    $nuevo = null;
+                    $ventas= null;
+                    $llamadas = null;
+                    $test = null;
+                    $grupal = null;
+                    if (!is_null($item["datos"])) 
+                    {
+                        for ($i=0; $i < count($item); $i++) { 
+                            if (isset($item[$i])) {
+                                if ($item[$i]["goal_id"]-35 > 0) {
+                                    $divisor =4;
+                                    $goal_id=$item[$i]["goal_id"]-35;
+                                    $datoAjustedo = (($goal_id/$divisor)-intval(($goal_id/$divisor)))*100;
+                                    switch (strval($datoAjustedo)) {
+                                        case 25:
+                                            $ventas = $item[$i];
+                                        break;
+                                        case 50:
+                                            $llamadas = $item[$i];
+                                        break;
+                                        case 75:
+                                            $test = $item[$i];
+                                        break;
+                                        case 0:
+                                            $grupal = $item[$i];
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    $divisor =5;
+                                    $goal_id=$item[$i]["goal_id"];
+                                    $datoAjustedo = (($goal_id/$divisor)-intval(($goal_id/$divisor)))*100;
+                                    switch (strval($datoAjustedo)) {
+                                        case 20:
+                                            $renovacion = $item[$i];
+                                        break;
+                                        case 40:
+                                            $nuevo = $item[$i];
+                                        break;
+                                        case 60:
+                                            $llamadas = $item[$i];
+                                        break;
+                                        case 80:
+                                            $test = $item[$i];
+                                        break;
+                                        case 0:
+                                            $grupal = $item[$i];
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
-                }
-                $valorRetorno .= '<tr>
-                        <td> '.$item["datos"]->usuario_nombre.'</td>
-                        <td> '.$item["datos"]->usuario_apellido.'</td>
-                        <td> '.$item["datos"]->usuario_correo.'</td>
-                        <td> '.$item['identification'].'</td>
-                        <td> '.$item["datos"]->usuario_codigonomina.' </td>
-                        <td> '.$mes.'</td>
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
+                    if (isset($item["datos"]->usuario_nombre)) {
+                        $valorRetorno .= '<tr>
+                            <td> '.$item["datos"]->usuario_nombre.'</td>
+                            <td> '.$item["datos"]->usuario_apellido.'</td>
+                            <td> '.$item["datos"]->usuario_correo.'</td>
+                            <td> '.$item['identification'].'</td>
+                            <td> '.$item["datos"]->usuario_codigonomina.' </td>
+                            <td> '.$mes.'</td>
+                            <td> '.str_replace('.',',',(double) $renovacion["value"]).'</td>
+                            <td> '.str_replace('.',',',(double) $nuevo["value"]).'</td>
+                            <td> '.str_replace('.',',',(double) $ventas["value"]).'</td>
+                            <td> '.str_replace('.',',',(double) $llamadas["value"]).'</td>
+                            <td> '.str_replace('.',',',(double) $test["value"]).'</td>
+                            <td> '.str_replace('.',',',(double) $grupal["value"]).'</td>
+                            <td> '.str_replace('.',',',(double) $renovacion["real"]).'</td>
+                            <td> '.str_replace('.',',',(double) $nuevo["real"]).'</td>
+                            <td> '.str_replace('.',',',(double) $ventas["real"]).'</td>
+                            <td> '.str_replace('.',',',(double) $llamadas["real"]).'</td>
+                            <td> '.str_replace('.',',',(double) $test["real"]).'</td>
+                            <td> '.str_replace('.',',',(double) $grupal["real"]).'</td>
 
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
-                        <td> '.$item["datos"]->cargo_nombre.'</td>
-                        <td> '.str_replace('.',',',(double) $item['suma']).'</td>
-                    </tr>';
-            }
-        endforeach;
-        foreach ($cargo3 as $item):
-            $renovacion = null;
-            $nuevo = null;
-            $llamadas = null;
-            $test = null;
-            $grupal = null;
-            if (!is_null($item["datos"])) 
-            {
-                for ($i=0; $i < count($item); $i++) { 
-                    if (isset($item[$i])) {
-                        if ($item[$i]["goal_id"] == 11) {
-                            $renovacion = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 12) {
-                            $nuevo = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 13) {
-                            $llamadas = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 14) {
-                            $test = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 15) {
-                            $grupal = $item[$i];
-                        }
+                            <td> '.str_replace('.',',',(double) $renovacion["percentage"]).'</td>
+                            <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
+                            <td> '.str_replace('.',',',(double) $ventas["percentage"]).'</td>
+                            <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
+                            <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
+                            <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
+
+                            <td> '.str_replace('.',',',(double) $renovacion["percentage_weighed"]).'</td>
+                            <td> '.str_replace('.',',',(double) $nuevo["percentage_weighed"]).'</td>
+                            <td> '.str_replace('.',',',(double) $ventas["percentage_weighed"]).'</td>
+                            <td> '.str_replace('.',',',(double) $llamadas["percentage_weighed"]).'</td>
+                            <td> '.str_replace('.',',',(double) $test["percentage_weighed"]).'</td>
+                            <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
+                            <td> '.$item["datos"]->cargo_nombre.'</td>
+                            <td> '.str_replace('.',',',(double) $item['suma']).'</td>
+                        </tr>';
                     }
                 }
-                $valorRetorno .= '<tr>
-                        <td> '.$item["datos"]->usuario_nombre.'</td>
-                        <td> '.$item["datos"]->usuario_apellido.'</td>
-                        <td> '.$item["datos"]->usuario_correo.'</td>
-                        <td> '.$item['identification'].'</td>
-                        <td> '.$item["datos"]->usuario_codigonomina.' </td>
-                        <td> '.$mes.'</td>
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
-
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
-                        <td> '.$item["datos"]->cargo_nombre.'</td>
-                        <td> '.str_replace('.',',',(double) $item['suma']).'</td>
-                    </tr>';
             }
-        endforeach;
-        foreach ($cargo4 as $item):
-            $renovacion = null;
-            $nuevo = null;
-            $llamadas = null;
-            $test = null;
-            $grupal = null;
-            if (!is_null($item["datos"])) 
-            {
-                for ($i=0; $i < count($item); $i++) { 
-                    if (isset($item[$i])) {
-                        if ($item[$i]["goal_id"] == 16) {
-                            $renovacion = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 17) {
-                            $nuevo = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 18) {
-                            $llamadas = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 19) {
-                            $test = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 20) {
-                            $grupal = $item[$i];
-                        }
-                    }
-                }
-                $valorRetorno .= '<tr>
-                        <td> '.$item["datos"]->usuario_nombre.'</td>
-                        <td> '.$item["datos"]->usuario_apellido.'</td>
-                        <td> '.$item["datos"]->usuario_correo.'</td>
-                        <td> '.$item['identification'].'</td>
-                        <td> '.$item["datos"]->usuario_codigonomina.' </td>
-                        <td> '.$mes.'</td>
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
-
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
-                        <td> '.$item["datos"]->cargo_nombre.'</td>
-                        <td> '.str_replace('.',',',(double) $item['suma']).'</td>
-                    </tr>';
-            }
-        endforeach;
-        foreach ($cargo5 as $item):
-            $renovacion = null;
-            $nuevo = null;
-            $llamadas = null;
-            $test = null;
-            $grupal = null;
-            if (!is_null($item["datos"])) 
-            {
-                for ($i=0; $i < count($item); $i++) { 
-                    if (isset($item[$i])) {
-                        if ($item[$i]["goal_id"] == 21) {
-                            $renovacion = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 22) {
-                            $nuevo = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 23) {
-                            $llamadas = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 24) {
-                            $test = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 25) {
-                            $grupal = $item[$i];
-                        }
-                    }
-                }
-                $valorRetorno .= '<tr>
-                        <td> '.$item["datos"]->usuario_nombre.'</td>
-                        <td> '.$item["datos"]->usuario_apellido.'</td>
-                        <td> '.$item["datos"]->usuario_correo.'</td>
-                        <td> '.$item['identification'].'</td>
-                        <td> '.$item["datos"]->usuario_codigonomina.' </td>
-                        <td> '.$mes.'</td>
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
-
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
-                        <td> '.$item["datos"]->cargo_nombre.'</td>
-                        <td> '.str_replace('.',',',(double) $item['suma']).'</td>
-                    </tr>';
-            }
-        endforeach;
-        foreach ($cargo6 as $item):
-            $renovacion = null;
-            $nuevo = null;
-            $llamadas = null;
-            $test = null;
-            $grupal = null;
-            if (!is_null($item["datos"])) 
-            {
-                for ($i=0; $i < count($item); $i++) { 
-                    if (isset($item[$i])) {
-                        if ($item[$i]["goal_id"] == 26) {
-                            $renovacion = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 27) {
-                            $nuevo = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 28) {
-                            $llamadas = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 29) {
-                            $test = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 30) {
-                            $grupal = $item[$i];
-                        }
-                    }
-                }
-                $valorRetorno .= '<tr>
-                        <td> '.$item["datos"]->usuario_nombre.'</td>
-                        <td> '.$item["datos"]->usuario_apellido.'</td>
-                        <td> '.$item["datos"]->usuario_correo.'</td>
-                        <td> '.$item['identification'].'</td>
-                        <td> '.$item["datos"]->usuario_codigonomina.' </td>
-                        <td> '.$mes.'</td>
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
-
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
-                        <td> '.$item["datos"]->cargo_nombre.'</td>
-                        <td> '.str_replace('.',',',(double) $item['suma']).'</td>
-                    </tr>';
-            }
-        endforeach;
-        foreach ($cargo7 as $item):
-            $renovacion = null;
-            $nuevo = null;
-            $llamadas = null;
-            $test = null;
-            $grupal = null;
-            if (!is_null($item["datos"])) 
-            {
-                for ($i=0; $i < count($item); $i++) { 
-                    if (isset($item[$i])) {
-                        if ($item[$i]["goal_id"] == 31) {
-                            $renovacion = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 32) {
-                            $nuevo = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 33) {
-                            $llamadas = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 34) {
-                            $test = $item[$i];
-                        }
-                        if ($item[$i]["goal_id"] == 35) {
-                            $grupal = $item[$i];
-                        }
-                    }
-                }
-                $valorRetorno .= '<tr>
-                        <td> '.$item["datos"]->usuario_nombre.'</td>
-                        <td> '.$item["datos"]->usuario_apellido.'</td>
-                        <td> '.$item["datos"]->usuario_correo.'</td>
-                        <td> '.$item['identification'].'</td>
-                        <td> '.$item["datos"]->usuario_codigonomina.' </td>
-                        <td> '.$mes.'</td>
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
-
-                        <td> '.str_replace('.',',',(double) $renovacion["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $nuevo["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $llamadas["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $test["percentage_weighed"]).'</td>
-                        <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
-                        <td> '.$item["datos"]->cargo_nombre.'</td>
-                        <td> '.str_replace('.',',',(double) $item['suma']).'</td>
-                    </tr>';
-            }
-        endforeach;
-
+        }
         $valorRetorno .= '</table>';
         if (is_null($datosPantalla)) {
             header('Content-type: application/vnd.ms-excel');
@@ -641,7 +501,8 @@ class Cargatablas extends MY_Controller {
                         'tabla' => $valorCampo->tabla_nombre,
                         'columna_tipo' => $valorCampo->columna_tipo,
                         'columna_remplasa' => $valorCampo->columna_remplasa,
-                        'valor'=> '' 
+                        'valor'=> '',
+                        'columna_insert' => $valorCampo->columna_insert
                     );
                 }
             endfor;
@@ -657,12 +518,13 @@ class Cargatablas extends MY_Controller {
                         'tabla' => $key->tabla_nombre,
                         'columna_tipo' => $key->columna_tipo,
                         'columna_remplasa' => $key->columna_remplasa,
-                        'valor'=> '' 
+                        'valor'=> '',
+                        'columna_insert' => $key->columna_insert
                     );
                     $in= $in+1;
                 }
                 
-                for ($m = 2; $m <= $highestRow; $m++): // RECORRE EL NUMERO DE FILAS QUE TIENE EL ARCHIVO EXCEL
+                for ($m = 2; $m <= $highestRow; $m++): // RECORRE EL NUMERO DE filter_input_array(type)S QUE TIENE EL ARCHIVO EXCEL
                     //var_dump($columnaTitulo);
                     //echo "<br>";
                     $columnaTitulo = $this->limpiarArray($columnaTitulo);
@@ -686,8 +548,24 @@ class Cargatablas extends MY_Controller {
                     }
                 endfor;
                 $this->Crud_log->Insertar('Carga '.$tabla,1,json_encode(date('Y-m-d H:i:s',$this->ajusteFecha)));
-                $mensaje =-1;
-                $this->controlador($tabla,$mensaje);
+                $campos = $this->buscarParametria($tabla);
+                if ($campos['tabla_jobfin'] != '' and !is_null($campos['tabla_jobfin'])) {
+                    $retorno = $this->consultaRest($campos['tabla_jobfin'],'GET',null,base_url());
+                    if (!$retorno["estado"]) {
+                        $this->mensajeExterno = 'error en ejecutar join ';
+                        $mensaje =-2;
+                        $this->controlador($tabla,$mensaje);
+                    }
+                    else
+                    {
+                        //var_dump($retorno["datos"]);
+                        $this->controlador($tabla,$mensaje);      
+                    }
+                }
+                else
+                {
+                    $this->controlador($tabla,$mensaje);
+                }
             }else
             {
                 $this->mensajeExterno = $mensaje;
@@ -700,9 +578,9 @@ class Cargatablas extends MY_Controller {
             $this->controlador($tabla,$mensaje);
         }
     }
-
     public function crearArray($columnaTitulo1,$tabla)
     {
+        //columna_insert
         $lista = array();
         $cargaExterna = false;
         for ($i=0; $i < count($columnaTitulo1); $i++) { 
@@ -746,6 +624,21 @@ class Cargatablas extends MY_Controller {
                                 //var_dump($array[$columnaTitulo1[$i]["columnatabla"].'_id']);
                                 $lista =array_merge($lista, array($columnaTitulo1[$i]["columnatabla"].'_id' => $array[$columnaTitulo1[$i]["columnatabla"].'_id']));
                             }
+                            else
+                            {
+                                if ((int) $columnaTitulo1[$i]["columna_insert"] == 1) 
+                                {
+                                    $insertBusqueda = array($columnaTitulo1[$i]["columnatabla"].'_nombre' => $columnaTitulo1[$i]["valor"]);
+                                    $this->Crud_model->agregarRegistro('basica_'.$columnaTitulo1[$i]["columnatabla"],$insertBusqueda);
+                                    $wheredinamico = array($columnaTitulo1[$i]["columna_remplasa"] => $columnaTitulo1[$i]["valor"]);
+                                    $valores = $this->Crud_model->obtenerRegistros('basica_'.$columnaTitulo1[$i]["columnatabla"],$wheredinamico);
+                                    if (!is_null($valores)) {
+                                        $array = json_decode(json_encode($valores[0]), true);
+                                        //var_dump($array[$columnaTitulo1[$i]["columnatabla"].'_id']);
+                                        $lista =array_merge($lista, array($columnaTitulo1[$i]["columnatabla"].'_id' => $array[$columnaTitulo1[$i]["columnatabla"].'_id']));
+                                    }
+                                }
+                            }
                         break;
                         case 'fijo':
                             if ($columnaTitulo1[$i]['columna_remplasa'] == 'now') {
@@ -784,6 +677,55 @@ class Cargatablas extends MY_Controller {
         }
         return $columnaTitulo1;
 
+    }
+    public function exportarParametros($tabla= null)
+    {
+        $arraywhere = array(
+            'p.tabla_nombre' => strtolower($tabla)
+        );
+        $valorCampo = $this->Crud_campo->GetDatosMetaGrupo(array_merge($arraywhere,array('c.campo_oblicatorio' =>1)));
+        $whereDinamico = array();
+        foreach ($valorCampo as $key) {
+            switch ($key->campo_value) {
+                case '[[NOT NULL]]':
+                    $tempoArray = array($key->campo_nombre.' !=' => null);
+                break;
+                default:
+                    $tempoArray = array($key->campo_nombre => $key->campo_value);
+                break;
+            }
+            
+            $whereDinamico = array_merge($tempoArray,$whereDinamico);
+        }
+        $valorjoin = $this->Crud_tabla->getJoin($arraywhere);
+        $datos = $this->Crud_model->obtenerRegistros('produccion_usuario',$whereDinamico,null,null,null,$valorjoin);
+        $this->listaToExcel($datos,null,$this->Crud_tabla->GetDatos($arraywhere));
+    }
+    public function listaToExcel($datos,$datosPantalla= null,$valorCampo)
+    {
+        $contador=0;
+        $valorRetorno = '<table cellspacing = "0" cellpadding = "0" border = "1" ><tr >';
+
+        foreach ($valorCampo as $key) {
+            $valorRetorno .= '<td>'.$key->columna_nombre.'</td>';
+        }
+        $valorRetorno .= '<tr>';
+        foreach ($datos as $key1) 
+        {
+            $valorRetorno .= '<tr>';
+            foreach ($valorCampo as $key2) {
+                $valorRetorno .= '<td>'.$key1->{$key2->columna_relacion}.'</td>';
+            }
+            $valorRetorno .= '</tr>';
+        }
+        $valorRetorno .= '</table>';
+        if (is_null($datosPantalla)) {
+            header('Content-type: application/vnd.ms-excel');
+            header("Content-Disposition: attachment; filename=lista_exportable-".date('Y-m-d H:i:s',$this->ajusteFecha) . ".xls");
+            header("Pragma: no-cache");
+            header("Expires: 0");
+        }
+        echo $valorRetorno;
     }
 
 }
