@@ -104,7 +104,6 @@ class Cargatablas extends MY_Controller {
         $ano =  date('Y',$this->ajusteFecha);
         $mes = $this->input->post("mes", TRUE);
         $fecha = $ano.'-'.$mes.'-01';
-
         $dominio_id = $this->input->post("dominio_id", TRUE);
         if (is_null($fecha) or (int) $fecha == 1) {
             $fecha=date('Y-m-d',$this->ajusteFecha);
@@ -125,12 +124,12 @@ class Cargatablas extends MY_Controller {
             $dominio = $this->Crud_model->obtenerRegistros('produccion_dominio',$where);
         }
         if ($tabla == 'exportgeneral' and !is_null($dominio_id)) {
-            
             $datosUsuario = $this->Crud_usuario->GetDatos(array('p.estado_id' => 1,'p.rol_id' => 7,'p.empresalegal_id'=>$dominio[0]->empresalegal_id));
             $datosIncentive =  $this->consultaRest('/api/clients/'.$dominio[0]->codigo_incentive.'/dategoalvalues/'.$fecha,'GET');
             $datosGenerales = array();
             if (count($datosIncentive) > 0) {
                 foreach ($datosIncentive['goal_values'] as $key) {
+                    //if ($key['identification'] == 22589702) {
                     if ($key['date'] == $fecha) {
                         $estructura = array();
                         $estructura[$key['goal_id']] = array(
@@ -152,20 +151,146 @@ class Cargatablas extends MY_Controller {
                             $datosGenerales[$key['identification']] = $estructura;
                         }
                     }
+                    //}
                 }
                 
             }
-            //var_dump($datosGenerales);
+            //var_dump(json_encode($datosGenerales));
             foreach ($datosGenerales as $key1) {
                 $suma =0;
+                $conteodos =  0;
                 $identificacion = $this->returnIdentificacion($key1);
                 foreach ($key1 as $valoressuma) {
                     $suma = $suma + $valoressuma['percentage_weighed'];
                     $goal_id = $valoressuma['goal_id'];
+                    $conteodos = $conteodos +1;
                 }
-                $datos = array('suma' => $suma,'identification' =>$identificacion,'cargo_id' => $this->idCategoria($goal_id),'datos'=>null);
-                $datosGenerales[$identificacion] = array_merge($datosGenerales[$identificacion],$datos);             
+                $datosCompletosUsuario = null;
+                $datosCompletosUsuario_id = null;
+                foreach ($datosUsuario as $usuarioUnidad) {
+                    if ($usuarioUnidad->usuario_documento == $identificacion) {
+                        $datosCompletosUsuario = $usuarioUnidad;
+                        $datosCompletosUsuario_id = $usuarioUnidad->usuario_id;
+                    }
+                }
+                $datos = array('suma' => $suma,'identification' =>$identificacion,'cargo_id' => $this->idCategoria($goal_id),'datos'=>$datosCompletosUsuario,'usuario_id'=>$datosCompletosUsuario_id);
+                $datosGenerales[$identificacion] = array_merge($datosGenerales[$identificacion],$datos);    
+                $whereIncentive = array('p.cargo_id' => $this->idCategoria($goal_id),'p.incentive_fechainicio <='=>$fecha,'p.incentive_fechafin >='=>$fecha);
+                $datosIncentiveCarga =$this->Crud_parametria->datosIncentive($whereIncentive);
+                if (is_null($datosIncentiveCarga[0]->incentive_id_ventas)) {
+                    $cargaboolrenovacion = false;
+                    $cargaboolnueva = false;
+                    foreach ($key1 as $valoressuma) {
+                        if ($datosIncentiveCarga[0]->incentive_id_renovacion == $valoressuma['goal_id']) {
+                            $cargaboolrenovacion = true;
+                        }
+                        if ($datosIncentiveCarga[0]->incentive_id_nueva == $valoressuma['goal_id']) {
+                            $cargaboolnueva = true;
+                        }
+                    }
+                    if (!$cargaboolrenovacion) {
+                        $datosMetaCarga = $this->Crud_model->obtenerRegistros('produccion_metaventa',array('usuario_id' => $datosGenerales[$identificacion]['usuario_id'],'metaventa_mes'=>$mes),'max(metaventa_nuevas) metaventa_nuevas');
+                        if (is_null($datosMetaCarga)) {
+                            $datosMetaCarga = 0;
+                        }
+                        else
+                        {
+                            $datosMetaCarga = $datosMetaCarga[0]->metaventa_nuevas;
+                        }
+                        $datosGenerales[$identificacion][$conteodos] = array(
+                            'identification' => $identificacion,
+                            'goal_id'=>$datosIncentiveCarga[0]->incentive_id_renovacion,
+                            'value'=>$datosMetaCarga,
+                            'real'=>0 ,
+                            'percentage'=>0,
+                            'percentage_modified'=>0,
+                            'percentage_weighed'=>0,
+                            'date'=>$fecha,
+                            'created_at'=> $fecha);
+                        $conteodos=$conteodos+1;
+                    }
+                    if (!$cargaboolnueva) {
+                        $datosMetaCarga = $this->Crud_model->obtenerRegistros('produccion_metaventa',array('usuario_id' => $datosGenerales[$identificacion]['usuario_id'],'metaventa_mes'=>$mes),'max(metaventa_recompra) metaventa_nuevas');
+                        if (is_null($datosMetaCarga)) {
+                            $datosMetaCarga = 0;
+                        }
+                        else
+                        {
+                            $datosMetaCarga = $datosMetaCarga[0]->metaventa_nuevas;
+                        }
+                        $datosGenerales[$identificacion][$conteodos] = array(
+                            'identification' => $identificacion,
+                            'goal_id'=>$datosIncentiveCarga[0]->incentive_id_nueva,
+                            'value'=>$datosMetaCarga,
+                            'real'=>0 ,
+                            'percentage'=>0,
+                            'percentage_modified'=>0,
+                            'percentage_weighed'=>0,
+                            'date'=>$fecha,
+                            'created_at'=> $fecha);
+                        $conteodos=$conteodos+1;
+                    }
+                }
+                else
+                {
+                    $cargaboolventa = false;
+                    foreach ($key1 as $valoressuma) {
+                        if ($datosIncentiveCarga[0]->incentive_id_ventas == $valoressuma['goal_id']) {
+                            $cargaboolventa = true;
+                        }
+                    }
+                    if (!$cargaboolventa) {
+                        $datosMetaCarga = $this->Crud_model->obtenerRegistros('produccion_metaventa',array('usuario_id' => $datosGenerales[$identificacion]['usuario_id'],'metaventa_mes'=>$mes),'max(metaventa_nuevas)+max(metaventa_recompra) metaventa_nuevas');
+                        if (is_null($datosMetaCarga)) {
+                            $datosMetaCarga = 0;
+                        }
+                        else
+                        {
+                            $datosMetaCarga = $datosMetaCarga[0]->metaventa_nuevas;
+                        }
+                        $datosGenerales[$identificacion][$conteodos] = array(
+                            'identification' => $identificacion,
+                            'goal_id'=>$datosIncentiveCarga[0]->incentive_id_ventas,
+                            'value'=>$datosMetaCarga,
+                            'real'=>0 ,
+                            'percentage'=>0,
+                            'percentage_modified'=>0,
+                            'percentage_weighed'=>0,
+                            'date'=>$fecha,
+                            'created_at'=> $fecha);
+                        $conteodos=$conteodos+1;
+                    }
+                }      
+                $cargaboolvisitas = false;
+                foreach ($key1 as $valoressuma) {
+                    if ($datosIncentiveCarga[0]->incentive_id_citas == $valoressuma['goal_id']) {
+                        $cargaboolvisitas = true;
+                    }
+                }
+                if (!$cargaboolvisitas) {
+                    $datosMetaCarga = $this->Crud_model->obtenerRegistros('produccion_metavisita',array('usuario_id' => $datosGenerales[$identificacion]['usuario_id'],'metavisita_mes'=>$mes),'max(metavisita_totales) metaventa_nuevas');
+                    if (is_null($datosMetaCarga)) {
+                        $datosMetaCarga = 0;
+                    }
+                    else
+                    {
+                        $datosMetaCarga = $datosMetaCarga[0]->metaventa_nuevas;
+                    }
+                    $datosGenerales[$identificacion][$conteodos] = array(
+                        'identification' => $identificacion,
+                        'goal_id'=>$datosIncentiveCarga[0]->incentive_id_citas,
+                        'value'=>$datosMetaCarga,
+                        'real'=>0 ,
+                        'percentage'=>0,
+                        'percentage_modified'=>0,
+                        'percentage_weighed'=>0,
+                        'date'=>$fecha,
+                        'created_at'=> $fecha);
+                    $conteodos=$conteodos+1;
+                }
             }
+            
+            //var_dump(json_encode($datosGenerales));
             $datos = array(
                 'cargo_1' => array('datos'=>array(),'conteo'=>0),
                 'cargo_2' => array('datos'=>array(),'conteo'=>0),
@@ -187,7 +312,7 @@ class Cargatablas extends MY_Controller {
             }
             //echo "<br>";
             //var_dump(json_encode($datos));
-            $this->listaConcesionariosToExcel($mes,$datos,null,$valorCampo);
+            $this->listaConcesionariosToExcel($mes,$datos,$datosPantalla,$valorCampo);
         }
         //$this->controlador('exportgeneral');
     }
@@ -195,7 +320,6 @@ class Cargatablas extends MY_Controller {
     {
         $contador=0;
         
-        var_dump($valorCampo);
         $valorRetorno = '
             <table cellspacing = "0" cellpadding = "0" border = "1" >
                 <tr >
@@ -233,7 +357,6 @@ class Cargatablas extends MY_Controller {
                     <td> Total</td>
                 </tr >  ';
         //var_dump(json_encode($datos));
-        /*
         foreach ($datos as $key) 
         {
             if ($key["conteo"] > 0) {
@@ -343,7 +466,6 @@ class Cargatablas extends MY_Controller {
             header("Expires: 0");
         }
         echo $valorRetorno;
-        */
     }
     public function guardar($tabla= null)
     {
