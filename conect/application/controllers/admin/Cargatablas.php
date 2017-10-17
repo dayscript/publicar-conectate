@@ -102,9 +102,19 @@ class Cargatablas extends MY_Controller {
         );
         $valorCampo = $this->Crud_tabla->GetDatos($arraywhere,null,null,'*');
         $ano =  date('Y',$this->ajusteFecha);
-        $mes = $this->input->post("mes", TRUE);
-        $fecha = $ano.'-'.$mes.'-01';
-        $dominio_id = $this->input->post("dominio_id", TRUE);
+        if (is_null($this->input->post("mes", TRUE))) 
+        {
+            $mes = date('m',strtotime($fecha));
+        }
+        else
+        {
+            $mes = $this->input->post("mes", TRUE);
+            $fecha = $ano.'-'.$mes.'-01';
+        }
+        if (!is_null($this->input->post("dominio_id", TRUE))) 
+        {
+            $dominio_id = $this->input->post("dominio_id", TRUE);
+        }
         if (is_null($fecha) or (int) $fecha == 1) {
             $fecha=date('Y-m-d',$this->ajusteFecha);
             $ano =  date('Y',$this->ajusteFecha);
@@ -330,29 +340,35 @@ class Cargatablas extends MY_Controller {
                     <td> Nomina </td>
                     <td> Mes</td>
                     <td> Ventas Renovacion Meta</td>
-                    <td> Ventas Nuevas Meta</td>
-                    <td> Ventas Meta</td>
-                    <td> Visitas Meta</td>
-                    <td> Test Meta</td>
-                    <td> Grupal Meta</td>
                     <td> Ventas Renovacion Real</td>
-                    <td> Ventas Nuevas Real</td>
-                    <td> Ventas Real</td>
-                    <td> Visitas Real</td>
-                    <td> Test Real</td>
-                    <td> Grupal Real</td>
                     <td> Ventas Renovacion %</td>
-                    <td> Ventas Nuevas %</td>
-                    <td> Ventas %</td>
-                    <td> Visitas %</td>
-                    <td> Test %</td>
-                    <td> Grupal %</td>
                     <td> Ventas Renovacion puntos</td>
+
+                    <td> Ventas Nuevas Meta</td>
+                    <td> Ventas Nuevas Real</td>
+                    <td> Ventas Nuevas %</td>
                     <td> Ventas Nuevas puntos</td>
+
+                    <td> Ventas Meta</td>
+                    <td> Ventas Real</td>
+                    <td> Ventas %</td>
                     <td> Ventas puntos</td>
+
+                    <td> Visitas Meta</td>
+                    <td> Visitas Real</td>
+                    <td> Visitas %</td>
                     <td> Visitas puntos</td>
+
+                    <td> Test Meta</td>
+                    <td> Test Real</td>
+                    <td> Test %</td>
                     <td> Test puntos</td>
+
+                    <td> Grupal Meta</td>
+                    <td> Grupal Real</td>
+                    <td> Grupal %</td>
                     <td> Grupal puntos</td>
+
                     <td> Perfil</td>
                     <td> Total</td>
                 </tr >  ';
@@ -426,31 +442,35 @@ class Cargatablas extends MY_Controller {
                             <td> '.$item["datos"]->usuario_codigonomina.' </td>
                             <td> '.$mes.'</td>
                             <td> '.str_replace('.',',',(double) $renovacion["value"]).'</td>
-                            <td> '.str_replace('.',',',(double) $nuevo["value"]).'</td>
-                            <td> '.str_replace('.',',',(double) $ventas["value"]).'</td>
-                            <td> '.str_replace('.',',',(double) $llamadas["value"]).'</td>
-                            <td> '.str_replace('.',',',(double) $test["value"]).'</td>
-                            <td> '.str_replace('.',',',(double) $grupal["value"]).'</td>
                             <td> '.str_replace('.',',',(double) $renovacion["real"]).'</td>
-                            <td> '.str_replace('.',',',(double) $nuevo["real"]).'</td>
-                            <td> '.str_replace('.',',',(double) $ventas["real"]).'</td>
-                            <td> '.str_replace('.',',',(double) $llamadas["real"]).'</td>
-                            <td> '.str_replace('.',',',(double) $test["real"]).'</td>
-                            <td> '.str_replace('.',',',(double) $grupal["real"]).'</td>
-
                             <td> '.str_replace('.',',',(double) $renovacion["percentage"]).'</td>
-                            <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
-                            <td> '.str_replace('.',',',(double) $ventas["percentage"]).'</td>
-                            <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
-                            <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
-                            <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
-
                             <td> '.str_replace('.',',',(double) $renovacion["percentage_weighed"]).'</td>
+
+                            <td> '.str_replace('.',',',(double) $nuevo["value"]).'</td>
+                            <td> '.str_replace('.',',',(double) $nuevo["real"]).'</td>
+                            <td> '.str_replace('.',',',(double) $nuevo["percentage"]).'</td>
                             <td> '.str_replace('.',',',(double) $nuevo["percentage_weighed"]).'</td>
+
+                            <td> '.str_replace('.',',',(double) $ventas["value"]).'</td>
+                            <td> '.str_replace('.',',',(double) $ventas["real"]).'</td>
+                            <td> '.str_replace('.',',',(double) $ventas["percentage"]).'</td>
                             <td> '.str_replace('.',',',(double) $ventas["percentage_weighed"]).'</td>
+
+                            <td> '.str_replace('.',',',(double) $llamadas["value"]).'</td>
+                            <td> '.str_replace('.',',',(double) $llamadas["real"]).'</td>
+                            <td> '.str_replace('.',',',(double) $llamadas["percentage"]).'</td>
                             <td> '.str_replace('.',',',(double) $llamadas["percentage_weighed"]).'</td>
+
+                            <td> '.str_replace('.',',',(double) $test["value"]).'</td>
+                            <td> '.str_replace('.',',',(double) $test["real"]).'</td>
+                            <td> '.str_replace('.',',',(double) $test["percentage"]).'</td>
                             <td> '.str_replace('.',',',(double) $test["percentage_weighed"]).'</td>
+
+                            <td> '.str_replace('.',',',(double) $grupal["value"]).'</td>
+                            <td> '.str_replace('.',',',(double) $grupal["real"]).'</td>
+                            <td> '.str_replace('.',',',(double) $grupal["percentage"]).'</td>
                             <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
+                            
                             <td> '.$item["datos"]->cargo_nombre.'</td>
                             <td> '.str_replace('.',',',(double) $item['suma']).'</td>
                         </tr>';
