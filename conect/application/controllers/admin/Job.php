@@ -716,7 +716,7 @@ class Job extends MY_Controller {
                         $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'grupo_id');
                     }
                     
-                    if (!is_null($metas) and !is_null($venta)) {
+                    if (!is_null($metas) and !is_null($venta) and count($venta) != 0) {
                         $metasTotal = (int) $metas[0]->metagrupo_meta;
                         $ventatotal = (int) $venta[0]['ventasumaRecompra'] +(int) $venta[0]['ventasumaNuevo'];
                         $envioDatos = array(
