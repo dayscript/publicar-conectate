@@ -37,7 +37,7 @@ class Crud_grupo extends CI_Model {
         $joins[1]  = array('tabla' => 'basica_grupo g ','tipo_join' =>'inner', 'conect'=>'g.grupo_id = u.grupo_id');
         return $this->Crud_model->obtenerRegistros('produccion_venta',$where,$select, NULL,NULL, $joins,$group);
     }
-    public function GetdatosQuery($mes,$grupo)
+    public function GetdatosQuery($stringwhere,$order)
     {
         $string = 'select grupo_id,grupo_nombre,sum(venta_recompra) ventasumaRecompra,sum(venta_nuevas) ventasumaNuevo from (
         SELECT p.usuario_documento, 
@@ -54,13 +54,14 @@ class Crud_grupo extends CI_Model {
             max(v.venta_fechacarga) venta_fechacarga, 
             v.estado_id, 
             v.usuario_id, 
-            v.venta_nomina
+            v.venta_nomina,
+            usuario_codigojefe
         FROM produccion_usuario p INNER JOIN basica_cargo c ON c.cargo_id = p.cargo_id
              INNER JOIN basica_grupo g ON g.grupo_id = p.grupo_id
              INNER JOIN produccion_venta v ON v.usuario_id = p.usuario_id
-        WHERE p.grupo_id =  '.$grupo.' and v.venta_mes = '.$mes.'
+        WHERE '.$stringwhere.'
         GROUP BY p.usuario_id) tempo
-        group by grupo_id';
+        group by '.$order.'';
         return $this->Crud_model->queryConsulta($string);
     }
 }

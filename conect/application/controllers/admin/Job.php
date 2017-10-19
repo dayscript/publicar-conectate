@@ -699,9 +699,11 @@ class Job extends MY_Controller {
             if (!is_null($datosUsuario)) {
                 foreach ($datosUsuario as $key) 
                 {
+                //if ($key->usuario_codigonomina == 746104) {
                     $where = array('p.metagrupo_mes' => $mes,'p.grupo_id' => $key->grupo_id); 
                     $metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
-                    $venta = $this->Crud_grupo->GetdatosQuery($mes,$key->grupo_id);
+                    $stringwhere = 'p.grupo_id =  '.$key->grupo_id.' and v.venta_mes = '.$mes.'';
+                    $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'grupo_id');
                     if (!is_null($metas) and !is_null($venta)) {
                         $metasTotal = (int) $metas[0]->metagrupo_meta;
                         $ventatotal = (int) $venta[0]['ventasumaRecompra'] +(int) $venta[0]['ventasumaNuevo'];
@@ -739,6 +741,12 @@ class Job extends MY_Controller {
                             $this->Crud_cumplimiento->editar($edit,$where);
                         }
                         if ($key->cargo_grupo == 1) {
+                            //$where = array('p.metagrupo_mess' => $mes,'p.grupo_id' => $key->grupo_id); 
+                            //$metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
+                            $stringwhere = 'p.usuario_codigojefe =  '.$key->usuario_codigonomina.' and v.venta_mes = '.$mes.'';
+                            $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'usuario_codigojefe');
+                            //var_dump(json_encode($venta));
+                            //break;
                             if (is_null($key->incentive_id_ventas)) {
                                 $ventatotal = (int) $venta[0]['ventasumaRecompra'];
                                 $envioDatos = array(
@@ -848,6 +856,7 @@ class Job extends MY_Controller {
                         }
                     }
                 }
+                //}   
             }
             return true;
         }
@@ -1224,7 +1233,7 @@ class Job extends MY_Controller {
     }
     public function cargarActualizaciones()
     {
-        $select = 'p.usuario_id as usuario_idUpdate,u.usuario_id,p.usuario_documento, p.grupo_id as grupo_idUpdate, u.grupo_id as grupo_id,p.cargo_id as cargo_idUpdate,u.cargo_id as cargo_id,p.empresalegal_id as empresalegal_idUpdate,u.empresalegal_id,u.agile_id';
+        $select = 'p.usuario_id as usuario_idUpdate,u.usuario_id,p.usuario_documento, p.grupo_id as grupo_idUpdate, u.grupo_id as grupo_id,p.cargo_id as cargo_idUpdate,u.cargo_id as cargo_id,u.usuariocodigojefe as usuariocodigojefe,p.usuariocodigojefe as usuariocodigojefeUpdate,p.empresalegal_id as empresalegal_idUpdate,u.empresalegal_id,u.agile_id';
         $datosUpdate = $this->Crud_update->datosConsulta(null,$select);
         if (!is_null($datosUpdate)) {
             foreach ($datosUpdate as $key) {
@@ -1266,6 +1275,13 @@ class Job extends MY_Controller {
                     }
                     $carga = array('empresalegal_Viejo' => $key->empresalegal_id, 'empresalegal_nuevo'=>$key->empresalegal_idUpdate);
                     $this->Crud_log->Insertar('Actualizaciones Empresa Legal',$datosusuario[0]->usuario_id,json_encode($carga));
+                }
+                if ($key->usuariocodigojefe != $key->usuariocodigojefeUpdate) {
+                    $where = array('usuario_id' => $key->usuario_id);
+                    $actualiza = array('usuariocodigojefe' => $key->usuariocodigojefeUpdate);
+                    $this->Crud_usuario->editar($actualiza,$where);
+                    $carga = array('usuariocodigojefe_Viejo' => $key->usuariocodigojefe, 'usuariocodigojefe_nuevo'=>$key->usuariocodigojefeUpdate);
+                    $this->Crud_log->Insertar('Actualizaciones usuariocodigojefe',$datosusuario[0]->usuario_id,json_encode($carga));
                 }
                 $actualiza = array('estado_id' => 5);
                 $where = array('usuario_id' => $key->usuario_idUpdate);
