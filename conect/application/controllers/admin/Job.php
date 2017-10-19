@@ -699,7 +699,7 @@ class Job extends MY_Controller {
             if (!is_null($datosUsuario)) {
                 foreach ($datosUsuario as $key) 
                 {
-                if ($key->usuario_codigonomina == 746104) {
+                //if ($key->usuario_codigonomina == 746104) {
                     if ($key->cargo_grupo == 1) 
                     {
                         //$where = array('p.metagrupo_mess' => $mes,'p.grupo_id' => $key->grupo_id); 
@@ -870,7 +870,7 @@ class Job extends MY_Controller {
                         }
                     }
                 }
-                }   
+                //}   
             }
             return true;
         }
