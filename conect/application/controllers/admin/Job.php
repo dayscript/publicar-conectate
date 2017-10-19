@@ -746,7 +746,7 @@ class Job extends MY_Controller {
                             $stringwhere = 'p.usuario_codigojefe =  '.$key->usuario_codigonomina.' and v.venta_mes = '.$mes.'';
                             $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'usuario_codigojefe');
                             
-                            if (is_null($venta)) {
+                            if (is_null($venta) or count($venta) == 0) {
                                 var_dump(json_encode($venta));
                                 echo "<br>";
                                 var_dump(json_encode($key));
