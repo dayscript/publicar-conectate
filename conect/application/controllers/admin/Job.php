@@ -699,11 +699,21 @@ class Job extends MY_Controller {
             if (!is_null($datosUsuario)) {
                 foreach ($datosUsuario as $key) 
                 {
-                //if ($key->usuario_codigonomina == 746104) {
-                    $where = array('p.metagrupo_mes' => $mes,'p.grupo_id' => $key->grupo_id); 
-                    $metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
-                    $stringwhere = 'p.grupo_id =  '.$key->grupo_id.' and v.venta_mes = '.$mes.'';
-                    $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'grupo_id');
+                if ($key->usuario_codigonomina == 746104) {
+                    if ($key->cargo_grupo == 1) 
+                    {
+                        //$where = array('p.metagrupo_mess' => $mes,'p.grupo_id' => $key->grupo_id); 
+                        //$metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
+                        $stringwhere = 'p.usuario_codigojefe =  '.$key->usuario_codigonomina.' and v.venta_mes = '.$mes.'';
+                        $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'usuario_codigojefe');
+                    }else
+                    {
+                        $where = array('p.metagrupo_mes' => $mes,'p.grupo_id' => $key->grupo_id); 
+                        $metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
+                        $stringwhere = 'p.grupo_id =  '.$key->grupo_id.' and v.venta_mes = '.$mes.'';
+                        $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'grupo_id');
+                    }
+                    
                     if (!is_null($metas) and !is_null($venta)) {
                         $metasTotal = (int) $metas[0]->metagrupo_meta;
                         $ventatotal = (int) $venta[0]['ventasumaRecompra'] +(int) $venta[0]['ventasumaNuevo'];
@@ -741,11 +751,6 @@ class Job extends MY_Controller {
                             $this->Crud_cumplimiento->editar($edit,$where);
                         }
                         if ($key->cargo_grupo == 1) {
-                            //$where = array('p.metagrupo_mess' => $mes,'p.grupo_id' => $key->grupo_id); 
-                            //$metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
-                            $stringwhere = 'p.usuario_codigojefe =  '.$key->usuario_codigonomina.' and v.venta_mes = '.$mes.'';
-                            $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'usuario_codigojefe');
-                            
                             if (is_null($venta) or count($venta) == 0) {
                                 var_dump(json_encode($venta));
                                 echo "<br>";
@@ -863,7 +868,7 @@ class Job extends MY_Controller {
                         }
                     }
                 }
-                //}   
+                }   
             }
             return true;
         }
