@@ -704,6 +704,8 @@ class Job extends MY_Controller {
                     {
                         //$where = array('p.metagrupo_mess' => $mes,'p.grupo_id' => $key->grupo_id); 
                         //$metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
+                        $where = array('p.metagrupo_mes' => $mes,'p.grupo_id' => $key->grupo_id); 
+                        $metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
                         $stringwhere = 'p.usuario_codigojefe =  '.$key->usuario_codigonomina.' and v.venta_mes = '.$mes.'';
                         $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'usuario_codigojefe');
                     }else
