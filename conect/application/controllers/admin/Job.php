@@ -753,9 +753,6 @@ class Job extends MY_Controller {
                             }
                             else{
                             //break;
-                                var_dump($venta);
-                                echo "<br>";
-                                var_dump(json_encode($key));
                                 if (is_null($key->incentive_id_ventas)) {
                                     $ventatotal = (int) $venta[0]['ventasumaRecompra'];
                                     $envioDatos = array(
