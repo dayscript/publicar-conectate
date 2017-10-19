@@ -1247,7 +1247,7 @@ class Job extends MY_Controller {
     }
     public function cargarActualizaciones()
     {
-        $select = 'p.usuario_id as usuario_idUpdate,u.usuario_id,p.usuario_documento, p.grupo_id as grupo_idUpdate, u.grupo_id as grupo_id,p.cargo_id as cargo_idUpdate,u.cargo_id as cargo_id,u.usuariocodigojefe as usuariocodigojefe,p.usuariocodigojefe as usuariocodigojefeUpdate,p.empresalegal_id as empresalegal_idUpdate,u.empresalegal_id,u.agile_id';
+        $select = 'p.usuario_id as usuario_idUpdate,u.usuario_id,p.usuario_documento, p.grupo_id as grupo_idUpdate, u.grupo_id as grupo_id,p.cargo_id as cargo_idUpdate,u.cargo_id as cargo_id,u.usuario_codigojefe as usuariocodigojefe,p.usuario_codigojefe as usuariocodigojefeUpdate,p.empresalegal_id as empresalegal_idUpdate,u.empresalegal_id,u.agile_id';
         $datosUpdate = $this->Crud_update->datosConsulta(null,$select);
         if (!is_null($datosUpdate)) {
             foreach ($datosUpdate as $key) {
