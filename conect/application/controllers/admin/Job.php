@@ -1292,7 +1292,7 @@ class Job extends MY_Controller {
                 }
                 if ($key->usuariocodigojefe != $key->usuariocodigojefeUpdate) {
                     $where = array('usuario_id' => $key->usuario_id);
-                    $actualiza = array('usuariocodigojefe' => $key->usuariocodigojefeUpdate);
+                    $actualiza = array('usuario_codigojefe' => $key->usuariocodigojefeUpdate);
                     $this->Crud_usuario->editar($actualiza,$where);
                     $carga = array('usuariocodigojefe_Viejo' => $key->usuariocodigojefe, 'usuariocodigojefe_nuevo'=>$key->usuariocodigojefeUpdate);
                     $this->Crud_log->Insertar('Actualizaciones usuariocodigojefe',$datosusuario[0]->usuario_id,json_encode($carga));
