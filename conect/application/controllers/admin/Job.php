@@ -753,7 +753,7 @@ class Job extends MY_Controller {
                             }
                             else{
                             //break;
-                                var_dump(json_encode($venta));
+                                var_dump($venta);
                                 echo "<br>";
                                 var_dump(json_encode($key));
                                 if (is_null($key->incentive_id_ventas)) {
