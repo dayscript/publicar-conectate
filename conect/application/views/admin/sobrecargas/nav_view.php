@@ -144,6 +144,7 @@
             </div>
             <!-- /sidebar menu -->
             <!-- /menu footer buttons -->
+
             <div class="sidebar-footer hidden-small">
               <?php 
               if (isset($rol_id)) {
@@ -193,9 +194,9 @@
                         <span>Settings</span>
                       </a>
                     </li>
-                    
-                    <li><a href="javascript:;">Ayuda</a></li>
                     -->
+                    <li><a href="javascript:;"><?php echo date('Y-m-d H:i:s',$this->ajusteFecha); ?></a></li>
+                    
                     <li><a href="<?php echo base_url().index_page()?>/Login/cerrarSesion"><i class="fa fa-sign-out pull-right"></i> Cerrar Sesion</a></li>
                   </ul>
                 </li>

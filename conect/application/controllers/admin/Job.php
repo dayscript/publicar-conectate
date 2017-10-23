@@ -51,6 +51,14 @@ class Job extends MY_Controller {
             }
         }
     }
+    public function JobcargarUsuarios()
+    {
+        $enviar  = array(
+            'usuarios' => $this->cargaUsuarios(),
+            'Actiualizausuarios'=> $this->cargarActualizaciones()
+        );
+        $this->Crud_log->Insertar('Ejecucion cargarUsuarios',0,json_encode($enviar));
+    }
     public function rankingxgrupo()
     {
         if ($this->input->is_ajax_request()) {
