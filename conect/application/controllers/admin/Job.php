@@ -1408,8 +1408,17 @@ class Job extends MY_Controller {
         $datosUsuario = $this->Crud_usuario->GetDatos($where);
         if (!is_null($datosUsuario)) {
             foreach ($datosUsuario as $key) {
-                var_dump($key->incentive_id_conocimiento);
-                if ($key->incentive_id_conocimiento != '') {
+                if ($key->incentive_id_conocimiento == '' or is_null($key->incentive_id_conocimiento)) {
+                    $envioDatos = array(
+                        'value' => 10,
+                        'real' => 10,
+                        'goal' => $key->incentive_id_conocimiento,
+                        'date' => $fecha,
+                        'documento'=> $key->usuario_documento
+                    );
+                    $this->Crud_log->Insertar('error incentive'.$descripcion,$key->usuario_id,json_encode($envioDatos));
+                }else
+                {
                     $envioDatos = array(
                         'value' => 10,
                         'real' => 10,
@@ -1442,17 +1451,6 @@ class Job extends MY_Controller {
                         );
                         $this->Crud_cumplimiento->editar($edit,$where);
                     }
-                }
-                else
-                {
-                    $envioDatos = array(
-                        'value' => 10,
-                        'real' => 10,
-                        'goal' => $key->incentive_id_conocimiento,
-                        'date' => $fecha,
-                        'documento'=> $key->usuario_documento
-                    );
-                    $this->Crud_log->Insertar('error incentive'.$descripcion,$key->usuario_id,json_encode($envioDatos));
                 }
             }
         }
