@@ -1134,17 +1134,19 @@ class Job extends MY_Controller {
                         if (!is_null($datosusuario)) {
                             $fecha = explode(',', $key["node"]["Date finished"]); 
                             $mes = $this->retornoMesxString($fecha[1]);
-                            $where = array('p.usuario_id' => $datosusuario[0]->usuario_id,'p.test_fecha'=>date('Y').'-'.$mes.'-'.'01');
-                            $registroExiste = $this->Crud_model->obtenerRegistros('produccion_test',$where);
-                            if (is_null($registroExiste)) {
-                                $insert = array(
-                                    'usuario_id' => $datosusuario[0]->usuario_id, 
-                                    'test_fecha'=> (date('Y').'-'.$mes.'-'.'01'), 
-                                    'estado_id'=> 1, 
-                                    'test_valores'=> $key["node"]["Puntuación"], 
-                                    'test_rest'=> json_encode($key["node"])
-                                );
-                                $this->Crud_model->agregarRegistro('produccion_test',$insert);
+                            if ((int) $mes == (int) date('m',$this->ajusteFecha)) {
+                                $where = array('p.usuario_id' => $datosusuario[0]->usuario_id,'p.test_fecha'=>date('Y').'-'.$mes.'-'.'01');
+                                $registroExiste = $this->Crud_model->obtenerRegistros('produccion_test',$where);
+                                if (is_null($registroExiste)) {
+                                    $insert = array(
+                                        'usuario_id' => $datosusuario[0]->usuario_id, 
+                                        'test_fecha'=> (date('Y').'-'.$mes.'-'.'01'), 
+                                        'estado_id'=> 1, 
+                                        'test_valores'=> $key["node"]["Puntuación"], 
+                                        'test_rest'=> json_encode($key["node"])
+                                    );
+                                    $this->Crud_model->agregarRegistro('produccion_test',$insert);
+                                }
                             }
                         }
                     }
@@ -1406,37 +1408,50 @@ class Job extends MY_Controller {
         $datosUsuario = $this->Crud_usuario->GetDatos($where);
         if (!is_null($datosUsuario)) {
             foreach ($datosUsuario as $key) {
-                $envioDatos = array(
-                    'value' => 10,
-                    'real' => 10,
-                    'goal' => $key->incentive_id_conocimiento,
-                    'date' => $fecha
-                );
-                $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
-                $this->Crud_log->Insertar('visitas incentive'.$descripcion,$key->usuario_id,json_encode($datodCarga));
-                $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_conocimiento, 'cumplimiento_fecha' => $fecha);
-                $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
-                if (is_null($datosCumplimiento)) {
-                    $insertar = array(
-                        'usuario_id' => $key->usuario_id, 
-                        'tipocumplimiento_id' => $key->incentive_id_conocimiento,
-                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                        'cumplimiento_fecha' => $fecha,
-                        'incentive_id' => $datodCarga["value"]["id"],
-                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
-                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                var_dump($key->incentive_id_conocimiento);
+                if ($key->incentive_id_conocimiento != '') {
+                    $envioDatos = array(
+                        'value' => 10,
+                        'real' => 10,
+                        'goal' => $key->incentive_id_conocimiento,
+                        'date' => $fecha
                     );
-                    $this->Crud_cumplimiento->Insertar($insertar);
+                    $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                    $this->Crud_log->Insertar('incentive'.$descripcion,$key->usuario_id,json_encode($datodCarga));
+                    $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_conocimiento, 'cumplimiento_fecha' => $fecha);
+                    $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
+                    if (is_null($datosCumplimiento)) {
+                        $insertar = array(
+                            'usuario_id' => $key->usuario_id, 
+                            'tipocumplimiento_id' => $key->incentive_id_conocimiento,
+                            'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                            'cumplimiento_fecha' => $fecha,
+                            'incentive_id' => $datodCarga["value"]["id"],
+                            'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                            'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                        );
+                        $this->Crud_cumplimiento->Insertar($insertar);
+                    }
+                    else
+                    {
+                        $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
+                        $edit = array(
+                            'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                            'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                            'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                        );
+                        $this->Crud_cumplimiento->editar($edit,$where);
+                    }
                 }
                 else
                 {
-                    $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
-                    $edit = array(
-                        'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                        'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
-                        'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                    $envioDatos = array(
+                        'value' => 10,
+                        'real' => 10,
+                        'goal' => $key->incentive_id_conocimiento,
+                        'date' => $fecha
                     );
-                    $this->Crud_cumplimiento->editar($edit,$where);
+                    $this->Crud_log->Insertar('error incentive'.$descripcion,$key->usuario_id,json_encode($envioDatos));
                 }
             }
         }
