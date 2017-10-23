@@ -1291,7 +1291,7 @@ class Job extends MY_Controller {
                 $where = array('usuario_id' => $key->usuario_idUpdate);
                 $datosusuario = $this->Crud_update->GetDatos($where);
                 $contact1 = $this->buscarUsuarioAgile($key->agile_id, 'id');
-                if ($key->grupo_idUpdate != $key->grupo_id) {
+                if ($key->grupo_idUpdate != $key->grupo_id and !is_null($key->grupo_idUpdate)) {
                     $where = array('usuario_id' => $key->usuario_id);
                     $actualiza = array('grupo_id' => $key->grupo_idUpdate);
                     $this->Crud_usuario->editar($actualiza,$where);
@@ -1302,7 +1302,7 @@ class Job extends MY_Controller {
                     $carga = array('grupo_Viejo' => $key->grupo_id, 'grupo_nuevo'=>$key->grupo_idUpdate);
                     $this->Crud_log->Insertar('Actualizaciones Grupo',$datosusuario[0]->usuario_id,json_encode($carga));
                 }
-                if ($key->cargo_idUpdate != $key->cargo_id) {
+                if ($key->cargo_idUpdate != $key->cargo_id and !is_null($key->cargo_idUpdate)) {
                     $where = array('usuario_id' => $key->usuario_id);
                     $actualiza = array('cargo_id' => $key->cargo_idUpdate);
                     $this->Crud_usuario->editar($actualiza,$where);
@@ -1314,7 +1314,7 @@ class Job extends MY_Controller {
                     $carga = array('cargo_Viejo' => $key->cargo_id, 'cargo_nuevo'=>$key->cargo_idUpdate);
                     $this->Crud_log->Insertar('Actualizaciones Cargo',$datosusuario[0]->usuario_id,json_encode($carga));
                 }
-                if ($key->empresalegal_idUpdate != $key->empresalegal_id) {
+                if ($key->empresalegal_idUpdate != $key->empresalegal_id and !is_null($key->empresalegal_idUpdate)) {
                     $where = array('usuario_id' => $key->usuario_id);
                     $actualiza = array('empresalegal_id' => $key->empresalegal_idUpdate);
                     $this->Crud_usuario->editar($actualiza,$where);
@@ -1327,7 +1327,7 @@ class Job extends MY_Controller {
                     $carga = array('empresalegal_Viejo' => $key->empresalegal_id, 'empresalegal_nuevo'=>$key->empresalegal_idUpdate);
                     $this->Crud_log->Insertar('Actualizaciones Empresa Legal',$datosusuario[0]->usuario_id,json_encode($carga));
                 }
-                if ($key->usuariocodigojefe != $key->usuariocodigojefeUpdate) {
+                if ($key->usuariocodigojefe != $key->usuariocodigojefeUpdate and !is_null($key->usuariocodigojefe)) {
                     $where = array('usuario_id' => $key->usuario_id);
                     $actualiza = array('usuario_codigojefe' => $key->usuariocodigojefeUpdate);
                     $this->Crud_usuario->editar($actualiza,$where);
@@ -1443,7 +1443,6 @@ class Job extends MY_Controller {
             }
         }
     }
-
     public function testNoRealizado($fecha = NULL, $bandera = NULL)
     {
         echo "badera";
@@ -1472,6 +1471,5 @@ class Job extends MY_Controller {
             echo "fecha no cargada";
         }
     }
-
 }
 
