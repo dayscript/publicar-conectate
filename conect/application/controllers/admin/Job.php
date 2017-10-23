@@ -1084,6 +1084,33 @@ class Job extends MY_Controller {
             return false;
         }
     }
+    public function cargarUsuariosActivos()
+    {
+        $jobGrupo = $this->Crud_parametria->obtenerParametria('jobActivos');
+        if ($jobGrupo == '1') {
+            $datosTest = $this->totalactivos();
+            if (!is_null($datosTest)) {
+                foreach ($datosTest["nodes"] as $key) {
+                    if ($key["node"]["Último acceso"] != '') {
+                        $contact1 = $this->buscarUsuarioAgile($key["node"]["Correo electrónico"],'email');
+                        if ($contact1 != '') {
+                            $result = json_decode($contact1, false, 512, JSON_BIGINT_AS_STRING);
+                            $result1 =$this->editarContactoAgile($result,'on','Actualizado');
+                        }
+                    }
+                    else
+                    {
+                        $contact1 = $this->buscarUsuarioAgile($key["node"]["Correo electrónico"],'email');
+                        if ($contact1 != '') {
+                            $result = json_decode($contact1, false, 512, JSON_BIGINT_AS_STRING);
+                            $result1 =$this->editarContactoAgile($result,'off','Actualizado');
+                        }
+                    }
+                    
+                }
+            }
+        }
+    }
     public function cargarCumplimientoTest()
     {
         $jobGrupo = $this->Crud_parametria->obtenerParametria('jobTest');
@@ -1303,21 +1330,34 @@ class Job extends MY_Controller {
             }
         }
     }
-    public function datosCedula()
+    public function bachPortipo($tiporegla = null,$where= null,$fecha = '2017-01-01')
     {
-    /*
-        $arrayName = array();
-        $arrayName[0] = 22460753;
-        $arrayName[1] = 38657130;
-        $arrayName[2] = 63369066;
-        $arrayName[3] = 45476010;
-        $arrayName[4] = 16767418;
-        foreach ($arrayName as $key) {
-            $this->eliminarDatosIncentivexCedula($key,'2017-07-01');
+        if (is_null($tiporegla)) {
+            echo "regla nula";
         }
-    */
-        $where = array('r.rol_id' => 7 ,'p.empresalegal_id' => 1);
-        $this->cargaregaloTest($where,'2017-07-01','Regalo de conocimiento');
+        else
+        {
+            switch ($tiporegla) {
+                case 'elimina':
+                    if (!is_null($where)) {
+                        //$where = array('r.rol_id' => 7);
+                        $datosUsuario = $this->Crud_usuario->GetDatos($where);
+                        foreach ($datosUsuario as $key) {
+                            $this->eliminarDatosIncentivexCedula($key->usuario_documento,$fecha);
+                        }
+                    }
+                break;
+                case 'regalar':
+                    if (!is_null($where)) {
+                        //$where = array('r.rol_id' => 7 ,'p.empresalegal_id' => 1);
+                        $this->cargaregaloTest($where,$fecha,'Regalo de conocimiento');
+                    }
+                break;
+                default:
+                    echo "regla no existente";
+                break;
+            }
+        }
     }
     public function  eliminarDatosIncentivexCedula($docuemnto = 80216675,$fecha = '2017-08-01')
     {

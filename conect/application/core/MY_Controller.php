@@ -781,6 +781,18 @@ class MY_Controller extends CI_Controller
         //var_dump($datosRst);
         return $datosRst;
     }
+    public function totalactivos()
+    {
+        $insertar = array(
+            'username' => 'admin',
+            'password' => 'p0p01234'
+        );
+        $datosIncentive =  $this->consultaRest('/usuarios/user/login','POST',$insertar,'http://conectatepublicar.com/','',array('Accept : application/json'));
+        //$datosRst =  $this->consultaRest('Reportes/usuarios-activos/json','GET',null,'http://conectatepublicar.com/','',array('Accept : application/json','Cookie'=>$datosIncentive['session_name'] . '=' . $datosIncentive['sessid']));
+        $datosRst =  json_decode('',true);
+        //var_dump($datosRst);
+        return $datosRst;
+    }
     public function cargarDatosUsuario($cargo1,$limite,$grupo_id)
     {
         $cargo1Final = array();
