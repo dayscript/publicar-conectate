@@ -57,7 +57,10 @@ class Job extends MY_Controller {
             'usuarios' => $this->cargaUsuarios(),
             'Actiualizausuarios'=> $this->cargarActualizaciones()
         );
+        $return = array('estado' => true);
+        echo json_encode($return);
         $this->Crud_log->Insertar('Ejecucion cargarUsuarios',0,json_encode($enviar));
+
     }
     public function rankingxgrupo()
     {
@@ -1247,12 +1250,12 @@ class Job extends MY_Controller {
                         $this->Crud_log->Insertar('usuario agile',$key->usuario_id,json_encode($tempo));
                     }
             }
-            return true;
+            $return = array('estado' => true);
+            return $return;
         }else
         {
-            echo "no hay carga de usuarios";
-            echo "<br>";
-            return false;
+            $return = array('estado' => false);
+            return $return;
         }
     }
     public function habeasData($numeroId = null)
@@ -1336,6 +1339,8 @@ class Job extends MY_Controller {
                 $where = array('usuario_id' => $key->usuario_idUpdate);
                 $this->Crud_update->editar($actualiza,$where);
             }
+            $return = array('estado' => true);
+            return $return;
         }
     }
     public function bachPortipo($tiporegla = null,$where= null,$fecha = '2017-01-01')
