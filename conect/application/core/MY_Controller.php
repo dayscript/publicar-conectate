@@ -777,6 +777,7 @@ class MY_Controller extends CI_Controller
         );
         $datosIncentive =  $this->consultaRest('/usuarios/user/login','POST',$insertar,'http://conectatepublicar.com/','',array('Accept : application/json'));
         $datosRst =  $this->consultaRest('/resultados-quiz','GET',null,'http://conectatepublicar.com/','',array('Accept : application/json','Cookie'=>$datosIncentive['session_name'] . '=' . $datosIncentive['sessid']));
+        var_dump($datosRst);
         //$datosRst =  json_decode('',true);
         //var_dump($datosRst);
         return $datosRst;

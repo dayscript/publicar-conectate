@@ -709,7 +709,7 @@ class Job extends MY_Controller {
             if (!is_null($datosUsuario)) {
                 foreach ($datosUsuario as $key) 
                 {
-                //if ($key->usuario_codigonomina == 746104) {
+                if ($key->usuario_codigonomina == 850450) {
                     if ($key->cargo_grupo == 1) 
                     {
                         //$where = array('p.metagrupo_mess' => $mes,'p.grupo_id' => $key->grupo_id); 
@@ -725,7 +725,6 @@ class Job extends MY_Controller {
                         $stringwhere = 'p.grupo_id =  '.$key->grupo_id.' and v.venta_mes = '.$mes.'';
                         $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'grupo_id');
                     }
-                    
                     if (!is_null($metas) and !is_null($venta) and count($venta) != 0) {
                         $metasTotal = (int) $metas[0]->metagrupo_meta;
                         $ventatotal = (int) $venta[0]['ventasumaRecompra'] +(int) $venta[0]['ventasumaNuevo'];
@@ -733,18 +732,18 @@ class Job extends MY_Controller {
                             'value' => $metasTotal,
                             'real' => $ventatotal,
                             'goal' => $key->incentive_id_grupo,
-                            'date' => '2017-'.$mes.'-01'
+                            'date' => date('Y',$this->ajusteFecha).'-'.$mes.'-01'
                         );
                         $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
                         $this->Crud_log->Insertar('Meta Grupo incentive',$key->usuario_id,json_encode($datodCarga));
-                        $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_grupo, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
+                        $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_grupo, 'cumplimiento_fecha' => date('Y',$this->ajusteFecha).'-'.$mes.'-01',);
                         $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
                         if (is_null($datosCumplimiento)) {
                             $insertar = array(
                                 'usuario_id' => $key->usuario_id, 
                                 'tipocumplimiento_id' => $key->incentive_id_grupo,
                                 'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                                'cumplimiento_fecha' => '2017-'.$mes.'-01',
+                                'cumplimiento_fecha' => date('Y',$this->ajusteFecha).'-'.$mes.'-01',
                                 'incentive_id' => $datodCarga["value"]["id"],
                                 'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
                                 'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
@@ -776,18 +775,18 @@ class Job extends MY_Controller {
                                         'value' => $metasTotal,
                                         'real' => $ventatotal,
                                         'goal' => $key->incentive_id_renovacion,
-                                        'date' => '2017-'.$mes.'-01'
+                                        'date' => date('Y',$this->ajusteFecha).'-'.$mes.'-01'
                                     );
                                     $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
                                     $this->Crud_log->Insertar('Venta incentive',$key->usuario_id,json_encode($datodCarga));
-                                    $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_renovacion, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
+                                    $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_renovacion, 'cumplimiento_fecha' => date('Y',$this->ajusteFecha).'-'.$mes.'-01',);
                                     if (is_null($datosCumplimiento)) 
                                     {
                                         $insertar = array(
                                             'usuario_id' => $key->usuario_id, 
                                             'tipocumplimiento_id' => $key->incentive_id_renovacion,
                                             'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                                            'cumplimiento_fecha' => '2017-'.$mes.'-01',
+                                            'cumplimiento_fecha' => date('Y',$this->ajusteFecha).'-'.$mes.'-01',
                                             'incentive_id' => $datodCarga["value"]["id"],
                                             'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
                                             'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
@@ -810,17 +809,17 @@ class Job extends MY_Controller {
                                         'value' => $metasTotal,
                                         'real' => $ventatotal,
                                         'goal' => $key->incentive_id_nueva,
-                                        'date' => '2017-'.$mes.'-01'
+                                        'date' => date('Y',$this->ajusteFecha).'-'.$mes.'-01'
                                     );
                                     $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
                                     $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
-                                    $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_nueva, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
+                                    $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_nueva, 'cumplimiento_fecha' => date('Y',$this->ajusteFecha).'-'.$mes.'-01',);
                                     if (is_null($datosCumplimiento)) {
                                         $insertar = array(
                                             'usuario_id' => $key->usuario_id, 
                                             'tipocumplimiento_id' => $key->incentive_id_nueva,
                                             'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                                            'cumplimiento_fecha' => '2017-'.$mes.'-01',
+                                            'cumplimiento_fecha' => date('Y',$this->ajusteFecha).'-'.$mes.'-01',
                                             'incentive_id' => $datodCarga["value"]["id"],
                                             'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
                                             'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
@@ -846,18 +845,18 @@ class Job extends MY_Controller {
                                         'value' => $metasTotal,
                                         'real' => $ventatotal,
                                         'goal' => $key->incentive_id_ventas,
-                                        'date' => '2017-'.$mes.'-01'
+                                        'date' => date('Y',$this->ajusteFecha).'-'.$mes.'-01'
                                     );
                                     $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
                                     $this->Crud_log->Insertar('meta incentive',$key->usuario_id,json_encode($datodCarga));
-                                    $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_ventas, 'cumplimiento_fecha' => '2017-'.$mes.'-01',);
+                                    $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_ventas, 'cumplimiento_fecha' => date('Y',$this->ajusteFecha).'-'.$mes.'-01',);
                                     if (is_null($datosCumplimiento)) 
                                     {
                                         $insertar = array(
                                             'usuario_id' => $key->usuario_id, 
                                             'tipocumplimiento_id' => $key->incentive_id_ventas,
                                             'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
-                                            'cumplimiento_fecha' => '2017-'.$mes.'-01',
+                                            'cumplimiento_fecha' => date('Y',$this->ajusteFecha).'-'.$mes.'-01',
                                             'incentive_id' => $datodCarga["value"]["id"],
                                             'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
                                             'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
@@ -880,16 +879,15 @@ class Job extends MY_Controller {
                         }
                     }
                 }
-                //}   
+                }   
             }
-            return true;
+            $return = array('estado' => true,'mensaje'=>'Guardado Grupo');      
         }
         else
         {
-            echo "no esta activo grupo";
-            echo "<br>";
-            return false;
+            $return = array('estado' => false,'mensaje'=>'no esta activo grupo');            
         }
+        return $return;
     }
     public function cargarCumplimientosVentas($fecha = null)
     {
@@ -1056,7 +1054,7 @@ class Job extends MY_Controller {
                 );
                 $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
                 $this->Crud_log->Insertar('visitas incentive',$key->usuario_id,json_encode($datodCarga));
-                $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_citas, 'cumplimiento_fecha' => '2017-'.$key->metavisita_mes.'-01',);
+                $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_citas, 'cumplimiento_fecha' => date('Y',$this->ajusteFecha).'-'.$key->metavisita_mes.'-01',);
                 $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
                 if (is_null($datosCumplimiento)) {
                     $insertar = array(
@@ -1470,6 +1468,10 @@ class Job extends MY_Controller {
         {
             echo "fecha no cargada";
         }
+    }
+    public function conectService()
+    {
+        $datosTest = $this->totaltest();
     }
 }
 
