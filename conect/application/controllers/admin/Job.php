@@ -57,10 +57,9 @@ class Job extends MY_Controller {
             'usuarios' => $this->cargaUsuarios(),
             'Actiualizausuarios'=> $this->cargarActualizaciones()
         );
+        $this->Crud_log->Insertar('Ejecucion cargarUsuarios',0,json_encode($enviar));
         $return = array('estado' => true);
         echo json_encode($return);
-        $this->Crud_log->Insertar('Ejecucion cargarUsuarios',0,json_encode($enviar));
-
     }
     public function rankingxgrupo()
     {
@@ -1016,13 +1015,13 @@ class Job extends MY_Controller {
                 $this->Crud_model->actualizarRegistro('produccion_venta',$actualiza,$whereVenta);
                 $this->Crud_model->actualizarRegistro('produccion_metaventa',$actualiza,$whereMetas);
             }
-            return true;
+            $return = array('estado' => true,'mensaje'=>'Datos cargados Ventas');
         }
         else
         {
-            echo "sin datos ventas<br>";
-            return false;
+            $return = array('estado' => false,'mensaje'=>'sin datos ventas');
         }
+        return $return;
     }
     public function cargarCumplimientosVisitas($fecha = null)
     {
@@ -1087,13 +1086,13 @@ class Job extends MY_Controller {
                 $this->Crud_model->actualizarRegistro('produccion_visita',$actualiza,$whereVenta);
                 $this->Crud_model->actualizarRegistro('produccion_metavisita',$actualiza,$whereMetas);
             }
-            return true;
+            $return = array('estado' => true,'mensaje'=>'Datos cargados Visitas');
         }
         else
         {
-            echo "sin datos Visitas<br>";
-            return false;
+            $return = array('estado' => true,'mensaje'=>'sin datos Visitas');
         }
+        return $return;
     }
     public function cargarUsuariosActivos()
     {
@@ -1250,11 +1249,11 @@ class Job extends MY_Controller {
                         $this->Crud_log->Insertar('usuario agile',$key->usuario_id,json_encode($tempo));
                     }
             }
-            $return = array('estado' => true);
+            $return = array('estado' => true,'mensaje'=>'Carga ausuarios');
             return $return;
         }else
         {
-            $return = array('estado' => false);
+            $return = array('estado' => false,'mensaje'=>'No hay datos para actualizar');
             return $return;
         }
     }
@@ -1339,11 +1338,15 @@ class Job extends MY_Controller {
                 $where = array('usuario_id' => $key->usuario_idUpdate);
                 $this->Crud_update->editar($actualiza,$where);
             }
-            $return = array('estado' => true);
-            return $return;
+            $return = array('estado' => true,'mensaje'=>'Datos Actualizdos');
         }
+        else
+        {
+            $return = array('estado' => false,'mensaje'=>'No hay datos');
+        }
+        return $return;
     }
-    public function bachPortipo($tiporegla = null,$where= null,$fecha = '2017-01-01')
+    public function bachPortipo($tiporegla = null,$fecha = null)
     {
         if (is_null($tiporegla)) {
             echo "regla nula";
@@ -1352,8 +1355,9 @@ class Job extends MY_Controller {
         {
             switch ($tiporegla) {
                 case 'elimina':
+                    $where = $this->Crud_parametria->datosWhere(array('where_nombre' => 'elimina'),'*');
                     if (!is_null($where)) {
-                        //$where = array('r.rol_id' => 7);
+                        $where = json_decode($where[0]->where_array,true);
                         $datosUsuario = $this->Crud_usuario->GetDatos($where);
                         foreach ($datosUsuario as $key) {
                             $this->eliminarDatosIncentivexCedula($key->usuario_documento,$fecha);
@@ -1361,9 +1365,12 @@ class Job extends MY_Controller {
                     }
                 break;
                 case 'regalar':
+                    $where = $this->Crud_parametria->datosWhere(array('where_nombre' => 'regalar'),'*');
                     if (!is_null($where)) {
-                        //$where = array('r.rol_id' => 7 ,'p.empresalegal_id' => 1);
-                        $this->cargaregaloTest($where,$fecha,'Regalo de conocimiento');
+                        $where = json_decode($where[0]->where_array,true);
+                        if (!is_null($fecha)) {
+                            $this->cargaregaloTest($where,$fecha,'Regalo de conocimiento');
+                        }
                     }
                 break;
                 default:

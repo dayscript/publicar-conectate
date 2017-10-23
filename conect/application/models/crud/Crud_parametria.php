@@ -48,6 +48,9 @@ class Crud_parametria extends CI_Model {
         $group = null;
         return $this->Crud_model->obtenerRegistros('basica_cargomenu',$whereArray,$select,null,null,$joins,$group);
     }
+    public function datosWhere($whereArray = null,$select=null){
+        return $this->Crud_model->obtenerRegistros('produccion_where',$whereArray,$select);
+    }
 
 }
 
