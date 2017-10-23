@@ -1449,7 +1449,8 @@ class Job extends MY_Controller {
                         'value' => 10,
                         'real' => 10,
                         'goal' => $key->incentive_id_conocimiento,
-                        'date' => $fecha
+                        'date' => $fecha,
+                        'documento'=> $key->usuario_documento
                     );
                     $this->Crud_log->Insertar('error incentive'.$descripcion,$key->usuario_id,json_encode($envioDatos));
                 }
