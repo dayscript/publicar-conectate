@@ -1134,7 +1134,8 @@ class Job extends MY_Controller {
                         if (!is_null($datosusuario)) {
                             $fecha = explode(',', $key["node"]["Date finished"]); 
                             $mes = $this->retornoMesxString($fecha[1]);
-                            if ((int) $mes == (int) date('m',$this->ajusteFecha)) {
+                            $mestempo = $mes;
+                            if ((int) $mestempo == (int) date('m',$this->ajusteFecha)) {
                                 $where = array('p.usuario_id' => $datosusuario[0]->usuario_id,'p.test_fecha'=>date('Y').'-'.$mes.'-'.'01');
                                 $registroExiste = $this->Crud_model->obtenerRegistros('produccion_test',$where);
                                 if (is_null($registroExiste)) {
