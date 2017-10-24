@@ -1365,7 +1365,7 @@ class Job extends MY_Controller {
                         }
                     }
                 break;
-                case 'regalar':
+                case 'regalarTest':
                     $where = $this->Crud_parametria->datosWhere(array('where_nombre' => 'regalar'),'*');
                     if (!is_null($where)) {
                         $where = json_decode($where[0]->where_array,true);
