@@ -333,9 +333,6 @@ class Cargatablas extends MY_Controller {
         {
             if ($key["conteo"] > 0) {
                 foreach ($key["datos"] as $item) {
-                    var_dump($item['usuario_id']);
-                    var_dump($item['suma']);
-                    echo "<br>";
                     $arraywhere = array(
                         'p.usuario_id' => $item['usuario_id'],
                         'p.liquidacion_mes' => $mes
@@ -343,12 +340,18 @@ class Cargatablas extends MY_Controller {
                     $valorCampo = $this->Crud_model->obtenerRegistros('produccion_liquidacion',$arraywhere);
                     if(is_null($valorCampo))
                     {
-                        $arrayinsert = array(
-                            'usuario_id' => $item['usuario_id'],
-                            'liquidacion_mes' => $mes,
-                            'liquidacion_suma' => $item['suma']
-                        );
-                        $this->Crud_model->agregarRegistro('produccion_liquidacion',$arrayinsert);
+                        if (!is_null($item['usuario_id'])) {
+                            $arrayinsert = array(
+                                'usuario_id' => $item['usuario_id'],
+                                'liquidacion_mes' => $mes,
+                                'liquidacion_suma' => $item['suma']
+                            );
+                            $this->Crud_model->agregarRegistro('produccion_liquidacion',$arrayinsert);
+                        }
+                        else
+                        {
+                            $this->Crud_log->Insertar('error carga de liquidacion',1,json_encode($valorCampo));
+                        }
                     }else
                     {
                         if ($valorCampo[0]->liquidacion_suma != $item['suma']) {
