@@ -322,7 +322,7 @@ class Cargatablas extends MY_Controller {
             }
             //echo "<br>";
             //var_dump(json_encode($datos));
-            //$this->listaConcesionariosToExcel($mes,$datos,$datosPantalla,$valorCampo);
+            $this->listaConcesionariosToExcel($mes,$datos,$datosPantalla,$valorCampo);
             $this->cargarTotales($datos,$mes);
         }
         //$this->controlador('exportgeneral');
@@ -361,7 +361,6 @@ class Cargatablas extends MY_Controller {
                             $this->Crud_model->actualizarRegistro('produccion_liquidacion',$arrayinsert,$where);
                         }
                     }
-                    break;
                 }
             }
         }
