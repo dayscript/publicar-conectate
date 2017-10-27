@@ -322,10 +322,51 @@ class Cargatablas extends MY_Controller {
             }
             //echo "<br>";
             //var_dump(json_encode($datos));
-            $this->listaConcesionariosToExcel($mes,$datos,$datosPantalla,$valorCampo);
+            //$this->listaConcesionariosToExcel($mes,$datos,$datosPantalla,$valorCampo);
+            $this->cargarTotales($datos,$mes);
         }
         //$this->controlador('exportgeneral');
     }
+    public function cargarTotales($datos,$mes)
+    {
+        foreach ($datos as $key) 
+        {
+            if ($key["conteo"] > 0) {
+                foreach ($key["datos"] as $item) {
+                    var_dump($item['usuario_id']);
+                    var_dump($item['suma']);
+                    echo "<br>";
+                    $arraywhere = array(
+                        'p.usuario_id' => $item['usuario_id'],
+                        'p.liquidacion_mes' => $mes
+                    );
+                    $valorCampo = $this->Crud_model->obtenerRegistros('produccion_liquidacion',$arraywhere);
+                    if(is_null($valorCampo))
+                    {
+                        $arrayinsert = array(
+                            'usuario_id' => $item['usuario_id'],
+                            'liquidacion_mes' => $mes,
+                            'liquidacion_suma' => $item['suma']
+                        );
+                        $this->Crud_model->agregarRegistro('produccion_liquidacion',$arrayinsert);
+                    }else
+                    {
+                        if ($valorCampo[0]->liquidacion_suma != $item['suma']) {
+                            $arrayinsert = array(
+                                'usuario_id' => $item['usuario_id'],
+                                'liquidacion_mes' => $mes,
+                                'liquidacion_suma' => $item['suma']
+                            );
+                            $where = array('liquidacion_id' => $valorCampo[0]->liquidacion_id);
+                            $this->Crud_model->actualizarRegistro('produccion_liquidacion',$arrayinsert,$where);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
     public function listaConcesionariosToExcel($mes = '07',$datos,$datosPantalla,$valorCampo)
     {
         $contador=0;
