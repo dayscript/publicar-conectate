@@ -21,9 +21,9 @@ class Crud_grupo extends CI_Model {
         $joins[1]  = array('tabla' => 'basica_grupo g ','tipo_join' =>'inner', 'conect'=>'g.grupo_id = u.grupo_id');
         return $this->Crud_model->obtenerRegistros('produccion_metaventa',$where,$select, NULL,NULL, $joins,$group);
     }
-    public function GetDatosMetaGrupoFijo($where)
+    public function GetDatosMetaGrupoFijo($where,$select = '*')
     {
-        return $this->Crud_model->obtenerRegistros('produccion_metagrupo',$where,'*', NULL,NULL, NULL,NULL);
+        return $this->Crud_model->obtenerRegistros('produccion_metagrupo',$where,$select, NULL,NULL, NULL,NULL);
     }
     public function GetDatosGrupo($where,$selct = '*')
     {

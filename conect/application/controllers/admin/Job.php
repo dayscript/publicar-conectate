@@ -709,15 +709,17 @@ class Job extends MY_Controller {
             if (!is_null($datosUsuario)) {
                 foreach ($datosUsuario as $key) 
                 {
-                //if ($key->usuario_codigonomina == 850450) {
+                //if ($key->usuario_codigonomina == 706079) {
                     if ($key->cargo_grupo == 1) 
                     {
                         //$where = array('p.metagrupo_mess' => $mes,'p.grupo_id' => $key->grupo_id); 
                         //$metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
-                        $where = array('p.metagrupo_mes' => $mes,'p.grupo_id' => $key->grupo_id); 
-                        $metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
+                        $where = array('p.metagrupo_mes' => $mes,'p.metagrupo_nomina' => $key->usuario_codigonomina); 
+                        $metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where,'p.metagrupo_id, p.usuario_id, p.grupo_id, sum(p.metagrupo_meta) metagrupo_meta, p.metagrupo_nomina, p.metagrupo_mes');
                         $stringwhere = 'p.usuario_codigojefe =  '.$key->usuario_codigonomina.' and v.venta_mes = '.$mes.'';
                         $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'usuario_codigojefe');
+                        //var_dump($metas);
+                        //var_dump($venta);
                     }else
                     {
                         $where = array('p.metagrupo_mes' => $mes,'p.grupo_id' => $key->grupo_id); 
@@ -725,6 +727,7 @@ class Job extends MY_Controller {
                         $stringwhere = 'p.grupo_id =  '.$key->grupo_id.' and v.venta_mes = '.$mes.'';
                         $venta = $this->Crud_grupo->GetdatosQuery($stringwhere,'grupo_id');
                     }
+
                     if (!is_null($metas) and !is_null($venta) and count($venta) != 0) {
                         $metasTotal = (int) $metas[0]->metagrupo_meta;
                         $ventatotal = (int) $venta[0]['ventasumaRecompra'] +(int) $venta[0]['ventasumaNuevo'];
