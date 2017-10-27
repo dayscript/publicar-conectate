@@ -322,8 +322,9 @@ class Cargatablas extends MY_Controller {
             }
             //echo "<br>";
             //var_dump(json_encode($datos));
-            $this->listaConcesionariosToExcel($mes,$datos,$datosPantalla,$valorCampo);
             $this->cargarTotales($datos,$mes);
+            $this->listaConcesionariosToExcel($mes,$datos,$datosPantalla,$valorCampo);
+            
         }
         //$this->controlador('exportgeneral');
     }
