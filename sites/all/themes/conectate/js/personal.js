@@ -21,7 +21,8 @@
             documento: document.getElementById("usuario_id").value,
             dia : d.getDate(),
             mes : d.getMonth()+1,
-            ano : d.getFullYear()
+            ano : d.getFullYear(),
+            dominio:  window.location.hostname
         };
  		$.ajax({
             url: "http://"+URLactual+ "/conect/index.php/admin/job/puntosPorUsuario",

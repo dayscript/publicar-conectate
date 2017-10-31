@@ -64,7 +64,11 @@ class Job extends MY_Controller {
     public function rankingxgrupo()
     {
         if ($this->input->is_ajax_request()) {
+            $dominio = $this->input->post("dominio", TRUE);
+
+            $dominio = $this->getDominio($dominio);
             $datos = $this->rankingxgrupoxMes('07');
+            
             $html = '';
             for ($i=1; $i < 6; $i++) { 
                 $html =$html .'<br>'. $this->cargarHtmlRanking($datos["cargo".$i."Final"]);

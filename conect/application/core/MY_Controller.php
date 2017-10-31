@@ -1032,9 +1032,15 @@ class MY_Controller extends CI_Controller
         $html =$html.'</select> ';
         return $html;
     }
-    public function getDominio()
+    public function getDominio($dominio = null)
     {
-        $rest = substr($_SERVER['HTTP_HOST'], 0,6);
+        if (is_null($dominio)) {
+            $rest = substr($_SERVER['HTTP_HOST'], 0,6);
+        }
+        else
+        {
+            $rest = substr($dominio, 0,6);   
+        }
         switch ($rest) {
             case 'sumate':
                 $variable = 2;
