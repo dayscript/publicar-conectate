@@ -64,14 +64,11 @@ class Job extends MY_Controller {
     public function rankingxgrupo()
     {
         if ($this->input->is_ajax_request()) {
-            $dominio = $this->input->post("dominio", TRUE);
-
-            $dominio = $this->getDominio($dominio);
-            $datos = $this->rankingxgrupoxMes('07');
-            
+            $dominio = $this->getDominio($this->input->post("dominio", TRUE));
+            $datos = $this->rankingxgrupoxMes($dominio);
             $html = '';
-            for ($i=1; $i < 6; $i++) { 
-                $html =$html .'<br>'. $this->cargarHtmlRanking($datos["cargo".$i."Final"]);
+            foreach ($datos as $key) {
+                $html =$html .'<br>'. $this->cargarHtmlRanking($key);
             }
             $return = array('estado' => true,'carga'=>$html);
             echo json_encode($return, JSON_FORCE_OBJECT);
@@ -83,11 +80,11 @@ class Job extends MY_Controller {
     }
     
     
-    public function cargarHtmlRanking($arrayDatos)
+    public function cargarHtmlRanking($arrayDatos,$numeroderegistros = 5)
     {
         setlocale(LC_MONETARY, 'en_US.UTF-8');
         $bandera = true;
-        $html = '<div class="encabezadoTituloGrupo">'.$arrayDatos[0]['datosUsuario']->cargo_nombre.'</div><table class="responsive rendimientoTotal" border="0" cellpadding="1" cellspacing="1" style="width:100%">
+        $html = '<div class="encabezadoTituloGrupo">'.$arrayDatos["Nombre"].'</div><table class="responsive rendimientoTotal" border="0" cellpadding="1" cellspacing="1" style="width:100%">
         <thead>
             <tr>
                 <th width="40%" class="encabezado">Documento</th>
@@ -97,15 +94,13 @@ class Job extends MY_Controller {
             </tr>
         </thead>
         <tbody>';
-        foreach ($arrayDatos as $key) {
-            $gruponombre = (isset($key['datosUsuario'])) ? $key['datosUsuario']->grupo_nombre : '' ;
-            $usuario_nombre = (isset($key['datosUsuario'])) ? $key['datosUsuario']->usuario_nombre : '' ;
+        for ($i=0; $i < 5; $i++) { 
             $html = $html.'
                         <tr>
-                            <td height="36">'.$key['identification'].'</td>
-                            <td>'.$gruponombre.'</td>
-                            <td>'.$usuario_nombre.'</td>
-                            <td align="right" class="puntos">'.number_format($key['suma'],1).'</td>
+                            <td height="36">'.$arrayDatos[$i]->usuario_documento.'</td>
+                            <td>'.$arrayDatos[$i]->grupo_nombre.'</td>
+                            <td>'.$arrayDatos[$i]->usuario_nombre.' '.$arrayDatos[$i]->usuario_apellido.'</td>
+                            <td align="right" class="puntos">'.number_format($arrayDatos[$i]->liquidacion_suma,1).'</td>
                         </tr>';
         }
         $html =  $html.'</tbody></table>';

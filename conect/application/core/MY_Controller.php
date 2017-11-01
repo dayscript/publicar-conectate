@@ -31,6 +31,7 @@ class MY_Controller extends CI_Controller
         $this->load->model('crud/Crud_rol');
         $this->load->model('crud/Crud_usuario');
         $this->load->model('crud/Crud_grupo');
+        $this->load->model('crud/Crud_liquidacion');
         $this->load->library('agileRes/Curlwrap');
         $this->load->library('basic_RestClient/My_restclient','My_restclient');
     }
@@ -643,8 +644,29 @@ class MY_Controller extends CI_Controller
         );
         return $datosEnvio;
     }
-    public function rankingxgrupoxMes($mes = null,$limite = 5,$grupo_id = null)
+    public function rankingxgrupoxMes($dominio= null,$mes = null,$limite = 5,$grupo_id = null)
     {
+        $datosTotal = array();
+        if (!is_null($dominio)) {
+            $where = array('u.empresalegal_id' => $dominio);
+            $datosLiquidacion = $this->Crud_liquidacion->GetDatosliquidacion($where);
+            $whereCargo = array('dominio_id' => $dominio);
+            $datosCargo =  $this->Crud_model->obtenerRegistros('basica_cargo',$whereCargo);
+            foreach ($datosCargo as $carg) {
+                $datosTotal['cargo_'.$carg->cargo_id] = array('Nombre' => $carg->cargo_nombre);
+                foreach ($datosLiquidacion as $liqui) {
+                    if ($carg->cargo_id == $liqui->cargo_id) {
+                        $datosTotal['cargo_'.$carg->cargo_id][] = $liqui;
+                    }
+                }
+            }
+            return $datosTotal;
+        }
+        else
+        {
+            return NULL;
+        }
+        /*
         if (!is_null($mes)) 
         {
             $dia = '01';
@@ -768,6 +790,7 @@ class MY_Controller extends CI_Controller
         {
             return NULL;
         }
+        */
     }
     public function totaltest()
     {
@@ -1039,7 +1062,7 @@ class MY_Controller extends CI_Controller
         }
         else
         {
-            $rest = substr($dominio, 0,6);   
+            $rest = substr($dominio, 7,6);   
         }
         switch ($rest) {
             case 'sumate':
@@ -1048,6 +1071,8 @@ class MY_Controller extends CI_Controller
             case 'conect':
                 $variable = 1;
             break;
+            default:
+                $variable = 1;
         }
         return $variable;
     }
