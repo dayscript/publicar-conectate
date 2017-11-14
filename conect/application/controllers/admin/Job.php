@@ -708,11 +708,30 @@ class Job extends MY_Controller {
             if (!is_null($datosUsuario)) {
                 foreach ($datosUsuario as $key) 
                 {
-                //if ($key->usuario_codigonomina == 706079) {
+                //if ($key->usuario_codigonomina == 744904) {
                     if ($key->cargo_grupo == 1) 
                     {
-                        //$where = array('p.metagrupo_mess' => $mes,'p.grupo_id' => $key->grupo_id); 
-                        //$metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where);
+                        
+                        $where = array('p.metavisita_mes' => $mes,'g.grupo_id' => $key->grupo_id); 
+                        $metasvis = $this->Crud_grupo->GetDatosMetaVisita($where);
+                        if (!is_null($metasvis)) {
+                            $metasvisita = $metasvis[0]->metavisita_totales/$metasvis[0]->totalusuario_id;
+                            $totalusuvisitas = $metasvis[0]->totalusuario_id;
+                        }
+                        else
+                        {
+                            $metasvisita = 0;
+                            $totalusuvisitas = 0;
+                        }
+                        $where = array('p.visita_mes' => $mes,'g.grupo_id' => $key->grupo_id); 
+                        $visi = $this->Crud_grupo->GetDatosVisita($where);
+                        if (!is_null($metasvis)) {
+                            $visitatotal = $visi[0]->visita_total/$totalusuvisitas;
+                        }
+                        else
+                        {
+                            $visitatotal = 0;
+                        }
                         $where = array('p.metagrupo_mes' => $mes,'p.metagrupo_nomina' => $key->usuario_codigonomina); 
                         $metas = $this->Crud_grupo->GetDatosMetaGrupoFijo($where,'p.metagrupo_id, p.usuario_id, p.grupo_id, sum(p.metagrupo_meta) metagrupo_meta, p.metagrupo_nomina, p.metagrupo_mes');
                         $stringwhere = 'p.usuario_codigojefe =  '.$key->usuario_codigonomina.' and v.venta_mes = '.$mes.'';
@@ -880,8 +899,48 @@ class Job extends MY_Controller {
                             }
                         }
                     }
-                }
-                //}   
+                    if (!is_null($metasvisita) and !is_null($visitatotal)) {
+                        if ($key->cargo_grupo == 1) 
+                        {
+                            $metasTotal = (int) $metasvisita;
+                            $visitatotals = (int) $visitatotal;
+                            $envioDatos = array(
+                                'value' => $metasTotal,
+                                'real' => $visitatotals,
+                                'goal' => $key->incentive_id_citas,
+                                'date' => date('Y',$this->ajusteFecha).'-'.$mes.'-01'
+                            );
+                            $datodCarga =  $this->consultaRest('/api/entities/'.$key->usuario_documento.'/addgoalvalue','POST',$envioDatos);
+                            $this->Crud_log->Insertar('Visitas jefe incentive',$key->usuario_id,json_encode($datodCarga));
+                            $wherebuscar = array('usuario_id' => $key->usuario_id, 'tipocumplimiento_id' => $key->incentive_id_citas, 'cumplimiento_fecha' => date('Y',$this->ajusteFecha).'-'.$mes.'-01',);
+                            $datosCumplimiento =  $this->Crud_cumplimiento->GetDatosCumplimiento($wherebuscar);
+                            if (is_null($datosCumplimiento)) {
+                                $insertar = array(
+                                    'usuario_id' => $key->usuario_id, 
+                                    'tipocumplimiento_id' => $key->incentive_id_citas,
+                                    'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                    'cumplimiento_fecha' => date('Y',$this->ajusteFecha).'-'.$mes.'-01',
+                                    'incentive_id' => $datodCarga["value"]["id"],
+                                    'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                    'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                                );
+                                //var_dump($insertar);
+                                $this->Crud_cumplimiento->Insertar($insertar);
+                            }
+                            else
+                            {
+                                $where = array('cumplimiento_id' => $datosCumplimiento[0]->cumplimiento_id);
+                                $edit = array(
+                                    'cumplimiento_porcentaje' => $datodCarga["value"]["percentage"],
+                                    'cumplimiento_modified'=>$datodCarga["value"]["percentage_modified"],
+                                    'cumplimiento_weighed'=>$datodCarga["value"]["percentage_weighed"]
+                                );
+                                $this->Crud_cumplimiento->editar($edit,$where);
+                            }
+                        }
+                    }
+                //}
+                }   
             }
             $return = array('estado' => true,'mensaje'=>'Guardado Grupo');      
         }

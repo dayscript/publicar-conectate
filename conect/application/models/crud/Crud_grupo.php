@@ -21,6 +21,22 @@ class Crud_grupo extends CI_Model {
         $joins[1]  = array('tabla' => 'basica_grupo g ','tipo_join' =>'inner', 'conect'=>'g.grupo_id = u.grupo_id');
         return $this->Crud_model->obtenerRegistros('produccion_metaventa',$where,$select, NULL,NULL, $joins,$group);
     }
+    public function GetDatosMetaVisita($where)
+    {
+        $group = 'u.grupo_id';
+        $select = 'g.grupo_id,g.grupo_nombre,sum(p.metavisita_totales) metavisita_totales,count(p.usuario_id) totalusuario_id';
+        $joins[0]  = array('tabla' => 'produccion_usuario u ','tipo_join' =>'inner', 'conect'=>'p.usuario_id = u.usuario_id');
+        $joins[1]  = array('tabla' => 'basica_grupo g ','tipo_join' =>'inner', 'conect'=>'g.grupo_id = u.grupo_id');
+        return $this->Crud_model->obtenerRegistros('produccion_metavisita',$where,$select, NULL,NULL, $joins,$group);
+    }
+    public function GetDatosVisita($where)
+    {
+        $group = 'u.grupo_id';
+        $select = '`g`.`grupo_id`, `g`.`grupo_nombre`, sum(p.visita_total) visita_total, count(p.usuario_id) totalusuario_id';
+        $joins[0]  = array('tabla' => 'produccion_usuario u ','tipo_join' =>'inner', 'conect'=>'p.usuario_id = u.usuario_id');
+        $joins[1]  = array('tabla' => 'basica_grupo g ','tipo_join' =>'inner', 'conect'=>'g.grupo_id = u.grupo_id');
+        return $this->Crud_model->obtenerRegistros('produccion_visita',$where,$select, NULL,NULL, $joins,$group);
+    }
     public function GetDatosMetaGrupoFijo($where,$select = '*')
     {
         return $this->Crud_model->obtenerRegistros('produccion_metagrupo',$where,$select, NULL,NULL, NULL,NULL);
