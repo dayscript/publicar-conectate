@@ -115,6 +115,28 @@
                 }       
             });
         }
+         document.getElementById("quicktabs-tab-rendimiento_sumate-1").onclick = function()
+        {
+           $.ajax({
+                url: "http://"+URLactual+ "/conect/index.php/admin/job/rankingxgrupo",
+                type: 'post',
+                data: data,
+                success: function(info){
+                    modResponse = $.parseJSON(info);
+                    if (modResponse.estado=== false) {
+                        document.getElementById("rendimientoRanking").outerHTML = '<div id="rendimientoRanking">'+modResponse.carga+'</div>';
+                    }else{
+                        for (i = 0; i < $(".rendimientoRanking").length; i++) {
+                            $(".rendimientoRanking")[i].outerHTML = '<div id="rendimientoRanking" class="rendimientoRanking">'+modResponse.carga+'</div>';
+                        }
+                        for (i = 0; i < $(".rendimientoRanking").length; i++) {
+                            $(".rendimientoRanking")[i].outerHTML = '<div id="rendimientoRanking" class="rendimientoRanking">'+modResponse.carga+'</div>';
+                        }
+                    }
+                }       
+            });
+        }
+        
 	}); 
     
 })(jQuery);

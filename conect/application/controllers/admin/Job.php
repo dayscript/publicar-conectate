@@ -1134,9 +1134,11 @@ class Job extends MY_Controller {
                         $where = array('p.usuario_documento' => $key["node"]["Nombre"]);
                         $datosusuario = $this->Crud_usuario->GetDatos($where);
                         if (!is_null($datosusuario)) {
+                            var_dump($key["node"]["Date finished"]);
                             $fecha = explode(',', $key["node"]["Date finished"]); 
                             $mes = $this->retornoMesxString($fecha[1]);
                             $mestempo = $mes;
+
                             if ((int) $mestempo == (int) date('m',$this->ajusteFecha)) {
                                 $where = array('p.usuario_id' => $datosusuario[0]->usuario_id,'p.test_fecha'=>date('Y').'-'.$mes.'-'.'01');
                                 $registroExiste = $this->Crud_model->obtenerRegistros('produccion_test',$where);
@@ -1197,6 +1199,7 @@ class Job extends MY_Controller {
                     $update = array('estadoexportacion' => 1);
                     $this->Crud_test->editar($update,$id);
                 }
+                
             }
         }
         else
