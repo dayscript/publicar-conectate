@@ -1,6 +1,6 @@
 (function($){
- 	$(document).ready(function()
- 	{
+    $(document).ready(function()
+    {
         var URLactual = window.location.hostname+""; 
 
         if ((window.location.pathname == '/' || window.location.pathname == '/node') && document.getElementById("usuario_id") == null) 
@@ -15,29 +15,29 @@
           $(".block-title")[1].style.display = 'none';
           //$(".sec-que-es")[0].style.removeProperty("background-image");
         }
- 		
- 		var d = new Date();
- 		var data = {
+        
+        var d = new Date();
+        var data = {
             documento: document.getElementById("usuario_id").value,
             dia : d.getDate(),
             mes : d.getMonth()+1,
             ano : d.getFullYear(),
             dominio:  window.location.hostname
         };
- 		$.ajax({
+        $.ajax({
             url: "http://"+URLactual+ "/conect/index.php/admin/job/puntosPorUsuario",
             type: 'post',
             data: data,
             success: function(info){
-            	modResponse = $.parseJSON(info);
+                modResponse = $.parseJSON(info);
                 if (modResponse.estado=== false) {
                     for (i = 0; i < $(".puntosTotal").length; i++) {
-					    $(".puntosTotal")[i].textContent = 0;
-					}
+                        $(".puntosTotal")[i].textContent = 0;
+                    }
                 }else{
                     for (i = 0; i < $(".puntosTotal").length; i++) {
-					    $(".puntosTotal")[i].textContent = modResponse.carga;
-					} 
+                        $(".puntosTotal")[i].textContent = modResponse.carga;
+                    } 
                 }
             }       
         });
@@ -95,49 +95,55 @@
                 cargarmetodo();
             }     
         });
-        document.getElementById("quicktabs-tab-tabs_rendimiento-1").onclick = function()
+        console.log(document.getElementById('quicktabs-tab-tabs_rendimiento-1'));
+        if(document.getElementById('quicktabs-tab-tabs_rendimiento-1') !=null)
         {
-           $.ajax({
-                url: "http://"+URLactual+ "/conect/index.php/admin/job/rankingxgrupo",
-                type: 'post',
-                data: data,
-                success: function(info){
-                    modResponse = $.parseJSON(info);
-                    if (modResponse.estado=== false) {
-                        document.getElementById("rendimientoRanking").outerHTML = '<div id="rendimientoRanking">'+modResponse.carga+'</div>';
-                    }else{
-                        for (i = 0; i < $(".rendimientoRanking").length; i++) {
-                            $(".rendimientoRanking")[i].outerHTML = '<div id="rendimientoRanking" class="rendimientoRanking">'+modResponse.carga+'</div>';
+            document.getElementById("quicktabs-tab-tabs_rendimiento-1").onclick = function()
+            {
+               $.ajax({
+                    url: "http://"+URLactual+ "/conect/index.php/admin/job/rankingxgrupo",
+                    type: 'post',
+                    data: data,
+                    success: function(info){
+                        modResponse = $.parseJSON(info);
+                        if (modResponse.estado=== false) {
+                            document.getElementById("rendimientoRanking").outerHTML = '<div id="rendimientoRanking">'+modResponse.carga+'</div>';
+                        }else{
+                            for (i = 0; i < $(".rendimientoRanking").length; i++) {
+                                $(".rendimientoRanking")[i].outerHTML = '<div id="rendimientoRanking" class="rendimientoRanking">'+modResponse.carga+'</div>';
+                            }
+                            for (i = 0; i < $(".rendimientoRanking").length; i++) {
+                                $(".rendimientoRanking")[i].outerHTML = '<div id="rendimientoRanking" class="rendimientoRanking">'+modResponse.carga+'</div>';
+                            }
                         }
-                        for (i = 0; i < $(".rendimientoRanking").length; i++) {
-                            $(".rendimientoRanking")[i].outerHTML = '<div id="rendimientoRanking" class="rendimientoRanking">'+modResponse.carga+'</div>';
-                        }
-                    }
-                }       
-            });
+                    }       
+                });
+            }
         }
-        document.getElementById("quicktabs-tab-rendimiento_sumate-1").onclick = function()
+        console.log(document.getElementById('quicktabs-tab-rendimiento_sumate-1'));
+        if(document.getElementById('quicktabs-tab-rendimiento_sumate-1') !=null)
         {
-           $.ajax({
-                url: "http://"+URLactual+ "/conect/index.php/admin/job/rankingxgrupo",
-                type: 'post',
-                data: data,
-                success: function(info){
-                    modResponse = $.parseJSON(info);
-                    if (modResponse.estado=== false) {
-                        document.getElementById("rendimientoRanking").outerHTML = '<div id="rendimientoRanking">'+modResponse.carga+'</div>';
-                    }else{
-                        for (i = 0; i < $(".rendimientoRanking").length; i++) {
-                            $(".rendimientoRanking")[i].outerHTML = '<div id="rendimientoRanking" class="rendimientoRanking">'+modResponse.carga+'</div>';
+            document.getElementById('quicktabs-tab-rendimiento_sumate-1').onclick = function()
+            {
+               $.ajax({
+                    url: "http://"+URLactual+ "/conect/index.php/admin/job/rankingxgrupo",
+                    type: 'post',
+                    data: data,
+                    success: function(info){
+                        modResponse = $.parseJSON(info);
+                        if (modResponse.estado=== false) {
+                            document.getElementById("rendimientoRanking").outerHTML = '<div id="rendimientoRanking">'+modResponse.carga+'</div>';
+                        }else{
+                            for (i = 0; i < $(".rendimientoRanking").length; i++) {
+                                $(".rendimientoRanking")[i].outerHTML = '<div id="rendimientoRanking" class="rendimientoRanking">'+modResponse.carga+'</div>';
+                            }
+                            for (i = 0; i < $(".rendimientoRanking").length; i++) {
+                                $(".rendimientoRanking")[i].outerHTML = '<div id="rendimientoRanking" class="rendimientoRanking">'+modResponse.carga+'</div>';
+                            }
                         }
-                        for (i = 0; i < $(".rendimientoRanking").length; i++) {
-                            $(".rendimientoRanking")[i].outerHTML = '<div id="rendimientoRanking" class="rendimientoRanking">'+modResponse.carga+'</div>';
-                        }
-                    }
-                }       
-            });
+                    }       
+                });
+            }
         }
-        
-	}); 
-    
+    }); 
 })(jQuery);

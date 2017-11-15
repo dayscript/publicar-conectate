@@ -94,7 +94,7 @@ class Job extends MY_Controller {
             </tr>
         </thead>
         <tbody>';
-        for ($i=0; $i < 5; $i++) { 
+        for ($i=0; $i < count($arrayDatos)-1; $i++) { 
             $html = $html.'
                         <tr>
                             <td height="36">'.$arrayDatos[$i]->usuario_documento.'</td>
@@ -102,6 +102,7 @@ class Job extends MY_Controller {
                             <td>'.$arrayDatos[$i]->usuario_nombre.' '.$arrayDatos[$i]->usuario_apellido.'</td>
                             <td align="right" class="puntos">'.number_format($arrayDatos[$i]->liquidacion_suma,1).'</td>
                         </tr>';
+            $i = ($i == 5) ? 1000000 : $i ;
         }
         $html =  $html.'</tbody></table>';
         return $html;

@@ -1062,7 +1062,12 @@ class MY_Controller extends CI_Controller
         }
         else
         {
-            $rest = substr($dominio, 7,6);   
+            if (strstr($dominio, 'conectate') == $dominio) {
+                $rest = 'conect';
+            }
+            if (strstr($dominio, 'sumate') == $dominio) {
+                $rest = 'sumate';
+            }
         }
         switch ($rest) {
             case 'sumate':
