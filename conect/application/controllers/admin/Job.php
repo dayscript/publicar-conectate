@@ -109,23 +109,28 @@ class Job extends MY_Controller {
     }
     public function tareaMetasVentas()
     {
-
+        $return = array('estado' => true);
+        echo json_encode($return);
     }
     public function tareaMetasVisitas()
     {
-
+        $return = array('estado' => true);
+        echo json_encode($return);
     }
     public function tareaVentas()
     {
-
+        $return = array('estado' => true);
+        echo json_encode($return);
     }
     public function tareaVisitas()
     {
-
+        $return = array('estado' => true);
+        echo json_encode($return);
     }
     public function tareaMetasGrupal()
     {
-
+        $return = array('estado' => true);
+        echo json_encode($return);
     }
     public function puntosPorUsuario()
     {
