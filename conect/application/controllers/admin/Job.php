@@ -107,6 +107,26 @@ class Job extends MY_Controller {
         $html =  $html.'</tbody></table>';
         return $html;
     }
+    public function tareaMetasVentas()
+    {
+
+    }
+    public function tareaMetasVisitas()
+    {
+
+    }
+    public function tareaVentas()
+    {
+
+    }
+    public function tareaVisitas()
+    {
+
+    }
+    public function tareaMetasGrupal()
+    {
+
+    }
     public function puntosPorUsuario()
     {
         if ($this->input->is_ajax_request()) {
