@@ -98,11 +98,17 @@ class Crud_model extends CI_Model {
         //devolvemos la variable de retorno
         return $valorRetorno;
     }
-     public function actualizarRegistro($pTabla, $pArrayActualizar, $pArrayWhere) {
+    public function actualizarRegistro($pTabla, $pArrayActualizar, $pArrayWhere) {
 
         //hago la actualización
         $actualizar = $this->db->where($pArrayWhere);
         return $actualizar = $this->db->update($pTabla, $pArrayActualizar);
+    }
+    public function eliminarRegistro($pTabla, $pArrayWhere) {
+
+        //hago la actualización
+        $actualizar = $this->db->where($pArrayWhere);
+        return $actualizar = $this->db->delete($pTabla);
     }
     public function queryConsulta($string)
     {

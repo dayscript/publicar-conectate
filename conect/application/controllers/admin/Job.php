@@ -1482,15 +1482,54 @@ class Job extends MY_Controller {
                 {
                     if (date("m", strtotime($key["date"])) == date("m", strtotime($fecha))) 
                     {
-                        echo "<pre>";                        
+                        echo "<pre>";                    
                         $datosIncentive =  $this->consultaRest('/api/entities/'.$docuemnto.'/delgoalvalue/'.$key['id'],'GET');
+                        //var_dump($key["goal_id"]);
+                        switch ($this->tipodemetas($key["goal_id"])) {
+                            case 'incentive_id_renovacion':
+                                $wheredelete = array('metaventa_mes' => date("m", strtotime($fecha)),'usuario_id' => $datosUsuario[0]->usuario_id);
+                                $this->Crud_model->eliminarRegistro('produccion_metaventa',$wheredelete);
+                                $wheredelete = array('venta_mes' => date("m", strtotime($fecha)),'usuario_id' => $datosUsuario[0]->usuario_id);
+                                $this->Crud_model->eliminarRegistro('produccion_venta',$wheredelete);
+                            break;
+                            case 'incentive_id_nueva':
+                                $wheredelete = array('metaventa_mes' => date("m", strtotime($fecha)),'usuario_id' => $datosUsuario[0]->usuario_id);
+                                $this->Crud_model->eliminarRegistro('produccion_metaventa',$wheredelete);
+                                $wheredelete = array('venta_mes' => date("m", strtotime($fecha)),'usuario_id' => $datosUsuario[0]->usuario_id);
+                                $this->Crud_model->eliminarRegistro('produccion_venta',$wheredelete);
+                            break;
+                            case 'incentive_id_ventas':
+                                $wheredelete = array('metaventa_mes' => date("m", strtotime($fecha)),'usuario_id' => $datosUsuario[0]->usuario_id);
+                                $this->Crud_model->eliminarRegistro('produccion_metaventa',$wheredelete);
+                                $wheredelete = array('venta_mes' => date("m", strtotime($fecha)),'usuario_id' => $datosUsuario[0]->usuario_id);
+                                $this->Crud_model->eliminarRegistro('produccion_venta',$wheredelete);
+                            break;
+                            case 'incentive_id_citas':
+                                $wheredelete = array('metavisita_mes' => date("m", strtotime($fecha)),'usuario_id' => $datosUsuario[0]->usuario_id);
+                                $this->Crud_model->eliminarRegistro('produccion_metavisita',$wheredelete);
+                                $wheredelete = array('visita_mes' => date("m", strtotime($fecha)),'usuario_id' => $datosUsuario[0]->usuario_id);
+                                $this->Crud_model->eliminarRegistro('produccion_visita',$wheredelete);
+                            break;
+                            case 'incentive_id_conocimiento':
+                                $wheredelete = array('test_fecha' => $fecha,'usuario_id'=>$datosUsuario[0]->usuario_id);
+                                $this->Crud_model->eliminarRegistro('produccion_test',$wheredelete);
+                            break;
+                            case 'incentive_id_grupo':
+                                
+                            break;
+                        }
+                        $wheredelete = array('cumplimiento_fecha' => $fecha,'usuario_id' => $datosUsuario[0]->usuario_id,'tipocumplimiento_id' => $key["goal_id"]);
+                        $this->Crud_model->eliminarRegistro('produccion_cumplimiento',$wheredelete);
                         $arrayName = array('fecha' => $fecha,'Documento'=> $docuemnto,'goal_id'=>$key['id'] );
                         $arrayName = array_merge($datosIncentive,$arrayName);
                         var_dump($arrayName);
                         $this->Crud_log->Insertar('Eliminar goal',$datosUsuario[0]->usuario_id,json_encode($arrayName));
                         echo "</pre>";
+                        echo "<br>";
                     }
                 }
+                $wheredelete = array('liquidacion_mes' => date("m", strtotime($fecha)),'usuario_id'=>$datosUsuario[0]->usuario_id);
+                $this->Crud_model->eliminarRegistro('produccion_liquidacion',$wheredelete);
             }
         }
     }

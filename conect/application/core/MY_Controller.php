@@ -575,6 +575,46 @@ class MY_Controller extends CI_Controller
         $datos =  $this->Crud_model->queryConsulta($query);
         return $datos[0]["cargo_id"];
     }
+    public function tipodemetas($meta_id)
+    {
+        $query = 'select * from parametria_incentive where incentive_id_renovacion = '.$meta_id.'';
+        $datos =  $this->Crud_model->queryConsulta($query);
+        if(count($datos) != 0)
+        {
+            return 'incentive_id_renovacion';
+        }
+        $query = 'select * from parametria_incentive where incentive_id_nueva = '.$meta_id.'';
+        $datos =  $this->Crud_model->queryConsulta($query);
+        if(count($datos) != 0)
+        {
+            return 'incentive_id_nueva';
+        }
+        $query = 'select * from parametria_incentive where incentive_id_ventas = '.$meta_id.'';
+        $datos =  $this->Crud_model->queryConsulta($query);
+        if(count($datos) != 0)
+        {
+            return 'incentive_id_ventas';
+        }
+        $query = 'select * from parametria_incentive where incentive_id_citas = '.$meta_id.'';
+        $datos =  $this->Crud_model->queryConsulta($query);
+        if(count($datos) != 0)
+        {
+            return 'incentive_id_citas';
+        }
+        $query = 'select * from parametria_incentive where incentive_id_conocimiento = '.$meta_id.'';
+        $datos =  $this->Crud_model->queryConsulta($query);
+        if(count($datos) != 0)
+        {
+            return 'incentive_id_conocimiento';
+        }
+        $query = 'select * from parametria_incentive where incentive_id_grupo = '.$meta_id.'';
+        $datos =  $this->Crud_model->queryConsulta($query);
+        if(count($datos) != 0)
+        {
+            return 'incentive_id_grupo';
+        }
+        return NULL;
+    }
     public function traerNombremes($mes)
     {
         switch ($mes) {
