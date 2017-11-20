@@ -81,13 +81,14 @@ class Job extends MY_Controller {
     {
         $dataCorreos = array(
             'dataNombre' => 'Pamela Rasmussen',
-            'dataCorreo' => 'idelvalle@grupo-link.com',
-            //'dataCorreo' => 'pamela.rasmussen@publicar.com',
+            //'dataCorreo' => 'idelvalle@grupo-link.com',
+            'dataCorreo' => 'pamela.rasmussen@publicar.com',
             'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
-            'dataMensaje' => $this->Conectate_library->rankingTotal()
+            //'dataMensaje' => $this->Conectate_library->rankingTotal()
+            'dataMensaje' => $this->Sumete_library->rankingTotal()
         );
         //var_dump($dataCorreos);
-        $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,1);
+        $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,2);
         /*
         $dominio = $this->getDominio();
         $datos = $this->rankingxgrupoxMes($dominio);
