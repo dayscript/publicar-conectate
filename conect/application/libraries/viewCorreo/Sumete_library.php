@@ -164,7 +164,7 @@ class Sumete_library {
                         <table style="background-color: #ffffff; display: table;" width="600" cellspacing="0" cellpadding="0" border="0" align="center">
                               <tbody>
                                     <tr>
-                                          <td style="padding: 0px 0px;" align="center"><img src="'.base_url('File/img/correo/sumate/ranking/').'images/cta.png" width="280" height="48" border="0" align="one_image" tabindex="0" /></td>
+                                          <td style="padding: 0px 0px;" align="center"><a href="http://sumatepublicar.com/rendimiento" target="_blank"><img src="'.base_url('File/img/correo/sumate/ranking/').'images/cta.png" width="280" height="48" border="0" align="one_image" tabindex="0" /></a></td>
                                     </tr>
                               </tbody>
                         </table>
