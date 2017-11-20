@@ -79,43 +79,64 @@ class Job extends MY_Controller {
     }
     public function enviorankingxgrupo($prueba=false)
     {
-        $dominio = $this->getDominio();
-        $where = array('r.rol_id' => 7,'p.empresalegal_id' => $dominio);
-        $datosUsuario = $this->Crud_usuario->GetDatos($where);
-        if (!is_null($datosUsuario)) {
-            foreach ($datosUsuario as $key) {
-                if ($prueba) {
-                    $nombre = $key->usuario_nombre.' '.$key->usuario_apellido;
-                    $correo = $key->usuario_correo;
-                }
-                else{
-                    $nombre = 'Pamela Rasmussen';
-                    $correo = 'pamela.rasmussen@publicar.com';
-                }
-                switch ($dominio) {
-                    case 1:
-                        $dataCorreos = array(
-                            'dataNombre' => $nombre,
-                            'dataCorreo' => $correo,
-                            'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
-                            'dataMensaje' => $this->Conectate_library->rankingTotal()
-                        );
-                        $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,$dominio);
-                    break;
-                    case 2:
-                        $dataCorreos = array(
-                            'dataNombre' => $nombre,
-                            'dataCorreo' => $correo,
-                            'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
-                            'dataMensaje' => $this->Sumete_library->rankingTotal()
-                        );
-                        $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,$dominio);
-                    break;
-                }
-                if (!$prueba) {
-                    break;
+        if (!$prueba) {
+            $dominio = $this->getDominio();
+            $where = array('r.rol_id' => 7,'p.empresalegal_id' => $dominio);
+            $datosUsuario = $this->Crud_usuario->GetDatos($where);
+            if (!is_null($datosUsuario)) {
+                foreach ($datosUsuario as $key) {
+                    if ($prueba) {
+                        $nombre = $key->usuario_nombre.' '.$key->usuario_apellido;
+                        $correo = $key->usuario_correo;
+                    }
+                    else{
+                        $nombre = 'Pamela Rasmussen';
+                        $correo = 'pamela.rasmussen@publicar.com';
+                    }
+                    switch ($dominio) {
+                        case 1:
+                            $dataCorreos = array(
+                                'dataNombre' => $nombre,
+                                'dataCorreo' => $correo,
+                                'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
+                                'dataMensaje' => $this->Conectate_library->rankingTotal()
+                            );
+                            $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,$dominio);
+                        break;
+                        case 2:
+                            $dataCorreos = array(
+                                'dataNombre' => $nombre,
+                                'dataCorreo' => $correo,
+                                'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
+                                'dataMensaje' => $this->Sumete_library->rankingTotal()
+                            );
+                            $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,$dominio);
+                        break;
+                    }
+                    if (!$prueba) {
+                        break;
+                    }
                 }
             }
+        }
+        else
+        {
+            $nombre = 'Pamela Rasmussen';
+            $correo = 'pamela.rasmussen@publicar.com';
+            $dataCorreos = array(
+                                'dataNombre' => $nombre,
+                                'dataCorreo' => $correo,
+                                'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
+                                'dataMensaje' => $this->Conectate_library->rankingTotal()
+                            );
+                            $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,1);
+                            $dataCorreos = array(
+                                'dataNombre' => $nombre,
+                                'dataCorreo' => $correo,
+                                'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
+                                'dataMensaje' => $this->Sumete_library->rankingTotal()
+                            );
+                            $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,2);
         }
         /*
         $dominio = $this->getDominio();
