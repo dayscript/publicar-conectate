@@ -695,7 +695,9 @@ class MY_Controller extends CI_Controller
             foreach ($datosCargo as $carg) {
                 $datosTotal['cargo_'.$carg->cargo_id] = array('Nombre' => $carg->cargo_nombre);
                 foreach ($datosLiquidacion as $liqui) {
-                    if ($carg->cargo_id == $liqui->cargo_id) {
+                    if ($carg->cargo_id == $liqui->cargo_id) 
+                    {
+                        $liqui->cargo_nombre= $carg->cargo_nombre;
                         $datosTotal['cargo_'.$carg->cargo_id][] = $liqui;
                     }
                 }
@@ -706,131 +708,23 @@ class MY_Controller extends CI_Controller
         {
             return NULL;
         }
-        /*
-        if (!is_null($mes)) 
-        {
-            $dia = '01';
-            $mes = $mes;
-            $ano = '2017';
-            $fecha = $ano.'-'.$mes.'-'.$dia;
-            $datosIncentive =  $this->consultaRest('/api/clients/3/dategoalvalues/'.$fecha,'GET');
-            $datosGenerales = array();
-            if (count($datosIncentive) > 0) {
-                foreach ($datosIncentive['goal_values'] as $key) {
-                    if ($key['date'] == $fecha) {
-                        $estructura = array();
-                        $estructura[$key['goal_id']] = array(
-                            'identification' => $key['identification'],
-                            'goal_id' => $key['goal_id'],
-                            'value' => $key['value'],
-                            'real' => $key['real'],
-                            'percentage' => $key['percentage'],
-                            'percentage_modified' => $key['percentage_modified'],
-                            'percentage_weighed' => $key['percentage_weighed'],
-                            'date' => $key['date'],
-                            'created_at' => $key['created_at']);
-                        //var_dump($estructura);
-                        if (isset($datosGenerales[$key['identification']])) {
-                            $datosGenerales[$key['identification']] = array_merge($datosGenerales[$key['identification']],$estructura);
-                        }
-                        else
-                        {
-                            $datosGenerales[$key['identification']] = $estructura;
-                        }
-                    }
-                }
-            }
-            foreach ($datosGenerales as $key1) {
-                $suma =0;
-                $identificacion = $this->returnIdentificacion($key1);
-                foreach ($key1 as $valoressuma) {
-                    $suma = $suma + $valoressuma['percentage_weighed'];
-                    $goal_id = $valoressuma['goal_id'];
-                }
-                $datos = array('suma' => $suma,'identification' =>$identificacion,'cargo_id' => $this->idCategoria($goal_id));
-                $datosGenerales[$identificacion] = array_merge($datosGenerales[$identificacion],$datos);             
-            }
-            $cargo1 = array();
-            $cargo1Final = array();
-            $conteo1 =0;
-            $cargo2 = array();
-            $cargo2Final = array();
-            $conteo2 =0;
-            $cargo3 = array();
-            $cargo3Final = array();
-            $conteo3 =0;
-            $cargo4 = array();
-            $cargo4Final = array();
-            $conteo4 =0;
-            $cargo5 = array();
-            $cargo5Final = array();
-            $conteo5 =0;
-            $cargo6 = array();
-            $cargo6Final = array();
-            $conteo6 =0;
-            $cargo7 = array();
-            $cargo7Final = array();
-            $conteo7 =0;
-            foreach ($datosGenerales as $key2) {
-                switch ($key2['cargo_id']) {
-                    case '1':
-                        $cargo1[$conteo1] = $key2; 
-                        $conteo1 = $conteo1+1;
-                    break;
-                    case '2':
-                        $cargo2[$conteo2] = $key2; 
-                        $conteo2 = $conteo2+1;
-                    break;
-                    case '3':
-                        $cargo3[$conteo3] = $key2; 
-                        $conteo3 = $conteo3+1;
-                    break;
-                    case '4':
-                        $cargo4[$conteo4] = $key2; 
-                        $conteo4 = $conteo4+1;
-                    break;
-                    case '5':
-                        $cargo5[$conteo5] = $key2; 
-                        $conteo5 = $conteo5+1;
-                    break;
-                    case '6':
-                        $cargo6[$conteo6] = $key2; 
-                        $conteo6 = $conteo6+1;
-                    break;
-                    case '7':
-                        $cargo7[$conteo7] = $key2;
-                        $conteo7 = $conteo7+1;
-                    break;
-                }
-            }
-            $cargo1 = $this->ordenarPosision($cargo1);
-            $cargo2 = $this->ordenarPosision($cargo2);
-            $cargo3 = $this->ordenarPosision($cargo3);
-            $cargo4 = $this->ordenarPosision($cargo4);
-            $cargo5 = $this->ordenarPosision($cargo5);
-            $cargo6 = $this->ordenarPosision($cargo6);
-            $cargo7 = $this->ordenarPosision($cargo7);
-            $cargo1Final =$this->cargarDatosUsuario($cargo1,$limite,$grupo_id);
-            $cargo2Final =$this->cargarDatosUsuario($cargo2,$limite,$grupo_id);
-            $cargo3Final =$this->cargarDatosUsuario($cargo3,$limite,$grupo_id);
-            $cargo4Final =$this->cargarDatosUsuario($cargo4,$limite,$grupo_id);
-            $cargo5Final =$this->cargarDatosUsuario($cargo5,$limite,$grupo_id);
-            $cargo6Final =$this->cargarDatosUsuario($cargo6,$limite,$grupo_id);
-            $cargo7Final =$this->cargarDatosUsuario($cargo7,$limite,$grupo_id);
-            $datosCraga = array(
-                'cargo1Final' => $cargo1Final, 
-                'cargo2Final' => $cargo2Final, 
-                'cargo3Final' => $cargo3Final, 
-                'cargo4Final' => $cargo4Final, 
-                'cargo5Final' => $cargo5Final, 
-            );
-            return $datosCraga;
+    }
+    public function ordenarporcargos($cargos,$datos)
+    {
+        $ordenado = array();
+        foreach ($cargos as $key) {
+            $ordenado = array_merge($ordenado,$datos['cargo_'.$key]);
         }
-        else
-        {
-            return NULL;
+        $ordenado = json_decode(json_encode($ordenado), true);
+        foreach ($ordenado as $key => $row) {
+            if ($key != 'Nombre') {
+                $aux[$row['usuario_id']] = $row['liquidacion_suma'];
+            }
         }
-        */
+        krsort($aux);
+        var_dump(json_encode($aux));
+        //var_dump(array_multisort($aux, SORT_ASC, $ordenado));
+        //var_dump(json_encode(array_multisort($liquidacion_suma, SORT_DESC, $usuario_id, SORT_ASC, $ordenado)));
     }
     public function totaltest()
     {
@@ -944,7 +838,7 @@ class MY_Controller extends CI_Controller
         }
         return $datosReturn;
     }
-    public function ordenarPosision($people)
+    public function ordenarPosision($people,$order = "suma")
     {
         $sortArray = array(); 
         if (count($people) > 0) {
@@ -956,7 +850,7 @@ class MY_Controller extends CI_Controller
                     $sortArray[$key][] = $value;
                 }
             } 
-            $orderby = "suma";
+            $orderby = $order;
             array_multisort($sortArray[$orderby],SORT_DESC,$people);
         }   
         return $people; 

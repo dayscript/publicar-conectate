@@ -14,6 +14,9 @@ class Job extends MY_Controller {
         $this->load->model('crud/Crud_grupo');
         $this->load->model('crud/Crud_test');
         $this->load->model('crud/Crud_update');
+        $this->load->library('My_PHPMailer');
+        $this->load->library('viewCorreo/Conectate_library',null,'Conectate_library');
+        $this->load->library('viewCorreo/Sumete_library',null,'Sumete_library');
     }
     public function index()
     {
@@ -73,6 +76,33 @@ class Job extends MY_Controller {
             $return = array('estado' => true,'carga'=>$html);
             echo json_encode($return, JSON_FORCE_OBJECT);
         }
+    }
+    public function enviorankingxgrupo()
+    {
+        $dataCorreos = array(
+            'dataNombre' => 'Pamela Rasmussen',
+            'dataCorreo' => 'idelvalle@grupo-link.com',
+            //'dataCorreo' => 'pamela.rasmussen@publicar.com',
+            'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
+            'dataMensaje' => $this->Conectate_library->rankingTotal()
+        );
+        //var_dump($dataCorreos);
+        $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,1);
+        /*
+        $dominio = $this->getDominio();
+        $datos = $this->rankingxgrupoxMes($dominio);
+        if ($dominio == 1) {
+            $carho = array();
+            $carho[] = 1;
+            $carho[] = 2;
+            $carho[] = 5;           
+            $this->ordenarporcargos($carho,$datos);
+        }
+        if ($dominio == 2) {
+            # code...
+        }
+        //var_dump(json_encode($datos));
+        */
     }
     public function fechaSistema()
     {
@@ -1616,6 +1646,17 @@ class Job extends MY_Controller {
     public function conectService()
     {
         $datosTest = $this->totaltest();
+    }
+    public function testCorreo($dominio = 1, $correoTipo = 'prueba')
+    {
+        switch ($dominio) {
+            case 1:
+                echo $this->Conectate_library->$correoTipo();
+            break;
+            case 2:
+                echo $this->Sumete_library->$correoTipo();;
+            break;
+        }
     }
 }
 
