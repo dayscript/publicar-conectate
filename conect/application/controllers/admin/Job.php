@@ -68,7 +68,8 @@ class Job extends MY_Controller {
     {
         if ($this->input->is_ajax_request()) {
             $dominio = $this->getDominio($this->input->post("dominio", TRUE));
-            $datos = $this->rankingxgrupoxMes($dominio);
+            $dominio = 1;
+            $datos = $this->rankingxgrupoxMesWhere($dominio);
             $html = '';
             foreach ($datos as $key) {
                 $html =$html .'<br>'. $this->cargarHtmlRanking($key);
@@ -77,7 +78,7 @@ class Job extends MY_Controller {
             echo json_encode($return, JSON_FORCE_OBJECT);
         }
     }
-    public function enviorankingxgrupo($prueba=false)
+    public function enviorankingxgrupo($prueba=false,$correopost = 'idelvalle@grupo-link.com',$nombrepost = 'ivan del valle')
     {
         if (!$prueba) {
             $dominio = $this->getDominio();
@@ -113,30 +114,25 @@ class Job extends MY_Controller {
                             $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,$dominio);
                         break;
                     }
-                    if (!$prueba) {
-                        break;
-                    }
                 }
             }
         }
         else
         {
-            $nombre = 'Pamela Rasmussen';
-            $correo = 'pamela.rasmussen@publicar.com';
             $dataCorreos = array(
-                                'dataNombre' => $nombre,
-                                'dataCorreo' => $correo,
-                                'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
-                                'dataMensaje' => $this->Conectate_library->rankingTotal()
-                            );
-                            $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,1);
-                            $dataCorreos = array(
-                                'dataNombre' => $nombre,
-                                'dataCorreo' => $correo,
-                                'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
-                                'dataMensaje' => $this->Sumete_library->rankingTotal()
-                            );
-                            $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,2);
+                'dataNombre' => $nombrepost,
+                'dataCorreo' => $correopost,
+                'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
+                'dataMensaje' => $this->Conectate_library->rankingTotal()
+            );
+            $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,1);
+            $dataCorreos = array(
+                'dataNombre' => $nombrepost,
+                'dataCorreo' => $correopost,
+                'dataAsunto' => '¡No pierdas ningún chance de ganar puntos y estar más cerca!',
+                'dataMensaje' => $this->Sumete_library->rankingTotal()
+            );
+            $this->my_phpmailer->enviarCorreo($dataCorreos,FALSE,2);
         }
         /*
         $dominio = $this->getDominio();

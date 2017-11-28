@@ -18,6 +18,7 @@ class Crud_liquidacion extends CI_Model {
         $select = 'SUM(p.liquidacion_suma) liquidacion_suma,u.*,g.grupo_nombre';
         $joins[0]  = array('tabla' => 'produccion_usuario u','tipo_join' =>'inner', 'conect'=>'u.usuario_id =  p.usuario_id');
         $joins[1]  = array('tabla' => 'basica_grupo g','tipo_join' =>'inner', 'conect'=>'u.grupo_id =  g.grupo_id');
+        $joins[2]  = array('tabla' => 'basica_cargo c','tipo_join' =>'inner', 'conect'=>'c.cargo_id =  u.cargo_id');
         return $this->Crud_model->obtenerRegistros('produccion_liquidacion',$where,$select, NULL,'liquidacion_suma desc', $joins,'u.usuario_id');
     }
 }

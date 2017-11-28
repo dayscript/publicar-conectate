@@ -709,6 +709,31 @@ class MY_Controller extends CI_Controller
             return NULL;
         }
     }
+    public function rankingxgrupoxMesWhere($dominio= null,$where = null)
+    {
+        $datosTotal = array();
+        if (!is_null($dominio)) {
+            $whereParame = array('where_nombre' => 'ranking'.$dominio);
+            $datosParame =  $this->Crud_parametria->datosWhere($whereParame);
+            $contador = 1;
+            foreach ($datosParame as $where) 
+            {
+                $where1 = array_merge(json_decode($where->where_array, true),array('u.empresalegal_id' => $dominio));
+                $datosLiquidacion = $this->Crud_liquidacion->GetDatosliquidacion($where1);
+                $adicionesle = json_decode($where->where_tranzacion, true);
+                $datosTotal['cargo_'.$contador] = array('Nombre' => $adicionesle['nombre']);
+                foreach ($datosLiquidacion as $liqui) {
+                    $datosTotal['cargo_'.$contador][] = $liqui;
+                }
+                $contador= $contador+1;
+            }
+            return $datosTotal;
+        }
+        else
+        {
+            return NULL;
+        }
+    }
     public function ordenarporcargos($cargos,$datos)
     {
         $ordenado = array();
