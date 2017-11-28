@@ -68,7 +68,6 @@ class Job extends MY_Controller {
     {
         if ($this->input->is_ajax_request()) {
             $dominio = $this->getDominio($this->input->post("dominio", TRUE));
-            $dominio = 1;
             $datos = $this->rankingxgrupoxMesWhere($dominio);
             $html = '';
             foreach ($datos as $key) {
