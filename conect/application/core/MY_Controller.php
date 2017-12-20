@@ -654,6 +654,9 @@ class MY_Controller extends CI_Controller
             case 12:
                 return 'Diciembre';
             break;
+            case 0:
+                return 'Total';
+            break;
         }
     }
     public function cargarDatosHome($mes = NULL)
@@ -1011,6 +1014,7 @@ class MY_Controller extends CI_Controller
             }
             $html = $html.'<option value="'.$i.'" '.$carga.'>'.$this->traerNombremes($i).'</option>';
         }
+        $html = $html.'<option value="0" '.$carga.'>Todas</option>';
         $html =$html.'</select> ';
         return $html;
     }

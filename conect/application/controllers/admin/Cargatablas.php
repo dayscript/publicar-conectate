@@ -133,7 +133,8 @@ class Cargatablas extends MY_Controller {
             $where = array('dominio_id' => $dominio_id);
             $dominio = $this->Crud_model->obtenerRegistros('produccion_dominio',$where);
         }
-        if ($tabla == 'exportgeneral' and !is_null($dominio_id)) {
+        if ($tabla == 'exportgeneral' and !is_null($dominio_id)) 
+        {
             $datosUsuario = $this->Crud_usuario->GetDatos(array('p.estado_id' => 1,'p.rol_id' => 7,'p.empresalegal_id'=>$dominio[0]->empresalegal_id));
             $datosIncentive =  $this->consultaRest('/api/clients/'.$dominio[0]->codigo_incentive.'/dategoalvalues/'.$fecha,'GET');
             $datosGenerales = array();
@@ -163,7 +164,6 @@ class Cargatablas extends MY_Controller {
                     }
                     //}
                 }
-                
             }
             //var_dump(json_encode($datosGenerales));
             foreach ($datosGenerales as $key1) {
@@ -324,7 +324,6 @@ class Cargatablas extends MY_Controller {
             //var_dump(json_encode($datos));
             $this->cargarTotales($datos,$mes);
             $this->listaConcesionariosToExcel($mes,$datos,$datosPantalla,$valorCampo);
-            
         }
         //$this->controlador('exportgeneral');
     }
@@ -414,6 +413,11 @@ class Cargatablas extends MY_Controller {
                     <td> Grupal puntos</td>
 
                     <td> Perfil</td>
+                    <td> Ciudad</td>
+                    <td> Grupo</td>
+                    <td> Empresa</td>
+                    <td> Genero</td>
+                    <td> Fecha Nacimiento</td>                
                     <td> Total</td>
                 </tr >  ';
         //var_dump(json_encode($datos));
@@ -422,6 +426,7 @@ class Cargatablas extends MY_Controller {
             if ($key["conteo"] > 0) {
                 foreach ($key["datos"] as $item) {
                     //var_dump(json_encode($item));
+                    //echo "<br>";
                     $renovacion = null;
                     $nuevo = null;
                     $ventas= null;
@@ -516,6 +521,11 @@ class Cargatablas extends MY_Controller {
                             <td> '.str_replace('.',',',(double) $grupal["percentage_weighed"]).'</td>
                             
                             <td> '.$item["datos"]->cargo_nombre.'</td>
+                            <td> '.$item["datos"]->ciudad_nombre.'</td>
+                            <td> '.$item["datos"]->grupo_nombre.'</td>
+                            <td> '.$item["datos"]->empresalegal_nombre.'</td>
+                            <td> '.$item["datos"]->genero_nombre.'</td>
+                            <td> '.$item["datos"]->usuario_fechanacimiento.'</td>
                             <td> '.str_replace('.',',',(double) $item['suma']).'</td>
                         </tr>';
                     }
