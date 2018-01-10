@@ -1337,6 +1337,9 @@ class Job extends MY_Controller {
                         'goal' => $datosUsurio[0]->incentive_id_conocimiento,
                         'date' => $key->test_fecha
                     );
+                    var_dump($datosUsurio[0]->usuario_documento);
+                    echo "<br>";
+                    var_dump($envioDatos);
                     $datodCarga =  $this->consultaRest('/api/entities/'.$datosUsurio[0]->usuario_documento.'/addgoalvalue','POST',$envioDatos);
                     $this->Crud_log->Insertar('visitas incentive',$key->usuario_id,json_encode($datodCarga));
                     $wherebuscar = array('usuario_id' => $datosUsurio[0]->usuario_id, 'tipocumplimiento_id' => $datosUsurio[0]->incentive_id_conocimiento, 'cumplimiento_fecha' => $key->test_fecha);
