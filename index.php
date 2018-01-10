@@ -1,21 +1,76 @@
-<?php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<?php
+        $rest = substr($_SERVER['HTTP_HOST'], 0,6);
+        switch ($rest) {
+            case 'sumate':
+                $variable = 2;
+                ?>
+    <title>Sumate Publicar</title>
 
-/**
- * @file
- * The PHP page that serves all page requests on a Drupal installation.
- *
- * The routines here dispatch control to the appropriate handler, which then
- * prints the appropriate page.
- *
- * All Drupal code is released under the GNU General Public License.
- * See COPYRIGHT.txt and LICENSE.txt.
- */
+	<style>
+		html{
+			width: 100%;
+			height: 100%;
+		}
+		body {
+		  background-image: url(sumat.jpg);
+		  background-position: center center;
+		  background-repeat: no-repeat;
+		  background-attachment: fixed;
+		  background-size: cover;
+		  background-color: #464646;
+		}
+	@media all and (orientation: portrait){
+		body {
+		  background-image: url(WEBM.png);
+		  background-position: center center;
+		  background-repeat: no-repeat;
+		  background-attachment: fixed;
+		  background-size: cover;
+		  background-color: #464646;
+		}
+	}
+	</style>
+                <?php
+            break;
+            case 'conect':
+                $variable = 1;
+                ?>
+    <title>Conectate Publicar</title>
 
-/**
- * Root directory of Drupal installation.
- */
-define('DRUPAL_ROOT', getcwd());
-
-require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
-drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
-menu_execute_active_handler();
+	<style>
+		html{
+			width: 100%;
+			height: 100%;
+		}
+		body {
+		  background-image: url(conect.jpg);
+		  background-position: center center;
+		  background-repeat: no-repeat;
+		  background-attachment: fixed;
+		  background-size: cover;
+		  background-color: #464646;
+		}
+	@media all and (orientation: portrait){
+		body {
+		  background-image: url(WEBM.png);
+		  background-position: center center;
+		  background-repeat: no-repeat;
+		  background-attachment: fixed;
+		  background-size: cover;
+		  background-color: #464646;
+		}
+	}
+	</style>
+                <?php
+            break;
+        }
+    ?>
+	
+</head>
+<body>
+</body>
+</html>
