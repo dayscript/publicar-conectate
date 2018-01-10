@@ -1294,7 +1294,6 @@ class Job extends MY_Controller {
                         $where = array('p.usuario_documento' => $key["node"]["Nombre"]);
                         $datosusuario = $this->Crud_usuario->GetDatos($where);
                         if (!is_null($datosusuario)) {
-                            var_dump($key["node"]["Date finished"]);
                             $fecha = explode(',', $key["node"]["Date finished"]); 
                             $mes = $this->retornoMesxString($fecha[1]);
                             $mestempo = $mes;
@@ -1317,6 +1316,15 @@ class Job extends MY_Controller {
                     }
                 }
             }
+            $this->testPendientes();
+        }
+        else
+        {
+            echo "no esta activo test";
+        }
+    }
+    public function testPendientes()
+    {
             $where = array('p.estadoexportacion' => 0);
             $datosTest = $this->Crud_test->GetDatos($where);
             if (!is_null($datosTest)) {
@@ -1361,11 +1369,6 @@ class Job extends MY_Controller {
                 }
                 
             }
-        }
-        else
-        {
-            echo "no esta activo test";
-        }
     }
     public function cargaUsuarios()
     {
