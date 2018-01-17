@@ -77,6 +77,20 @@ class Job extends MY_Controller {
             echo json_encode($return, JSON_FORCE_OBJECT);
         }
     }
+    public function rankingxgrupoexport()
+    {
+        //if ($this->input->is_ajax_request()) {
+            $dominio = $this->getDominio($this->input->post("dominio", TRUE));
+            $datos = $this->rankingxgrupoxMesWhere($dominio);
+            $html = '';
+            foreach ($datos as $key) {
+                $html =$html .'<br>'. $this->cargarHtmlRanking($key);
+            }
+            echo $html;
+            //$return = array('estado' => true,'carga'=>$html);
+            //echo json_encode($return, JSON_FORCE_OBJECT);
+        //}
+    }
     public function enviorankingxgrupo($prueba=false,$correopost = 'idelvalle@grupo-link.com',$nombrepost = 'ivan del valle')
     {
         if (!$prueba) {
