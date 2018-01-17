@@ -77,10 +77,10 @@ class Job extends MY_Controller {
             echo json_encode($return, JSON_FORCE_OBJECT);
         }
     }
-    public function rankingxgrupoexport()
+    public function rankingxgrupoexport($dominiopost = 'conectatepublicar')
     {
         //if ($this->input->is_ajax_request()) {
-            $dominio = $this->getDominio($this->input->post("dominio", TRUE));
+            $dominio = $this->getDominio($dominiopost);
             $datos = $this->rankingxgrupoxMesWhere($dominio);
             $html = '';
             foreach ($datos as $key) {
