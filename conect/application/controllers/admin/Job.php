@@ -84,7 +84,7 @@ class Job extends MY_Controller {
             $datos = $this->rankingxgrupoxMesWhere($dominio);
             $html = '';
             foreach ($datos as $key) {
-                $html =$html .'<br>'. $this->cargarHtmlRanking($key);
+                $html =$html .'<br>'. $this->cargarHtmlRanking($key,100000000);
             }
             echo $html;
             //$return = array('estado' => true,'carga'=>$html);
@@ -191,7 +191,7 @@ class Job extends MY_Controller {
                             <td>'.$arrayDatos[$i]->usuario_nombre.' '.$arrayDatos[$i]->usuario_apellido.'</td>
                             <td align="right" class="puntos">'.number_format($arrayDatos[$i]->liquidacion_suma,1).'</td>
                         </tr>';
-            $i = ($i == 5) ? 1000000 : $i ;
+            $i = ($i == $numeroderegistros) ? 1000000 : $i ;
         }
         $html =  $html.'</tbody></table>';
         return $html;
